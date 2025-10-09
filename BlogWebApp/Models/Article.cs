@@ -4,7 +4,6 @@ namespace BlogWebApp.Models
 {
     public class Article
     {
-        [Required]
         [Key]
         public int ArticleId { get; set; }
         [Required]
@@ -21,9 +20,8 @@ namespace BlogWebApp.Models
         public DateOnly? UpdatedAt { get; set; }
 
 
-        public Article(int articleId, string title, string image, string content, int likes, int genreId, DateOnly createdAt, DateOnly? updatedAt)
+        public Article(string title, string image, string content, int likes, int genreId, DateOnly createdAt, DateOnly? updatedAt)
         {
-            ArticleId = articleId;
             Title = title;
             Image = image;
             Content = content;

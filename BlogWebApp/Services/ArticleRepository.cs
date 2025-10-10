@@ -19,19 +19,24 @@ namespace BlogWebApp.Services
             return article;
         }
 
-        public Task DeleteAsync(int articleId)
+        public async Task DeleteAsync(int articleId)
         {
-            throw new NotImplementedException();
+            var article = await GetByIdAsync(articleId);
+            if(article != null)
+            {
+                _db.Articles.Remove(article);
+                await _db.SaveChangesAsync();
+            }
         }
 
-        public Task<IList<Article>> GetAllAsync()
+        public async Task<IList<Article>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _db.Articles.ToListAsync();
         }
 
-        public Task<Article> GetByIdAsync(int articleId)
+        public async Task<Article> GetByIdAsync(int articleId)
         {
-            throw new NotImplementedException();
+            return await _db.Articles.FirstOrDefaultAsync(a => a.ArticleId == articleId);
         }
     }
 }

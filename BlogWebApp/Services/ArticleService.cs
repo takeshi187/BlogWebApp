@@ -4,29 +4,47 @@ namespace BlogWebApp.Services
 {
     public class ArticleService : IArticleService
     {
-        public Task<Article> CreateArticleAsync(string title, string image, string content, int genreId)
+        private readonly IArticleRepository _articleRepository;
+
+        public ArticleService(IArticleRepository articleRepository)
         {
-            throw new NotImplementedException();
+            _articleRepository = articleRepository;
         }
 
-        public Task<bool> DeleteArticleAsync(int articleId)
+        public async Task<Article> CreateArticleAsync(string title, string image, string content, int genreId)
         {
-            throw new NotImplementedException();
+            var article = new Article(title, image, content, 0, genreId, DateOnly.FromDateTime(DateTime.Now), null);
+            return await _articleRepository.AddAsync(article);
+        }
+
+        public async Task<bool> DeleteArticleAsync(int articleId)
+        {
+            var article = await _articleRepository.GetByIdAsync(articleId);
+            if (article == null) return false;
+            await _articleRepository.DeleteAsync(articleId);
+            return true;
         }
 
         public Task<IList<Article>> GetAllArticlesAsync()
         {
-            throw new NotImplementedException();
+            return _articleRepository.GetAllAsync();
         }
 
-        public Task<Article> GetArticleByIdAsync(int ArticleId)
+        public async Task<Article> GetArticleByIdAsync(int articleId)
         {
-            throw new NotImplementedException();
+            return await _articleRepository.GetByIdAsync(articleId);
         }
 
-        public Task<Article> UpdateArticleAsync(string title, string image, string content, int genreId)
+        public async Task<Article> UpdateArticleAsync(int articleId, string title, string image, string content, int genreId)
         {
-            throw new NotImplementedException();
+            var article = await _articleRepository.GetByIdAsync(articleId);
+            if (article == null) return null;
+            article.Title = title;
+            article.Image = image;
+            article.Content = content;
+            article.GenreId = genreId;
+            article.UpdatedAt = DateOnly.FromDateTime(DateTime.Now);
+            return await _articleRepository.UpdateAsync(article);
         }
     }
 }

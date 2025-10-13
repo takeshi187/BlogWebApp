@@ -1,5 +1,6 @@
 ﻿using BlogWebApp.Db;
 using BlogWebApp.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlogWebApp.Services
 {
@@ -37,6 +38,13 @@ namespace BlogWebApp.Services
         public async Task<Article> GetByIdAsync(int articleId)
         {
             return await _db.Articles.FirstOrDefaultAsync(a => a.ArticleId == articleId);
+        }
+
+        public async Task<Article> UpdateAsync(Article article)
+        {
+            _db.Articles.Update(article);
+            await _db.SaveChangesAsync();
+            return article;
         }
     }
 }

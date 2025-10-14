@@ -34,11 +34,11 @@ namespace BlogWebApp.Services
         {
             return await _articleRepository.GetByIdAsync(articleId);
         }
-
+        // to do внести в update async объект article вместо полей
         public async Task<Article> UpdateArticleAsync(int articleId, string title, string image, string content, int genreId)
         {
             var article = await _articleRepository.GetByIdAsync(articleId);
-            if (article == null) return null;
+            if (article == null) throw new InvalidOperationException($"Article with id {articleId} not found.");
             article.Title = title;
             article.Image = image;
             article.Content = content;

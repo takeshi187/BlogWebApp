@@ -33,14 +33,11 @@ namespace BlogWebApp.Tests
         [Test]
         public async Task CreateArticleAsync_ShouldReturnArticle_WhenValid()
         {
-            // Arrange
             var newArticle = new Article("testtitle", "image", "testcontent", 1, 1, _date, null);
             _articleRepositoryMock.Setup(repo => repo.AddAsync(It.IsAny<Article>())).ReturnsAsync(newArticle);
 
-            // Act
             var result = await _articleService.CreateArticleAsync("testtitle", "image", "testcontent", 1);
 
-            // Assert
             Assert.That(result, Is.Not.Null);
             Assert.That("testtitle", Is.EqualTo(result.Title));
             Assert.That("image", Is.EqualTo(result.Image));
@@ -55,15 +52,12 @@ namespace BlogWebApp.Tests
         [Test]
         public async Task GetArticleByIdAsync_ShouldReturnArticle_WhenExist()
         {
-            // Arrange
             var newArticle = new Article("testtitle", "image", "testcontent", 1, 1, _date, null);
             newArticle.ArticleId = 1;
             _articleRepositoryMock.Setup(repo => repo.GetByIdAsync(newArticle.ArticleId)).ReturnsAsync(newArticle);
 
-            // Act
             var result = await _articleService.GetArticleByIdAsync(newArticle.ArticleId);
 
-            // Assert
             Assert.That(result, Is.Not.Null);
             Assert.That(result.ArticleId, Is.EqualTo(1));
             _articleRepositoryMock.Verify(repo => repo.GetByIdAsync(newArticle.ArticleId), Times.Once);
@@ -72,7 +66,6 @@ namespace BlogWebApp.Tests
         [Test]
         public async Task GetAllArticlesAsync_ShouldReturnListOfArticles_WhenExist()
         {
-            // Arrange
             var Articles = new List<Article>()
             {
                 new Article("testtitle", "image", "testcontent", 1, 1, _date, null),
@@ -81,10 +74,8 @@ namespace BlogWebApp.Tests
 
             _articleRepositoryMock.Setup(repo => repo.GetAllAsync()).ReturnsAsync(Articles);
 
-            // Act
             var result = await _articleService.GetAllArticlesAsync();
 
-            // Assert
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count, Is.EqualTo(Articles.Count));
             _articleRepositoryMock.Verify(repo => repo.GetAllAsync(), Times.Once);
@@ -93,15 +84,12 @@ namespace BlogWebApp.Tests
         [Test]
         public async Task DeleteArticleAsync_ShouldCallRepositoryDelete_WhenArticleExist()
         {
-            // Arrange
             var newArticle = new Article("testtitle", "image", "testcontent", 1, 1, _date, null);
             newArticle.ArticleId = 1;
             _articleRepositoryMock.Setup(repo => repo.GetByIdAsync(newArticle.ArticleId)).ReturnsAsync(newArticle);
 
-            // Act
             await _articleService.DeleteArticleAsync(newArticle.ArticleId);
 
-            // Assert
             _articleRepositoryMock.Verify(repo => repo.DeleteAsync(newArticle.ArticleId), Times.Once);
             _articleRepositoryMock.Verify(repo => repo.GetByIdAsync(newArticle.ArticleId), Times.Once);
         }
@@ -109,41 +97,49 @@ namespace BlogWebApp.Tests
         [Test]
         public async Task DeleteArticleAsync_ShouldReturnFalse_WhenArticleNotFound()
         {
-            // Arrange
             var articleId = 1;
             _articleRepositoryMock.Setup(repo => repo.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((Article?)null);
 
-            // Act
             var result = await _articleService.DeleteArticleAsync(articleId);
 
-            // Assert
             Assert.That(result, Is.False);
             _articleRepositoryMock.Verify(repo => repo.DeleteAsync(It.IsAny<int>()), Times.Never);
             _articleRepositoryMock.Verify(repo => repo.GetByIdAsync(articleId), Times.Once);
         }
-        // to do переделать тест, добавить тест на отсутствие обновляемого article
+
         [Test]
-        public async Task UpdateArticleAsync_ShouldReturnUpdateArticle_WhenArticleExist()
+        public async Task UpdateArticleAsync_ShouldUpdateArticle_WhenArticleExist()
         {
-            // Arrange
-            var oldArticle = new Article("testtitle", "image", "testcontent", 1, 1, _date, null);
-            var newArticle = new Article("newtitle", "newimage", "newcontent", 1, 2, _date, DateOnly.FromDateTime(DateTime.Now));
-            oldArticle.ArticleId = 1;
-            _articleRepositoryMock.Setup(repo => repo.GetByIdAsync(oldArticle.ArticleId)).ReturnsAsync(oldArticle);
+            var existingArticle = new Article("testtitle", "image", "testcontent", 1, 1, _date, null);
+            var updatedArticle = new Article("newtitle", "newimage", "newcontent", 1, 2, _date, DateOnly.FromDateTime(DateTime.Now));
+            existingArticle.ArticleId = 1;
+            updatedArticle.ArticleId = 1;
+            _articleRepositoryMock.Setup(repo => repo.GetByIdAsync(existingArticle.ArticleId)).ReturnsAsync(existingArticle);
 
-            // Act
-            await _articleService.UpdateArticleAsync(1, "newtitle", "newimage", "newcontent", 2);
+            await _articleService.UpdateArticleAsync(updatedArticle);
 
-            // Assert
-            _articleRepositoryMock.Verify(repo => repo.GetByIdAsync(oldArticle.ArticleId), Times.Once);
+            _articleRepositoryMock.Verify(repo => repo.GetByIdAsync(existingArticle.ArticleId), Times.Once);
             _articleRepositoryMock.Verify(r => r.UpdateAsync(It.Is<Article>(a =>
-                a.ArticleId == newArticle.ArticleId &&
+                a.ArticleId == existingArticle.ArticleId &&
                 a.Title == "newtitle" &&
                 a.Image == "newimage" &&
                 a.Content == "newcontent" &&
                 a.GenreId == 2 &&
                 a.UpdatedAt.HasValue
                 )), Times.Once);
+        }
+
+        [Test]
+        public async Task UpdateArticleAsync_ShouldThrowInvalidOperationException_WhenArticleNotFound()
+        {
+            var article = new Article("testtitle", "image", "testcontent", 1, 1, _date, null);
+            article.ArticleId = 0;
+
+            _articleRepositoryMock.Setup(repo => repo.GetByIdAsync(article.ArticleId)).ReturnsAsync((Article?)null);
+
+            _articleRepositoryMock.Verify(repo => repo.UpdateAsync(It.IsAny<Article>()), Times.Never);
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await _articleService.UpdateArticleAsync(article));
+
         }
     }
 }

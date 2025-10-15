@@ -34,17 +34,16 @@ namespace BlogWebApp.Services
         {
             return await _articleRepository.GetByIdAsync(articleId);
         }
-        // to do внести в update async объект article вместо полей
-        public async Task<Article> UpdateArticleAsync(int articleId, string title, string image, string content, int genreId)
+        public async Task<Article> UpdateArticleAsync(Article article)
         {
-            var article = await _articleRepository.GetByIdAsync(articleId);
-            if (article == null) throw new InvalidOperationException($"Article with id {articleId} not found.");
-            article.Title = title;
-            article.Image = image;
-            article.Content = content;
-            article.GenreId = genreId;
-            article.UpdatedAt = DateOnly.FromDateTime(DateTime.Now);
-            return await _articleRepository.UpdateAsync(article);
+            var existingArticle = await _articleRepository.GetByIdAsync(article.ArticleId);
+            if (existingArticle == null) throw new InvalidOperationException($"Article with id {article.ArticleId} not found.");
+            existingArticle.Title = article.Title;
+            existingArticle.Image = article.Image;
+            existingArticle.Content = article.Content;
+            existingArticle.GenreId = article.GenreId;
+            existingArticle.UpdatedAt = DateOnly.FromDateTime(DateTime.Now);
+            return await _articleRepository.UpdateAsync(existingArticle);
         }
     }
 }

@@ -31,8 +31,7 @@ namespace BlogWebApp.Tests
         [Test]
         public async Task AddArticleAsync_ShouldAddArticle_WhenValid()
         {
-            var newArticle = new Article("testtitle", "image", "testcontent", 1);
-            newArticle.ArticleId = 1;
+            var newArticle = new Article(1, "testtitle", "image", "testcontent", 1);
 
             var result = await _articleRepository.AddAsync(newArticle);
 
@@ -49,9 +48,7 @@ namespace BlogWebApp.Tests
         [Test]
         public async Task GetArticleByIdAsync_ShouldReturnArticle_WhenFound()
         {
-            var existingArticle = new Article("testtitle", "image", "testcontent", 1);
-            existingArticle.ArticleId = 1;
-
+            var existingArticle = new Article(1, "testtitle", "image", "testcontent", 1);
             var result = await _articleRepository.GetByIdAsync(existingArticle.ArticleId);
 
             Assert.That(result, Is.Not.Null);
@@ -61,8 +58,7 @@ namespace BlogWebApp.Tests
         [Test]
         public async Task UpdateArticleAsync_ShouldUpdateArticle_WhenValid()
         {
-            var existingArticle = new Article("testtitle", "image", "testcontent", 1);
-            existingArticle.ArticleId = 1;
+            var existingArticle = new Article(1, "testtitle", "image", "testcontent", 1);
             var newArticle = new Article("testtitle", "image", "testcontent", 1);
             newArticle.Title = "newtitle";
 

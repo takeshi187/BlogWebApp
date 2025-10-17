@@ -25,12 +25,13 @@ namespace BlogWebApp.Tests
 
             _db = new BlogWebAppDbContext(options);
             _articleRepository = new ArticleRepository(_db);
+            _date = DateOnly.FromDateTime(DateTime.UtcNow);
         }
 
         [Test]
         public async Task AddArticleAsync_ShouldAddArticle_WhenValid()
         {
-            var newArticle = new Article("testtitle", "image", "testcontent", 1, 1, _date, null);
+            var newArticle = new Article("testtitle", "image", "testcontent", 1);
             newArticle.ArticleId = 1;
 
             var result = await _articleRepository.AddAsync(newArticle);
@@ -39,7 +40,7 @@ namespace BlogWebApp.Tests
             Assert.That(result.Title, Is.EqualTo("testtitle"));
             Assert.That(result.Image, Is.EqualTo("image"));
             Assert.That(result.Content, Is.EqualTo("testcontent"));
-            Assert.That(result.Likes, Is.EqualTo(1));
+            Assert.That(result.Likes, Is.EqualTo(0));
             Assert.That(result.GenreId, Is.EqualTo(1));
             Assert.That(result.CreatedAt, Is.EqualTo(_date));
             Assert.That(result.Content, Is.EqualTo("testcontent"));
@@ -48,7 +49,7 @@ namespace BlogWebApp.Tests
         [Test]
         public async Task GetArticleByIdAsync_ShouldReturnArticle_WhenFound()
         {
-            var existingArticle = new Article("testtitle", "image", "testcontent", 1, 1, _date, null);
+            var existingArticle = new Article("testtitle", "image", "testcontent", 1);
             existingArticle.ArticleId = 1;
 
             var result = await _articleRepository.GetByIdAsync(existingArticle.ArticleId);
@@ -60,9 +61,9 @@ namespace BlogWebApp.Tests
         [Test]
         public async Task UpdateArticleAsync_ShouldUpdateArticle_WhenValid()
         {
-            var existingArticle = new Article("testtitle", "image", "testcontent", 1, 1, _date, null);
+            var existingArticle = new Article("testtitle", "image", "testcontent", 1);
             existingArticle.ArticleId = 1;
-            var newArticle = new Article("testtitle", "image", "testcontent", 1, 1, _date, null);
+            var newArticle = new Article("testtitle", "image", "testcontent", 1);
             newArticle.Title = "newtitle";
 
             var result = await _articleRepository.UpdateAsync(newArticle);
@@ -73,7 +74,7 @@ namespace BlogWebApp.Tests
         [Test]
         public async Task DeleteArticleAsync_ShouldDeleteArticle_WhenExist()
         {
-            var article = new Article("testtitle", "image", "testcontent", 1, 1, _date, null);
+            var article = new Article("testtitle", "image", "testcontent", 1);
             var createdArticle = await _articleRepository.AddAsync(article);
 
             await _articleRepository.DeleteAsync(createdArticle.ArticleId);

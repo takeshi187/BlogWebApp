@@ -3,16 +3,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlogWebApp.Models
 {
-    public class Comment
+    public class Genre
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int CommentId { get; private set; }
-        public int UserId { get; set; }
-        public string Content { get; set; }
-        public Comment()
-        {
-            
-        }
+        public int GenreId { get; private set; }
+        [Required]
+        [MaxLength(200)]
+        public string GenreName { get; set; }
     }
 }

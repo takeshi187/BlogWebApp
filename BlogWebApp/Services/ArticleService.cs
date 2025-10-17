@@ -13,7 +13,7 @@ namespace BlogWebApp.Services
 
         public async Task<Article> CreateArticleAsync(string title, string image, string content, int genreId)
         {
-            var article = new Article(title, image, content, 0, genreId, DateOnly.FromDateTime(DateTime.Now), null);
+            var article = new Article(title, image, content, genreId);
             return await _articleRepository.AddAsync(article);
         }
 
@@ -42,7 +42,7 @@ namespace BlogWebApp.Services
             existingArticle.Image = article.Image;
             existingArticle.Content = article.Content;
             existingArticle.GenreId = article.GenreId;
-            existingArticle.UpdatedAt = DateOnly.FromDateTime(DateTime.Now);
+            existingArticle.UpdatedAt = DateOnly.FromDateTime(DateTime.UtcNow);
             return await _articleRepository.UpdateAsync(existingArticle);
         }
     }

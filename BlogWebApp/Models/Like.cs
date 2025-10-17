@@ -3,16 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlogWebApp.Models
 {
-    public class Comment
+    public class Like
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int CommentId { get; private set; }
-        public int UserId { get; set; }
-        public string Content { get; set; }
-        public Comment()
-        {
-            
-        }
+        public int LikeId { get; set; }
     }
 }

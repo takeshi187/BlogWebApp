@@ -10,7 +10,7 @@ namespace BlogWebApp.Models
         public int ArticleId { get; private set; }
 
         [Required]
-        [MaxLength(200)]
+        [MaxLength(300)]
         public string Title { get; set; }
 
         public string? Image { get; set; }
@@ -18,12 +18,10 @@ namespace BlogWebApp.Models
         [Required]
         public string Content { get; set; }
 
-        public int Likes { get; set; } = 0;
-
         [Required]
+        public int GenreId { get; set; }
         [ForeignKey(nameof(GenreId))]
         public Genre Genre { get; set; }
-        public int GenreId { get; set; }
 
         [Required]
         public DateOnly CreatedAt { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
@@ -31,7 +29,10 @@ namespace BlogWebApp.Models
         public DateOnly? UpdatedAt { get; set; }
 
         public List<Comment> Comments { get; set; } = new();
-        public List<Like> LikeList { get; set; } = new();
+        public List<Like> Likes { get; set; } = new();
+
+        [NotMapped]
+        public int LikesCount => Likes.Count;
 
         public Article(string title, string image, string content, int genreId)
         {

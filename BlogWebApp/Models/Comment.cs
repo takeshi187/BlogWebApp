@@ -16,15 +16,17 @@ namespace BlogWebApp.Models
         [Required]
         public DateOnly CreatedAt { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
 
-        [Required]
-        [ForeignKey(nameof(UserId))]
-        public User User { get; set; }
-        public int UserId { get; set; }
+        public DateOnly? UpdatedAt { get; set; }
 
         [Required]
+        public int UserId { get; set; }
+        [ForeignKey(nameof(UserId))]
+        public User User { get; set; }
+
+        [Required]
+        public int ArticleId { get; set; }
         [ForeignKey(nameof(ArticleId))]
         public Article Article { get; set; }
-        public int ArticleId { get; set; }
 
         public Comment(string content, int userId, int articleId)
         {

@@ -41,7 +41,6 @@ namespace BlogWebApp.Tests
             Assert.That(result.Title, Is.EqualTo("testtitle"));
             Assert.That(result.Image, Is.EqualTo("image"));
             Assert.That(result.Content, Is.EqualTo("testcontent"));
-            Assert.That(result.Likes, Is.EqualTo(0));
             Assert.That(result.GenreId, Is.EqualTo(1));
             Assert.That(result.CreatedAt, Is.EqualTo(_date));
             Assert.That(result.UpdatedAt, Is.Null);

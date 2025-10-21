@@ -11,6 +11,11 @@ namespace BlogWebApp.Models
         public int UserId { get; private set; }
 
         [Required]
+        public int UserRoleId { get; set; }
+        [ForeignKey(nameof(UserRoleId))]
+        public UserRole UserRole { get; set; }       
+
+        [Required]
         [MaxLength(200)]
         // uniq
         public string Username { get; set; }
@@ -28,17 +33,19 @@ namespace BlogWebApp.Models
         [Required]
         public DateOnly CreatedAt { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
 
-        public User(string username, string passwordHash, string email)
+        public User(int userRoleId, string username, string passwordHash, string email)
         {
+            UserRoleId = userRoleId;
             Username = username;
             PasswordHash = passwordHash;
             Email = email;
         }
 
         // for tests
-        public User(int id,  string username, string passwordHash, string email)
+        public User(int id, int userRoleId,  string username, string passwordHash, string email)
         {
             UserId = id;
+            UserRoleId = userRoleId;
             Username = username;
             PasswordHash = passwordHash;
             Email = email;

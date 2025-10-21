@@ -33,7 +33,7 @@ namespace BlogWebApp.Models
 
         [NotMapped]
         public int LikesCount => Likes.Count;
-
+        // to do добавить userid в артикл
         public Article(string title, string image, string content, int genreId)
         {
             Title = title;

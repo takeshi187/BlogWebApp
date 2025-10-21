@@ -369,3 +369,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /BlogWebApp/Properties/launchSettings.json
+/BlogWebApp/Migrations/20251021143352_InitialMigration.cs
+/BlogWebApp/Migrations/20251021143352_InitialMigration.Designer.cs
+/BlogWebApp/Migrations/BlogWebAppDbContextModelSnapshot.cs

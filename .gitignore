@@ -372,3 +372,8 @@ FodyWeavers.xsd
 /BlogWebApp/Migrations/20251021143352_InitialMigration.cs
 /BlogWebApp/Migrations/20251021143352_InitialMigration.Designer.cs
 /BlogWebApp/Migrations/BlogWebAppDbContextModelSnapshot.cs
+/BlogWebApp/Migrations/20251022142349_RemoveOldUserTables.cs
+/BlogWebApp/Migrations/20251022160619_UpdateDbIds.cs
+/BlogWebApp/Migrations/20251022155042_UpdateDb.cs
+/BlogWebApp/Migrations/20251023095959_InitialMigration.cs
+/BlogWebApp/Migrations/20251023095959_InitialMigration.Designer.cs

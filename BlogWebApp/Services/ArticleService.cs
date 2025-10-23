@@ -11,31 +11,48 @@ namespace BlogWebApp.Services
             _articleRepository = articleRepository;
         }
 
-        public async Task<Article> CreateArticleAsync(string title, string image, string content, int genreId)
+        public async Task<Article> CreateArticleAsync(Article article)
         {
-            var article = new Article(title, image, content, genreId);
-            return await _articleRepository.AddAsync(article);
+            if(string.IsNullOrEmpty(article.Title))
+                throw new ArgumentNullException("Title cannot be empty", nameof(article.Title));
+            if(string.IsNullOrEmpty(article.Content))
+                throw new ArgumentNullException("Content cannot be empty", nameof(article.Content));
+            if (string.IsNullOrEmpty(article.GenreId.ToString()))
+                throw new ArgumentException("GenreId cannot be empty", nameof(article.GenreId));
+
+            await _articleRepository.AddAsync(article);
+            return article;
         }
 
-        public async Task<bool> DeleteArticleAsync(int articleId)
+        public async Task DeleteArticleAsync(Guid articleId)
         {
             var article = await _articleRepository.GetByIdAsync(articleId);
-            if (article == null) return false;
-            await _articleRepository.DeleteAsync(articleId);
-            return true;
+            if (article == null) throw new InvalidOperationException($"Article with id {articleId} not found."); 
+            await _articleRepository.DeleteAsync(article);
         }
 
         public Task<IList<Article>> GetAllArticlesAsync()
         {
-            return _articleRepository.GetAllAsync();
+            var listOfArticles = _articleRepository.GetAllAsync();
+            if (listOfArticles == null) throw new InvalidOperationException($"No one articles not found.");
+            return listOfArticles;
         }
 
-        public async Task<Article> GetArticleByIdAsync(int articleId)
+        public async Task<Article> GetArticleByIdAsync(Guid articleId)
         {
-            return await _articleRepository.GetByIdAsync(articleId);
+            var article = await _articleRepository.GetByIdAsync(articleId);
+            if (article == null) throw new InvalidOperationException($"Article with id {article.ArticleId} not found.");
+            return article;
         }
         public async Task<Article> UpdateArticleAsync(Article article)
         {
+            if (string.IsNullOrEmpty(article.Title))
+                throw new ArgumentNullException("Title cannot be empty", nameof(article.Title));
+            if (string.IsNullOrEmpty(article.Content))
+                throw new ArgumentNullException("Content cannot be empty", nameof(article.Content));
+            if (string.IsNullOrEmpty(article.GenreId.ToString()))
+                throw new ArgumentNullException("GenreId cannot be empty", nameof(article.GenreId));
+
             var existingArticle = await _articleRepository.GetByIdAsync(article.ArticleId);
             if (existingArticle == null) throw new InvalidOperationException($"Article with id {article.ArticleId} not found.");
             existingArticle.Title = article.Title;
@@ -43,7 +60,8 @@ namespace BlogWebApp.Services
             existingArticle.Content = article.Content;
             existingArticle.GenreId = article.GenreId;
             existingArticle.UpdatedAt = DateOnly.FromDateTime(DateTime.UtcNow);
-            return await _articleRepository.UpdateAsync(existingArticle);
+            await _articleRepository.UpdateAsync(existingArticle);
+            return existingArticle;
         }
     }
 }

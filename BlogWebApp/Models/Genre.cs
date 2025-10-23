@@ -6,8 +6,7 @@ namespace BlogWebApp.Models
     public class Genre
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int GenreId { get; private set; }
+        public Guid GenreId { get; private set; } = Guid.NewGuid();
         [Required]
         [MaxLength(200)]
         public string GenreName { get; set; }

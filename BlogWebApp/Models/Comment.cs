@@ -6,8 +6,7 @@ namespace BlogWebApp.Models
     public class Comment
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int CommentId { get; private set; }
+        public Guid CommentId { get; private set; } = Guid.NewGuid();
 
         [Required]
         [MaxLength(500)]
@@ -19,16 +18,14 @@ namespace BlogWebApp.Models
         public DateOnly? UpdatedAt { get; set; }
 
         [Required]
-        public int UserId { get; set; }
-        [ForeignKey(nameof(UserId))]
-        public User User { get; set; }
+        public string UserId { get; set; }
+        public ApplicationUser User { get; set; }
 
         [Required]
-        public int ArticleId { get; set; }
-        [ForeignKey(nameof(ArticleId))]
+        public Guid ArticleId { get; set; }
         public Article Article { get; set; }
 
-        public Comment(string content, int userId, int articleId)
+        public Comment(string content, string userId, Guid articleId)
         {
             Content = content;
             UserId = userId;
@@ -36,7 +33,7 @@ namespace BlogWebApp.Models
         }
 
         // for tests
-        public Comment(int commentId, string content, int userId, int articleId)
+        public Comment(Guid commentId, string content, string userId, Guid articleId)
         {
             CommentId = commentId;
             Content = content;

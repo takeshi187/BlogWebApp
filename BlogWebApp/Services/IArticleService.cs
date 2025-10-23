@@ -4,10 +4,10 @@ namespace BlogWebApp.Services
 {
     public interface IArticleService
     {
-        Task<Article> CreateArticleAsync(string title, string image, string content, int genreId);
-        Task<Article> GetArticleByIdAsync(int ArticleId);
+        Task<Article> CreateArticleAsync(Article article);
+        Task<Article> GetArticleByIdAsync(Guid ArticleId);
         Task<IList<Article>> GetAllArticlesAsync();
         Task<Article> UpdateArticleAsync(Article article);
-        Task<bool> DeleteArticleAsync(int articleId);
+        Task DeleteArticleAsync(Guid articleId);
     }
 }

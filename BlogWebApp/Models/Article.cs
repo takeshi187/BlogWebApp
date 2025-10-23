@@ -6,8 +6,7 @@ namespace BlogWebApp.Models
     public class Article
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int ArticleId { get; private set; }
+        public Guid ArticleId { get; private set; } = Guid.NewGuid();
 
         [Required]
         [MaxLength(300)]
@@ -19,8 +18,7 @@ namespace BlogWebApp.Models
         public string Content { get; set; }
 
         [Required]
-        public int GenreId { get; set; }
-        [ForeignKey(nameof(GenreId))]
+        public Guid GenreId { get; set; }
         public Genre Genre { get; set; }
 
         [Required]
@@ -33,8 +31,8 @@ namespace BlogWebApp.Models
 
         [NotMapped]
         public int LikesCount => Likes.Count;
-        // to do добавить userid в артикл
-        public Article(string title, string image, string content, int genreId)
+
+        public Article(string title, string image, string content, Guid genreId)
         {
             Title = title;
             Image = image;
@@ -43,7 +41,7 @@ namespace BlogWebApp.Models
         }
 
         // for tests
-        public Article(int articleId, string title, string image, string content, int genreId)
+        public Article(Guid articleId, string title, string image, string content, Guid genreId)
         {
             ArticleId = articleId;
             Title = title;

@@ -6,30 +6,27 @@ namespace BlogWebApp.Models
     public class Like
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int LikeId { get; private set; }
+        public Guid LikeId { get; private set; } = Guid.NewGuid();
 
         [Required]
-        public int UserId { get; set; }
-        [ForeignKey(nameof(UserId))]
-        public User User { get; set; }
+        public string UserId { get; set; }
+        public ApplicationUser User { get; set; }
 
         [Required]
-        public int ArticleId { get; set; }
-        [ForeignKey(nameof(ArticleId))]
+        public Guid ArticleId { get; set; }
         public Article Article { get; set; }
 
         [Required]
         public DateOnly CreatedAt { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
 
-        public Like(int userId, int articleId)
+        public Like(string userId, Guid articleId)
         {
             UserId = userId;
             ArticleId = articleId;
         }
 
         // for tests
-        public Like(int likeId, int userId, int articleId)
+        public Like(Guid likeId, string userId, Guid articleId)
         {
             LikeId = likeId;
             UserId = userId;

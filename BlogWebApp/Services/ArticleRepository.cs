@@ -20,14 +20,10 @@ namespace BlogWebApp.Services
             return article;
         }
 
-        public async Task DeleteAsync(int articleId)
+        public async Task DeleteAsync(Article article)
         {
-            var article = await GetByIdAsync(articleId);
-            if(article != null)
-            {
-                _db.Articles.Remove(article);
-                await _db.SaveChangesAsync();
-            }
+            _db.Articles.Remove(article);
+            await _db.SaveChangesAsync();
         }
 
         public async Task<IList<Article>> GetAllAsync()
@@ -35,7 +31,7 @@ namespace BlogWebApp.Services
             return await _db.Articles.ToListAsync();
         }
 
-        public async Task<Article> GetByIdAsync(int articleId)
+        public async Task<Article> GetByIdAsync(Guid articleId)
         {
             return await _db.Articles.FirstOrDefaultAsync(a => a.ArticleId == articleId);
         }

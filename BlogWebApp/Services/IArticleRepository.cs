@@ -5,9 +5,9 @@ namespace BlogWebApp.Services
     public interface IArticleRepository
     {
         Task<Article> AddAsync(Article article);
-        Task<Article> GetByIdAsync(int articleId);
+        Task<Article> GetByIdAsync(Guid articleId);
         Task<IList<Article>> GetAllAsync();
         Task<Article> UpdateAsync(Article article);
-        Task DeleteAsync(int articleId);
+        Task DeleteAsync(Article articleId);
     }
 }

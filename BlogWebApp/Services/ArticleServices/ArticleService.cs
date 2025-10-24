@@ -1,6 +1,6 @@
 ﻿using BlogWebApp.Models;
 
-namespace BlogWebApp.Services
+namespace BlogWebApp.Services.ArticleServices
 {
     public class ArticleService : IArticleService
     {
@@ -14,9 +14,9 @@ namespace BlogWebApp.Services
         public async Task<Article> CreateArticleAsync(Article article)
         {
             if(string.IsNullOrEmpty(article.Title))
-                throw new ArgumentNullException("Title cannot be empty", nameof(article.Title));
+                throw new ArgumentException("Title cannot be empty", nameof(article.Title));
             if(string.IsNullOrEmpty(article.Content))
-                throw new ArgumentNullException("Content cannot be empty", nameof(article.Content));
+                throw new ArgumentException("Content cannot be empty", nameof(article.Content));
             if (string.IsNullOrEmpty(article.GenreId.ToString()))
                 throw new ArgumentException("GenreId cannot be empty", nameof(article.GenreId));
 

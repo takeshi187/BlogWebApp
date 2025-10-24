@@ -1,6 +1,6 @@
 ﻿using BlogWebApp.Db;
 using BlogWebApp.Models;
-using BlogWebApp.Services;
+using BlogWebApp.Services.ArticleServices;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using System;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BlogWebApp.Tests
+namespace BlogWebApp.Tests.ArticleTests
 {
     [TestFixture]
     public class ArticleRepositoryTests
@@ -18,7 +18,6 @@ namespace BlogWebApp.Tests
         private BlogWebAppDbContext _db;
         private DateOnly _date;
         private string _guidString;
-        private string _guidStringNew;
 
         [SetUp]
         public void SetUp()
@@ -29,7 +28,6 @@ namespace BlogWebApp.Tests
             _articleRepository = new ArticleRepository(_db);
             _date = DateOnly.FromDateTime(DateTime.UtcNow);
             _guidString = "a1b2c3d4-e5f6-7890-1234-567890abcdef";
-            _guidStringNew = "b1b2c3d4-e5f6-7890-1234-567890abcdef";
         }
 
         [Test]

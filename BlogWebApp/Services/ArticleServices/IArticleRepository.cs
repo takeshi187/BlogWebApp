@@ -1,6 +1,6 @@
 ﻿using BlogWebApp.Models;
 
-namespace BlogWebApp.Services
+namespace BlogWebApp.Services.ArticleServices
 {
     public interface IArticleRepository
     {

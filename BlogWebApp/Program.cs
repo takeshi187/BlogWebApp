@@ -1,6 +1,6 @@
 using BlogWebApp.Db;
 using BlogWebApp.Models;
-using BlogWebApp.Services;
+using BlogWebApp.Services.ArticleServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

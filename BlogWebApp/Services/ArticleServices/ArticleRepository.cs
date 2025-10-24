@@ -2,7 +2,7 @@
 using BlogWebApp.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BlogWebApp.Services
+namespace BlogWebApp.Services.ArticleServices
 {
     public class ArticleRepository : IArticleRepository
     {

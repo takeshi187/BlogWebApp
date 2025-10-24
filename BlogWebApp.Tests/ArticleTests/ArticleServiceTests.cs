@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using NUnit.Framework.Legacy;
-using BlogWebApp.Services;
+using BlogWebApp.Services.ArticleServices;
 
-namespace BlogWebApp.Tests
+namespace BlogWebApp.Tests.ArticleTests
 {
     [TestFixture]
     public class ArticleServiceTests

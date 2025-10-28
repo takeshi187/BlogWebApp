@@ -1,6 +1,8 @@
 using BlogWebApp.Db;
 using BlogWebApp.Models;
 using BlogWebApp.Services.ArticleServices;
+using BlogWebApp.Services.LikeServices;
+using BlogWebApp.Services.UserServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +13,10 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<BlogWebAppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IArticleService, ArticleService>();
 builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
+builder.Services.AddScoped<ILikeService, LikeService>();
+builder.Services.AddScoped<ILikeRepository, LikeRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<BlogWebAppDbContext>()
     .AddDefaultTokenProviders();

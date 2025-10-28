@@ -1,26 +1,23 @@
 ﻿using BlogWebApp.Models;
+using BlogWebApp.Services.UserServices;
 using BlogWebApp.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogWebApp.Controllers
 {
+    [Route("[controller]/[action]")]
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IUserService _userService;
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AccountController(IUserService userService)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
+            _userService = userService;
         }
 
         [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
+        public IActionResult Register() => View();
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -28,21 +25,16 @@ namespace BlogWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Username, Email = model.Email };
-                var result = await _userManager.CreateAsync(user, model.Password);
+                var user = new ApplicationUser { UserName = model.Username, Email = model.Email, PasswordHash = model.Password };
+                var result = await _userService.RegisterAsync(user.UserName, user.Email, user.PasswordHash);
 
                 if (result.Succeeded)
-                {
-                    await _userManager.AddToRoleAsync(user, "User");
-                    await _signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("Index", "Home");
-                }
 
                 foreach (var error in result.Errors)
                     ModelState.AddModelError("", error.Description);
+            } 
 
-            }
-            
             return View(model);
         }
 
@@ -55,16 +47,14 @@ namespace BlogWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
+                var user = await _userService.GetUserByEmailAsync(model.Email);
                 if (user != null)
-                {                   
-                    var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: false);
+                {
+                    var result = await _userService.LoginAsync(user.Email, user.PasswordHash);
 
-                    if (result.Succeeded)
-                    {
+                    if (result)
                         return RedirectToAction("Index", "Home");
-                    }
-                }
+                } 
                 
                 ModelState.AddModelError("", "Неверный логин или пароль.");
             }
@@ -75,7 +65,7 @@ namespace BlogWebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
+            await _userService.LogoutAsync();
             return RedirectToAction("Index", "Home");
         }
     }

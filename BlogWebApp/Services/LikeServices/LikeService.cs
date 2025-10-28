@@ -1,5 +1,6 @@
 ﻿using BlogWebApp.Models;
 using BlogWebApp.Services.ArticleServices;
+using BlogWebApp.Services.UserServices;
 
 namespace BlogWebApp.Services.LikeServices
 {
@@ -7,12 +8,13 @@ namespace BlogWebApp.Services.LikeServices
     {
         private readonly ILikeRepository _likeRepository;
         private readonly IArticleRepository _articleRepository;
-        //private readonly IUserRepository _userRepository;
+        private readonly IUserRepository _userRepository;
 
-        public LikeService(ILikeRepository likeRepository, IArticleRepository articleRepository)
+        public LikeService(ILikeRepository likeRepository, IArticleRepository articleRepository, IUserRepository userRepository)
         {
             _likeRepository = likeRepository;
             _articleRepository = articleRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<bool> AddLikeAsync(Guid articleId, string userId)
@@ -27,9 +29,9 @@ namespace BlogWebApp.Services.LikeServices
             if (article == null)
                 throw new InvalidOperationException($"Article with id { articleId} not found.");
 
-            //var user = await _userRepository.GetByIdAsync(userId);
-            //if (user == null)
-            //    throw new InvalidOperationException($"User with id {articleId} not found.");
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new InvalidOperationException($"User with id {articleId} not found.");
 
             var alreadyLiked = await _likeRepository.ExistAsync(articleId, userId);
             if(alreadyLiked)

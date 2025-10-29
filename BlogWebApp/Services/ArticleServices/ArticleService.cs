@@ -41,7 +41,7 @@ namespace BlogWebApp.Services.ArticleServices
         public async Task<Article> GetArticleByIdAsync(Guid articleId)
         {
             var article = await _articleRepository.GetByIdAsync(articleId);
-            if (article == null) throw new InvalidOperationException($"Article with id {article.ArticleId} not found.");
+            if (article == null) throw new InvalidOperationException($"Article with id {articleId} not found.");
             return article;
         }
         public async Task<Article> UpdateArticleAsync(Article article)

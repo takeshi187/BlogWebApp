@@ -20,27 +20,23 @@ namespace BlogWebApp.Services.ArticleServices
             return article;
         }
 
-        public async Task DeleteAsync(Article article)
-        {
-            _db.Articles.Remove(article);
-            await _db.SaveChangesAsync();
-        }
-
-        public async Task<IList<Article>> GetAllAsync()
-        {
-            return await _db.Articles.ToListAsync();
-        }
-
-        public async Task<Article> GetByIdAsync(Guid articleId)
+        public async Task<Article?> GetByIdAsync(Guid articleId)
         {
             return await _db.Articles.FirstOrDefaultAsync(a => a.ArticleId == articleId);
         }
 
-        public async Task<Article> UpdateAsync(Article article)
-        {
+        public async Task<bool> UpdateAsync(Article article)
+        { 
             _db.Articles.Update(article);
             await _db.SaveChangesAsync();
-            return article;
+            return true;
+        }
+
+        public async Task<bool> DeleteAsync(Article article)
+        {
+            _db.Articles.Remove(article);
+            await _db.SaveChangesAsync();
+            return true;
         }
     }
 }

@@ -37,7 +37,7 @@ namespace BlogWebApp.Services.LikeServices
 
         public async Task<Like> GetByIdAsync(Guid likeId)
         {
-            return await _db.Likes.FirstOrDefaultAsync(l => l.LikeId == likeId);
+            return await _db.Likes.FindAsync(likeId);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace BlogWebApp.Models
 
         [Required]
         [MaxLength(500)]
-        public string Content { get; set; }
+        public string Content { get; set; } = null!;
 
         [Required]
         public DateOnly CreatedAt { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
@@ -18,12 +18,12 @@ namespace BlogWebApp.Models
         public DateOnly? UpdatedAt { get; set; }
 
         [Required]
-        public string UserId { get; set; }
-        public ApplicationUser User { get; set; }
+        public string UserId { get; set; } = null!;
+        public ApplicationUser User { get; set; } = null!;
 
         [Required]
         public Guid ArticleId { get; set; }
-        public Article Article { get; set; }
+        public Article Article { get; set; } = null!;
 
         public Comment(string content, string userId, Guid articleId)
         {

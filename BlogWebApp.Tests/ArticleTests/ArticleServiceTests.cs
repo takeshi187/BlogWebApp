@@ -11,6 +11,9 @@ using static System.Net.Mime.MediaTypeNames;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using NUnit.Framework.Legacy;
 using BlogWebApp.Services.ArticleServices;
+using NUnit.Framework.Internal;
+using Microsoft.Extensions.Logging;
+
 
 namespace BlogWebApp.Tests.ArticleTests
 {
@@ -18,13 +21,15 @@ namespace BlogWebApp.Tests.ArticleTests
     public class ArticleServiceTests
     {
         private Mock<IArticleRepository> _articleRepositoryMock;
+        private Mock<ILogger<ArticleService>> _loggerMock;
         private ArticleService _articleServiceMock;
 
         [SetUp]
         public void Setup()
         {
             _articleRepositoryMock = new Mock<IArticleRepository>();
-            _articleServiceMock = new ArticleService(_articleRepositoryMock.Object);
+            _loggerMock = new Mock<ILogger<ArticleService>>();
+            _articleServiceMock = new ArticleService(_articleRepositoryMock.Object, _loggerMock.Object);
         }
 
         [Test]
@@ -46,6 +51,7 @@ namespace BlogWebApp.Tests.ArticleTests
 
             Assert.ThrowsAsync<ArgumentException>(async () =>
                 await _articleServiceMock.CreateArticleAsync(article));
+            _articleRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Article>()), Times.Never);
         }
 
         [Test]
@@ -55,6 +61,7 @@ namespace BlogWebApp.Tests.ArticleTests
 
             Assert.ThrowsAsync<ArgumentException>(async () =>
                 await _articleServiceMock.CreateArticleAsync(article));
+            _articleRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Article>()), Times.Never);
         }
 
         [Test]
@@ -64,6 +71,7 @@ namespace BlogWebApp.Tests.ArticleTests
 
             Assert.ThrowsAsync<ArgumentException>(async () =>
                 await _articleServiceMock.CreateArticleAsync(article));
+            _articleRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Article>()), Times.Never);
         }
 
         [Test]
@@ -78,6 +86,16 @@ namespace BlogWebApp.Tests.ArticleTests
             Assert.That(result, Is.Not.Null);
             Assert.That(result.ArticleId, Is.EqualTo(existingArticle.ArticleId));
             _articleRepositoryMock.Verify(r => r.GetByIdAsync(existingArticle.ArticleId), Times.Once);
+        }
+
+        [Test]
+        public async Task GetArticleByIdAsync_ShouldThrowInvalidOperation_WhenArticleNotFound()
+        {
+            var articleId = Guid.NewGuid();
+            _articleRepositoryMock.Setup(r => r.GetByIdAsync(articleId)).ReturnsAsync((Article?)null);
+
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await _articleServiceMock.GetArticleByIdAsync(articleId));
+            _articleRepositoryMock.Verify(r => r.GetByIdAsync(articleId), Times.Once);
         }
 
         [Test]
@@ -109,7 +127,7 @@ namespace BlogWebApp.Tests.ArticleTests
             var updatedArticle = new Article(existingArticle.ArticleId, "newtitle", "newimage", "newcontent", Guid.NewGuid());
             _articleRepositoryMock.Setup(r => r.GetByIdAsync(existingArticle.ArticleId)).ReturnsAsync(existingArticle);
 
-            await _articleServiceMock.UpdateArticleAsync(updatedArticle);
+            var result = await _articleServiceMock.UpdateArticleAsync(updatedArticle);
 
             _articleRepositoryMock.Verify(r => r.GetByIdAsync(existingArticle.ArticleId), Times.Once);
             _articleRepositoryMock.Verify(r => r.UpdateAsync(It.Is<Article>(a =>
@@ -120,6 +138,7 @@ namespace BlogWebApp.Tests.ArticleTests
                 a.GenreId == updatedArticle.GenreId &&
                 a.UpdatedAt.HasValue
                 )), Times.Once);
+            Assert.That(result, Is.EqualTo(existingArticle));
         }
 
         [Test]

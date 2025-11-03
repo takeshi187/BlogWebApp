@@ -34,6 +34,10 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;    
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // https only
 });
+builder.Services.AddLogging(options => options.AddConsole());
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
 
 var app = builder.Build();
 

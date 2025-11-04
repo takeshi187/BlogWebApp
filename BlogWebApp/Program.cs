@@ -10,6 +10,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<BlogWebAppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IArticleService, ArticleService>();
@@ -28,16 +32,11 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
     options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-
     options.LoginPath = "/Account/Login";
     options.AccessDeniedPath= "/Account/AccessDenied"; 
     options.SlidingExpiration = true;    
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // https only
 });
-builder.Services.AddLogging(options => options.AddConsole());
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-builder.Logging.AddDebug();
 
 var app = builder.Build();
 

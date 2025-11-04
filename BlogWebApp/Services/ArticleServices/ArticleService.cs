@@ -6,9 +6,9 @@ namespace BlogWebApp.Services.ArticleServices
     public class ArticleService : IArticleService
     {
         private readonly IArticleRepository _articleRepository;
-        private readonly ILogger _logger;
+        private readonly ILogger<ArticleService> _logger;
 
-        public ArticleService(IArticleRepository articleRepository, ILogger logger)
+        public ArticleService(IArticleRepository articleRepository, ILogger<ArticleService> logger)
         {
             _articleRepository = articleRepository;
             _logger = logger;

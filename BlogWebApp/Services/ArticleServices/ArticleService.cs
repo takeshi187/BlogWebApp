@@ -19,11 +19,11 @@ namespace BlogWebApp.Services.ArticleServices
             try
             {
                 if (string.IsNullOrEmpty(article.Title))
-                    throw new ArgumentException("Title cannot be empty.");
+                    throw new ArgumentException("Title cannot be empty.", nameof(article.Title));
                 if (string.IsNullOrEmpty(article.Content))
-                    throw new ArgumentException("Content cannot be empty.");
+                    throw new ArgumentException("Content cannot be empty.", nameof(article.Content));
                 if (article.GenreId == Guid.Empty)
-                    throw new ArgumentException("GenreId cannot be empty.");
+                    throw new ArgumentException("GenreId cannot be empty.", nameof(article.GenreId));
 
                 await _articleRepository.AddAsync(article);
                 return article;
@@ -71,7 +71,7 @@ namespace BlogWebApp.Services.ArticleServices
             try
             {
                 if (string.IsNullOrEmpty(article.Title))
-                    throw new ArgumentException("Title cannot be empty.", nameof(article.Content));
+                    throw new ArgumentException("Title cannot be empty.", nameof(article.Title));
                 if (string.IsNullOrEmpty(article.Content))
                     throw new ArgumentException("Content cannot be empty.", nameof(article.Content));
                 if (article.GenreId == Guid.Empty)

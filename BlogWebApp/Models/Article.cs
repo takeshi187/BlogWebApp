@@ -32,7 +32,7 @@ namespace BlogWebApp.Models
         [NotMapped]
         public int LikesCount => Likes.Count;
 
-        public Article(string title, string image, string content, Guid genreId)
+        public Article(string title, string? image, string content, Guid genreId)
         {
             Title = title;
             Image = image;
@@ -41,7 +41,7 @@ namespace BlogWebApp.Models
         }
 
         // for tests
-        public Article(Guid articleId, string title, string image, string content, Guid genreId)
+        public Article(Guid articleId, string title, string? image, string content, Guid genreId)
         {
             ArticleId = articleId;
             Title = title;

@@ -74,7 +74,7 @@ namespace BlogWebApp.Tests.LikeTests
         }
 
         [Test]
-        public async Task LikeExistAsync_ShouldReturnTrue_WhenExist()
+        public async Task ExistLikeAsync_ShouldReturnTrue_WhenExist()
         {
             var like = new Like(Guid.NewGuid(), _userId, Guid.NewGuid());
 

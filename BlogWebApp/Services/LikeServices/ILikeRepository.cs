@@ -4,10 +4,10 @@ namespace BlogWebApp.Services.LikeServices
 {
     public interface ILikeRepository
     {
-        Task<Like> GetByIdAsync(Guid likeId);
-        Task<IList<Like>> GetByArticleIdAsync(Guid articleId);
-        Task AddAsync(Like like);
-        Task DeleteAsync(Like like);
+        Task<Like> AddAsync(Like like);
+        Task<Like?> GetByIdAsync(Guid likeId);
+        Task<IEnumerable<Like?>> GetByArticleIdAsync(Guid articleId);
         Task<bool> ExistAsync(Guid articleId, string userId);
+        Task<bool> DeleteAsync(Like like);
     }
 }

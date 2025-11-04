@@ -15,14 +15,14 @@ namespace BlogWebApp.Services.ArticleServices
 
         public async Task<Article> AddAsync(Article article)
         {
-            _db.Articles.Add(article);
+            await _db.Articles.AddAsync(article);
             await _db.SaveChangesAsync();
             return article;
         }
 
         public async Task<Article?> GetByIdAsync(Guid articleId)
         {
-            return await _db.Articles.FirstOrDefaultAsync(a => a.ArticleId == articleId);
+            return await _db.Articles.FindAsync(articleId);
         }
 
         public async Task<bool> UpdateAsync(Article article)

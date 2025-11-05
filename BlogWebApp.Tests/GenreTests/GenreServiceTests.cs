@@ -37,7 +37,7 @@ namespace BlogWebApp.Tests.GenreTests
         }
 
         [Test]
-        public async Task CreateGenreAsync_ShouldThrowArgumentException_WhenNameIsEmpty()
+        public async Task CreateGenreAsync_ShouldThrowArgumentException_WhenGenreNameIsEmpty()
         {
             var genreName = string.Empty;
             _genreRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Genre>())).ReturnsAsync((Genre?)null);

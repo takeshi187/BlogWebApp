@@ -25,10 +25,10 @@ namespace BlogWebApp.Services.LikeServices
             try
             {
                 if (string.IsNullOrEmpty(userId))
-                    throw new ArgumentException("UserId cannot be empty.");
+                    throw new ArgumentException("UserId cannot be empty.", nameof(userId));
 
                 if (articleId == Guid.Empty)
-                    throw new ArgumentException("ArticleId cannot be empty.");
+                    throw new ArgumentException("ArticleId cannot be empty.", nameof(articleId));
 
                 var article = await _articleService.GetArticleByIdAsync(articleId);
                 if (article == null)
@@ -74,7 +74,7 @@ namespace BlogWebApp.Services.LikeServices
             {
                 var like =  await _likeRepository.GetByIdAsync(likeId);
                 if (like == null)
-                    throw new InvalidOperationException($"Like with id {likeId} not found.");
+                    throw new InvalidOperationException($"Like with id: {likeId} not found.");
 
                 return like;
             }
@@ -85,7 +85,7 @@ namespace BlogWebApp.Services.LikeServices
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Unexpected error while searching like with id {likeId}");
+                _logger.LogError(ex, $"Unexpected error while searching like with id: {likeId}");
                 throw;
             }
         }
@@ -97,7 +97,7 @@ namespace BlogWebApp.Services.LikeServices
                 var likes = await _likeRepository.GetByArticleIdAsync(articleId);
 
                 if (likes == null || !likes.Any())
-                    throw new InvalidOperationException($"Likes for article with id {articleId} not found.");
+                    throw new InvalidOperationException($"Likes for article with id: {articleId} not found.");
 
                 return likes;
             }
@@ -108,7 +108,7 @@ namespace BlogWebApp.Services.LikeServices
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Unexpected error while searching like with article id {articleId}");
+                _logger.LogError(ex, $"Unexpected error while searching like with article id: {articleId}");
                 throw;
             }
         }

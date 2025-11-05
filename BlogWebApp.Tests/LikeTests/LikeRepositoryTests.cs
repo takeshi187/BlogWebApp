@@ -21,7 +21,7 @@ namespace BlogWebApp.Tests.LikeTests
         private string _userId;
 
         [SetUp]
-        public void Setup()
+        public void SetUp()
         {
             var options = new DbContextOptionsBuilder<BlogWebAppDbContext>().UseInMemoryDatabase("TestDatabase").Options;
 
@@ -43,10 +43,11 @@ namespace BlogWebApp.Tests.LikeTests
             Assert.That(like.UserId, Is.EqualTo(result.UserId));
             Assert.That(like.ArticleId, Is.EqualTo(result.ArticleId));
             Assert.That(like.LikeId, Is.EqualTo(result.LikeId));
+            Assert.That(like.CreatedAt.Date, Is.EqualTo(DateTime.UtcNow.Date));
         }
 
         [Test]
-        public async Task GetLikeByIdAsync_ShouldReturnLike_WhenExist()
+        public async Task GetLikeByIdAsync_ShouldReturnLike_WhenLikeExist()
         {
             var like = new Like(Guid.NewGuid(), _userId, Guid.NewGuid());
 
@@ -58,7 +59,7 @@ namespace BlogWebApp.Tests.LikeTests
         }
 
         [Test]
-        public async Task GetLikesByArticleIdAsync_ShouldReturnLikes_WhenExist()
+        public async Task GetLikesByArticleIdAsync_ShouldReturnLikes_WhenLikeExist()
         {
             var like1 = new Like(Guid.NewGuid(), "user1", _articleId);
             var like2 = new Like(Guid.NewGuid(), "user2", _articleId);
@@ -74,7 +75,7 @@ namespace BlogWebApp.Tests.LikeTests
         }
 
         [Test]
-        public async Task ExistLikeAsync_ShouldReturnTrue_WhenExist()
+        public async Task ExistLikeAsync_ShouldReturnTrue_WhenLikeExist()
         {
             var like = new Like(Guid.NewGuid(), _userId, Guid.NewGuid());
 
@@ -85,7 +86,7 @@ namespace BlogWebApp.Tests.LikeTests
         }
 
         [Test]
-        public async Task DeleteLikeAsync_ShouldDeleteLike_WhenExist()
+        public async Task DeleteLikeAsync_ShouldDeleteLike_WhenLikeExist()
         {
             var like = new Like(Guid.NewGuid(), _userId, Guid.NewGuid());
 

@@ -10,21 +10,21 @@ namespace BlogWebApp.Models
 
         [Required]
         [MaxLength(300)]
-        public string Title { get; set; }
+        public string Title { get; set; } = null!;
 
         public string? Image { get; set; }
 
         [Required]
-        public string Content { get; set; }
+        public string Content { get; set; } = null!;
 
         [Required]
         public Guid GenreId { get; set; }
-        public Genre Genre { get; set; }
+        public Genre Genre { get; set; } = null!;
 
         [Required]
-        public DateOnly CreatedAt { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
+        public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
-        public DateOnly? UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         public List<Comment> Comments { get; set; } = new();
         public List<Like> Likes { get; set; } = new();
@@ -50,6 +50,6 @@ namespace BlogWebApp.Models
             GenreId = genreId;
         }
 
-        public Article() { }
+        private Article() { }
     }
 }

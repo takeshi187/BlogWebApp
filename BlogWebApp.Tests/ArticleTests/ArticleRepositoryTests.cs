@@ -38,12 +38,12 @@ namespace BlogWebApp.Tests.ArticleTests
             Assert.That(result.Image, Is.EqualTo("image"));
             Assert.That(result.Content, Is.EqualTo("testcontent"));
             Assert.That(result.GenreId, Is.EqualTo(article.GenreId));
-            Assert.That(result.CreatedAt, Is.EqualTo(DateOnly.FromDateTime(DateTime.UtcNow)));
+            Assert.That(result.CreatedAt.Date, Is.EqualTo(DateTime.UtcNow.Date));
             Assert.That(result.Content, Is.EqualTo("testcontent"));
         }
 
         [Test]
-        public async Task GetArticleByIdAsync_ShouldReturnArticle_WhenFound()
+        public async Task GetArticleByIdAsync_ShouldReturnArticle_WhenArticleFound()
         {
             var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
             
@@ -61,15 +61,17 @@ namespace BlogWebApp.Tests.ArticleTests
             
             await _articleRepository.AddAsync(article);          
             article.Title = "newtitle";
+            article.UpdatedAt = DateTime.UtcNow;
 
             var result = await _articleRepository.UpdateAsync(article);
 
             Assert.That(result, Is.True);
             Assert.That(article.Title, Is.EqualTo("newtitle"));
+            Assert.That(article.UpdatedAt?.Date, Is.EqualTo(DateTime.UtcNow.Date));
         }
 
         [Test]
-        public async Task DeleteArticleAsync_ShouldDeleteArticle_WhenExist()
+        public async Task DeleteArticleAsync_ShouldDeleteArticle_WhenArticleExist()
         {
             var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
             var createdArticle = await _articleRepository.AddAsync(article);

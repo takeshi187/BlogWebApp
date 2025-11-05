@@ -9,15 +9,15 @@ namespace BlogWebApp.Models
         public Guid LikeId { get; private set; } = Guid.NewGuid();
 
         [Required]
-        public string UserId { get; set; }
-        public ApplicationUser User { get; set; }
+        public string UserId { get; set; } = null!;
+        public ApplicationUser User { get; set; } = null!;
 
         [Required]
         public Guid ArticleId { get; set; }
-        public Article Article { get; set; }
+        public Article Article { get; set; } = null!;
 
         [Required]
-        public DateOnly CreatedAt { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
+        public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
         public Like(string userId, Guid articleId)
         {
@@ -33,6 +33,6 @@ namespace BlogWebApp.Models
             ArticleId = articleId;
         }
 
-        public Like() { }
+        private Like() { }
     }
 }

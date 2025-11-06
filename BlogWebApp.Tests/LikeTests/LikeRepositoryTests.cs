@@ -36,8 +36,7 @@ namespace BlogWebApp.Tests.LikeTests
         {
             var like = new Like(Guid.NewGuid(), _userId, Guid.NewGuid());
 
-            await _likeRepository.AddAsync(like);
-            var result = await _db.Likes.FirstOrDefaultAsync(l => l.LikeId == like.LikeId);
+            var result = await _likeRepository.AddAsync(like);
 
             Assert.That(result, Is.Not.Null);
             Assert.That(like.UserId, Is.EqualTo(result.UserId));
@@ -59,7 +58,7 @@ namespace BlogWebApp.Tests.LikeTests
         }
 
         [Test]
-        public async Task GetLikesByArticleIdAsync_ShouldReturnLikes_WhenLikeExist()
+        public async Task GetLikesByArticleIdAsync_ShouldReturnLikes_WhenLikesExist()
         {
             var like1 = new Like(Guid.NewGuid(), "user1", _articleId);
             var like2 = new Like(Guid.NewGuid(), "user2", _articleId);

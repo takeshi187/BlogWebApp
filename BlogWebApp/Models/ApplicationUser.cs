@@ -4,6 +4,6 @@ namespace BlogWebApp.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public DateOnly CreatedAt { get; private set; } = DateOnly.FromDateTime(DateTime.UtcNow);
+        public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
     }
 }

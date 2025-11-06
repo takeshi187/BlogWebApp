@@ -12,14 +12,19 @@ namespace BlogWebApp.Services.UserServices
             _userManager = userManager;
         }
 
-        public async Task<bool> CheckPasswordAsync(ApplicationUser user, string passwordHash)
-        {
-            return await _userManager.CheckPasswordAsync(user, passwordHash);
-        }
-
         public async Task<IdentityResult> CreateAsync(ApplicationUser user, string passwordHash)
         {
             return await _userManager.CreateAsync(user, passwordHash);
+        }
+
+        public async Task<ApplicationUser?> GetByIdAsync(string userId)
+        {
+            return await _userManager.FindByIdAsync(userId);
+        }
+
+        public async Task<ApplicationUser?> GetByEmailAsync(string email)
+        {
+            return await _userManager.FindByEmailAsync(email);
         }
 
         public async Task<IdentityResult> DeleteAsync(ApplicationUser user)
@@ -27,14 +32,9 @@ namespace BlogWebApp.Services.UserServices
             return await _userManager.DeleteAsync(user);
         }
 
-        public async Task<ApplicationUser> GetByEmailAsync(string email)
+        public async Task<bool> CheckPasswordAsync(ApplicationUser user, string passwordHash)
         {
-            return await _userManager.FindByEmailAsync(email);
-        }
-
-        public async Task<ApplicationUser> GetByIdAsync(string userId)
-        {
-            return await _userManager.FindByIdAsync(userId);
+            return await _userManager.CheckPasswordAsync(user, passwordHash);
         }
     }
 }

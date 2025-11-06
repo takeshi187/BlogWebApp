@@ -49,7 +49,7 @@ namespace BlogWebApp.Tests.GenreTests
         }
 
         [Test]
-        public async Task GetAllGenresAsync_ShouldReturnAllGenres_WhenExist()
+        public async Task GetAllGenresAsync_ShouldReturnAllGenres_WhenGenresExist()
         { 
             var genre1 = new Genre(Guid.NewGuid(), "testgenre1");
             var genre2 = new Genre(Guid.NewGuid(), "testgenre2");

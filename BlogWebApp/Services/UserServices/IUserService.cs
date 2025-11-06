@@ -7,9 +7,9 @@ namespace BlogWebApp.Services.UserServices
     {
         Task<IdentityResult> RegisterAsync(string username, string email, string password);
         Task<bool> LoginAsync(string email, string password);
-        Task LogoutAsync();
-        Task<ApplicationUser> GetUserByEmailAsync(string email);
-        Task<ApplicationUser> GetUserByIdAsync(string userId);
-        Task<IdentityResult> DeleteUserAsync(string id); 
+        Task<ApplicationUser?> GetUserByEmailAsync(string email);
+        Task<ApplicationUser?> GetUserByIdAsync(string userId);
+        Task<IdentityResult> DeleteUserAsync(string id);
+        Task LogoutAsync();        
     }
 }

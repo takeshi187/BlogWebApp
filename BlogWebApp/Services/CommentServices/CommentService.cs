@@ -18,13 +18,13 @@ namespace BlogWebApp.Services.CommentServices
         }
         public async Task<Comment> AddCommentAsync(Comment comment)
         {
-            if (string.IsNullOrEmpty(comment.UserId))
+            if (string.IsNullOrWhiteSpace(comment.UserId))
                 throw new ArgumentException("UserId cannot be empty.");
 
-            if (string.IsNullOrEmpty(comment.ArticleId.ToString()))
+            if (string.IsNullOrWhiteSpace(comment.ArticleId.ToString()))
                 throw new ArgumentException("ArticleId cannot be empty.");
 
-            if (string.IsNullOrEmpty(comment.Content))
+            if (string.IsNullOrWhiteSpace(comment.Content))
                 throw new ArgumentException("Content cannot be empty.");
 
             var article = await _articleService.GetArticleByIdAsync(comment.ArticleId);

@@ -33,7 +33,7 @@ namespace BlogWebApp.Tests.ArticleTests
         }
 
         [Test]
-        public async Task CreateArticleAsync_ShouldReturnArticle_WhenValid()
+        public async Task CreateArticleAsync_ShouldCreateArticle_WhenValid()
         {
             var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
             _articleRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Article>())).ReturnsAsync(article);
@@ -99,7 +99,7 @@ namespace BlogWebApp.Tests.ArticleTests
         }
 
         [Test]
-        public async Task DeleteArticleAsync_ShouldCallRepositoryDelete_WhenArticleExist()
+        public async Task DeleteArticleAsync_ShouldDeleteArticle_WhenArticleExist()
         {
             var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());           
             _articleRepositoryMock.Setup(r => r.GetByIdAsync(article.ArticleId)).ReturnsAsync(article);

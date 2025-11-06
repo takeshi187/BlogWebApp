@@ -26,7 +26,7 @@ namespace BlogWebApp.Tests.GenreTests
         }
 
         [Test]
-        public async Task CreateGenreAsync_ShouldAddGenre_WhenValid()
+        public async Task CreateGenreAsync_ShouldCreateGenre_WhenValid()
         {
             var result = await _genreService.CreateGenreAsync("testname");
             _genreRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Genre>())).ReturnsAsync(result);

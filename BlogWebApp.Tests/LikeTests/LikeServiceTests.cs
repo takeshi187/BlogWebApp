@@ -38,7 +38,7 @@ namespace BlogWebApp.Tests.LikeTests
         }
 
         [Test]
-        public async Task AddLikeAsync_ShouldReturnTrue_WhenValid()
+        public async Task AddLikeAsync_ShouldAddLike_WhenValid()
         {
             var article = new Article(Guid.NewGuid(), "title", "testimage", "testcontent", _genreId);
             var user = new ApplicationUser { Id = _userId };
@@ -119,7 +119,7 @@ namespace BlogWebApp.Tests.LikeTests
         }
 
         [Test]
-        public async Task DeleteLikeAsync_ShouldReturnTrue_WhenLikeExist()
+        public async Task DeleteLikeAsync_ShouldDeleteLike_WhenLikeExist()
         {
             var like = new Like(_userId, Guid.NewGuid());
             _likeRepositoryMock.Setup(r => r.GetByArticleIdAsync(like.ArticleId)).ReturnsAsync(new List<Like> { like });
@@ -142,7 +142,7 @@ namespace BlogWebApp.Tests.LikeTests
         }
 
         [Test]
-        public async Task GetLikesForArticleAsync_ShouldReturnLikes_WhenExist()
+        public async Task GetLikesForArticleAsync_ShouldReturnLikes_WhenLikesExist()
         {
             var like = new Like(_userId, Guid.NewGuid());
             var likes = new List<Like> { like };

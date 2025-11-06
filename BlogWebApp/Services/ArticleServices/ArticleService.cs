@@ -18,9 +18,11 @@ namespace BlogWebApp.Services.ArticleServices
         {
             try
             {
-                if (string.IsNullOrEmpty(article.Title))
+                if(article == null)
+                    throw new ArgumentException("Article cannot be empty.", nameof(article));
+                if (string.IsNullOrWhiteSpace(article.Title))
                     throw new ArgumentException("Title cannot be empty.", nameof(article.Title));
-                if (string.IsNullOrEmpty(article.Content))
+                if (string.IsNullOrWhiteSpace(article.Content))
                     throw new ArgumentException("Content cannot be empty.", nameof(article.Content));
                 if (article.GenreId == Guid.Empty)
                     throw new ArgumentException("GenreId cannot be empty.", nameof(article.GenreId));
@@ -49,6 +51,9 @@ namespace BlogWebApp.Services.ArticleServices
         {
             try
             {
+                if (articleId == Guid.Empty)
+                    throw new ArgumentException("articleId cannot be empty.", nameof(articleId));
+
                 var article = await _articleRepository.GetByIdAsync(articleId);
                 if (article == null) throw new InvalidOperationException($"Article with id: {articleId} not found.");
 
@@ -70,9 +75,11 @@ namespace BlogWebApp.Services.ArticleServices
         {
             try
             {
-                if (string.IsNullOrEmpty(article.Title))
+                if (article == null)
+                    throw new ArgumentException("Article cannot be empty.", nameof(article));
+                if (string.IsNullOrWhiteSpace(article.Title))
                     throw new ArgumentException("Title cannot be empty.", nameof(article.Title));
-                if (string.IsNullOrEmpty(article.Content))
+                if (string.IsNullOrWhiteSpace(article.Content))
                     throw new ArgumentException("Content cannot be empty.", nameof(article.Content));
                 if (article.GenreId == Guid.Empty)
                     throw new ArgumentException("GenreId cannot be empty.", nameof(article.GenreId));
@@ -109,6 +116,9 @@ namespace BlogWebApp.Services.ArticleServices
         {
             try
             {
+                if (articleId == Guid.Empty)
+                    throw new ArgumentException("articleId cannot be empty.", nameof(articleId));
+
                 var article = await _articleRepository.GetByIdAsync(articleId);
                 if (article == null) throw new InvalidOperationException($"Article with id: {articleId} not found.");
 

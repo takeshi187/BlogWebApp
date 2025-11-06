@@ -43,7 +43,7 @@ namespace BlogWebApp.Tests.ArticleTests
         }
 
         [Test]
-        public async Task GetArticleByIdAsync_ShouldReturnArticle_WhenArticleFound()
+        public async Task GetArticleByIdAsync_ShouldReturnArticle_WhenArticleExist()
         {
             var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
             

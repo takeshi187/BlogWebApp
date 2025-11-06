@@ -13,9 +13,9 @@ namespace BlogWebApp.Models
         public string Content { get; set; } = null!;
 
         [Required]
-        public DateOnly CreatedAt { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
+        public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
-        public DateOnly? UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         [Required]
         public string UserId { get; set; } = null!;

@@ -58,6 +58,8 @@ namespace BlogWebApp.Services.GenreServices
         {
             try
             {
+                if (genreId == Guid.Empty)
+                    throw new ArgumentException("genreId cannot be empty.", nameof(genreId));
                 var genre = await _genreRepository.GetByIdAsync(genreId);
                 if (genre == null) throw new InvalidOperationException($"Genre with id: {genreId} not found.");
 

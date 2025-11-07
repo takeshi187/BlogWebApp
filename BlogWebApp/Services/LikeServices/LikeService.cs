@@ -73,7 +73,7 @@ namespace BlogWebApp.Services.LikeServices
             try
             {
                 if (likeId == Guid.Empty)
-                    throw new ArgumentException("likeId cannot be empty.", nameof(likeId));
+                    throw new ArgumentException("LikeId cannot be empty.", nameof(likeId));
 
                 var like =  await _likeRepository.GetByIdAsync(likeId);
                 if (like == null)
@@ -98,7 +98,7 @@ namespace BlogWebApp.Services.LikeServices
             try
             {
                 if (articleId == Guid.Empty)
-                    throw new ArgumentException("articleId cannot be empty.", nameof(articleId));
+                    throw new ArgumentException("ArticleId cannot be empty.", nameof(articleId));
 
                 var likes = await _likeRepository.GetByArticleIdAsync(articleId);
 
@@ -114,7 +114,7 @@ namespace BlogWebApp.Services.LikeServices
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Unexpected error while searching like with article id: {articleId}");
+                _logger.LogError(ex, $"Unexpected error while searching likes with article id: {articleId}");
                 throw;
             }
         }

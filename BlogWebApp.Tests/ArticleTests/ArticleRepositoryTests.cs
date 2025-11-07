@@ -74,12 +74,11 @@ namespace BlogWebApp.Tests.ArticleTests
         public async Task DeleteArticleAsync_ShouldDeleteArticle_WhenArticleExist()
         {
             var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
-            var createdArticle = await _articleRepository.AddAsync(article);
+            
+            await _articleRepository.AddAsync(article);
+            var result = await _articleRepository.DeleteAsync(article);
 
-            await _articleRepository.DeleteAsync(createdArticle);
-            var result = await _articleRepository.GetByIdAsync(createdArticle.ArticleId);
-
-            Assert.That(result, Is.Null);           
+            Assert.That(result, Is.True);           
         }
 
         [TearDown]

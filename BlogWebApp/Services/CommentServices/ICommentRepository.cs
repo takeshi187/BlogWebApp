@@ -4,10 +4,10 @@ namespace BlogWebApp.Services.CommentServices
 {
     public interface ICommentRepository
     {
-        Task<IList<Comment>> GetByArticleIdAsync(Guid articleId);
-        Task<Comment> GetByIdAsync(Guid commentId);
         Task<Comment> AddAsync(Comment comment);
-        Task DeleteAsync(Comment comment);
-        Task UpdateAsync(Comment comment);
+        Task<Comment?> GetByIdAsync(Guid commentId);
+        Task<IEnumerable<Comment?>> GetByArticleIdAsync(Guid articleId);
+        Task<bool> UpdateAsync(Comment comment);
+        Task<bool> DeleteAsync(Comment comment);       
     }
 }

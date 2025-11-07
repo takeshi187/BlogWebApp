@@ -52,7 +52,7 @@ namespace BlogWebApp.Services.ArticleServices
             try
             {
                 if (articleId == Guid.Empty)
-                    throw new ArgumentException("articleId cannot be empty.", nameof(articleId));
+                    throw new ArgumentException("ArticleId cannot be empty.", nameof(articleId));
 
                 var article = await _articleRepository.GetByIdAsync(articleId);
                 if (article == null) throw new InvalidOperationException($"Article with id: {articleId} not found.");
@@ -117,7 +117,7 @@ namespace BlogWebApp.Services.ArticleServices
             try
             {
                 if (articleId == Guid.Empty)
-                    throw new ArgumentException("articleId cannot be empty.", nameof(articleId));
+                    throw new ArgumentException("ArticleId cannot be empty.", nameof(articleId));
 
                 var article = await _articleRepository.GetByIdAsync(articleId);
                 if (article == null) throw new InvalidOperationException($"Article with id: {articleId} not found.");

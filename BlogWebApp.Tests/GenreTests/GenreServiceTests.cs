@@ -39,10 +39,7 @@ namespace BlogWebApp.Tests.GenreTests
         [Test]
         public async Task CreateGenreAsync_ShouldThrowArgumentException_WhenGenreNameIsEmpty()
         {
-            var genreName = string.Empty;
-            _genreRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Genre>())).ReturnsAsync((Genre?)null);
-
-            Assert.ThrowsAsync<ArgumentException>(async () => await _genreService.CreateGenreAsync(genreName));
+            Assert.ThrowsAsync<ArgumentException>(async () => await _genreService.CreateGenreAsync(string.Empty));
             _genreRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Genre>()), Times.Never);
         }
 

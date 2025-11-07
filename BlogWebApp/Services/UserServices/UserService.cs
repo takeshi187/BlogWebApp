@@ -35,7 +35,7 @@ namespace BlogWebApp.Services.UserServices
                 var result = await _userRepository.CreateAsync(user, password);
 
                 if (!result.Succeeded)
-                    _logger.LogWarning($"Failed to register user {email}. Errors{string.Join(", ", result.Errors.Select(e => e.Description))}");
+                    _logger.LogWarning($"Failed to register user: {email}. Errors{string.Join(", ", result.Errors.Select(e => e.Description))}");
 
                 return result;
             }
@@ -44,10 +44,15 @@ namespace BlogWebApp.Services.UserServices
                 _logger.LogWarning(ex, "Invalid registration data.");
                 throw;
             }
+            catch(InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, $"Failed to register user with email: {email}");
+                throw;
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Unexpected error while registration for: {email}");
-                throw new InvalidOperationException("Failed to register user.", ex); // maybe just throw ??
+                throw;
             }            
         }
 
@@ -55,9 +60,14 @@ namespace BlogWebApp.Services.UserServices
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(email))
+                    throw new ArgumentException("Email cannot be empty", nameof(email));
+                if (string.IsNullOrWhiteSpace(password))
+                    throw new ArgumentException("Password cannot be empty", nameof(password));
+
                 var user = await _userRepository.GetByEmailAsync(email);
                 if (user == null)
-                    throw new InvalidOperationException($"User with email {email} not found.");
+                    throw new InvalidOperationException($"User with email: {email} not found.");
 
                 var result = await _signInManager.PasswordSignInAsync(user, password, isPersistent: false, lockoutOnFailure: false);
 
@@ -70,13 +80,13 @@ namespace BlogWebApp.Services.UserServices
             }
             catch(InvalidOperationException ex)
             {
-                _logger.LogWarning(ex, $"Login failed for {email}");
+                _logger.LogWarning(ex, $"Login failed for: {email}");
                 throw;
             }
             catch(Exception ex)
             {
                 _logger.LogError(ex, $"Unexpected error while login for: {email}");
-                throw new InvalidOperationException("Unexpected login error.", ex); // maybe just throw ??
+                throw;
             }
         }
 
@@ -97,7 +107,12 @@ namespace BlogWebApp.Services.UserServices
                 _logger.LogWarning(ex, $"User with email: {email} not found.");
                 throw;
             }
-            catch(Exception ex)
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, $"User with email: {email} not found.");
+                throw;
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"Unexpected error while searching user with email: {email}");
                 throw;
@@ -121,6 +136,11 @@ namespace BlogWebApp.Services.UserServices
                 _logger.LogWarning(ex, $"User with userId: {userId} not found.");
                 throw;
             }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, $"Failed to get user with userId: {userId}");
+                throw;
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Unexpected error while searching user with userId: {userId}");
@@ -133,7 +153,7 @@ namespace BlogWebApp.Services.UserServices
             try
             {
                 if (string.IsNullOrWhiteSpace(userId))
-                    throw new ArgumentException($"userId cannot be empty {userId}");
+                    throw new ArgumentException("UserId cannot be empty.", nameof(userId));
 
                 var user = await _userRepository.GetByIdAsync(userId);
                 if (user == null)
@@ -144,6 +164,11 @@ namespace BlogWebApp.Services.UserServices
             catch (ArgumentException ex)
             {
                 _logger.LogWarning(ex, $"User with userId: {userId} not found.");
+                throw;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, $"Failed to delete user with userId: {userId}");
                 throw;
             }
             catch (Exception ex)

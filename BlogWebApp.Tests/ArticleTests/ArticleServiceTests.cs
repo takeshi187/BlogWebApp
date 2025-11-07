@@ -47,7 +47,7 @@ namespace BlogWebApp.Tests.ArticleTests
         [Test]
         public async Task CreateArticleAsync_ShouldThrowArgumentException_WhenTitleEmpty()
         {
-            var article = new Article(Guid.NewGuid(), null, "testimage", "testcontent", Guid.NewGuid());
+            var article = new Article(Guid.NewGuid(), "", "testimage", "testcontent", Guid.NewGuid());
 
             Assert.ThrowsAsync<ArgumentException>(async () =>
                 await _articleService.CreateArticleAsync(article));
@@ -57,7 +57,7 @@ namespace BlogWebApp.Tests.ArticleTests
         [Test]
         public async Task CreateArticleAsync_ShouldThrowArgumentException_WhenContentEmpty()
         {
-            var article = new Article(Guid.NewGuid(), "testtitle", "testimage", null, Guid.NewGuid());
+            var article = new Article(Guid.NewGuid(), "testtitle", "testimage", "", Guid.NewGuid());
 
             Assert.ThrowsAsync<ArgumentException>(async () =>
                 await _articleService.CreateArticleAsync(article));
@@ -77,15 +77,15 @@ namespace BlogWebApp.Tests.ArticleTests
         [Test]
         public async Task GetArticleByIdAsync_ShouldReturnArticle_WhenArticleExist()
         {
-            var existingArticle = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
-            _articleRepositoryMock.Setup(r => r.GetByIdAsync(existingArticle.ArticleId)).ReturnsAsync(existingArticle);
+            var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
+            _articleRepositoryMock.Setup(r => r.GetByIdAsync(article.ArticleId)).ReturnsAsync(article);
 
-            await _articleService.CreateArticleAsync(existingArticle);
-            var result = await _articleService.GetArticleByIdAsync(existingArticle.ArticleId);
+            await _articleService.CreateArticleAsync(article);
+            var result = await _articleService.GetArticleByIdAsync(article.ArticleId);
 
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.ArticleId, Is.EqualTo(existingArticle.ArticleId));
-            _articleRepositoryMock.Verify(r => r.GetByIdAsync(existingArticle.ArticleId), Times.Once);
+            Assert.That(result.ArticleId, Is.EqualTo(article.ArticleId));
+            _articleRepositoryMock.Verify(r => r.GetByIdAsync(article.ArticleId), Times.Once);
         }
 
         [Test]

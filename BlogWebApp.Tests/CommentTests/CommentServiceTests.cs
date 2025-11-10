@@ -42,7 +42,7 @@ namespace BlogWebApp.Tests.CommentTests
             _userServiceMock.Setup(s => s.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
             _articleServiceMock.Setup(s => s.GetArticleByIdAsync(article.ArticleId)).ReturnsAsync(article);
 
-            var result = await _commentService.AddCommentAsync(comment);
+            var result = await _commentService.CreateCommentAsync(comment);
 
             Assert.That(result, Is.EqualTo(comment));
             _commentRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Comment>()), Times.Once);
@@ -56,17 +56,27 @@ namespace BlogWebApp.Tests.CommentTests
             var comment = new Comment(Guid.NewGuid(), "", "testuser", Guid.NewGuid());
 
             Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _commentService.AddCommentAsync(comment));
+                await _commentService.CreateCommentAsync(comment));
             _commentRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Comment>()), Times.Never);
         }
 
         [Test]
-        public async Task CreateCommentAsync_ShouldThrowArgumentException_WhenUserNotFound()
+        public async Task CreateCommentAsync_ShouldThrowArgumentException_WhenUserIdEmpty()
         {
             var comment = new Comment(Guid.NewGuid(), "Test content", "", Guid.NewGuid());
 
             Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _commentService.AddCommentAsync(comment));
+                await _commentService.CreateCommentAsync(comment));
+            _commentRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Comment>()), Times.Never);
+        }
+
+        [Test]
+        public async Task CreateCommentAsync_ShouldThrowArgumentException_WhenArticleIdEmpty()
+        {
+            var comment = new Comment(Guid.NewGuid(), "Test content", "1", Guid.Empty);
+
+            Assert.ThrowsAsync<ArgumentException>(async () =>
+                await _commentService.CreateCommentAsync(comment));
             _commentRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Comment>()), Times.Never);
         }
 
@@ -79,7 +89,20 @@ namespace BlogWebApp.Tests.CommentTests
                 .ReturnsAsync((Article?)null);
 
             Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await _commentService.AddCommentAsync(comment));
+                await _commentService.CreateCommentAsync(comment));
+            _commentRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Comment>()), Times.Never);
+        }
+
+        [Test]
+        public async Task CreateCommentAsync_ShouldThrowInvalidOperationException_WhenUserNotFound()
+        {
+            var comment = new Comment(Guid.NewGuid(), "Test content", "1", Guid.NewGuid());
+
+            _userServiceMock.Setup(s => s.GetUserByIdAsync(comment.UserId))
+                .ReturnsAsync((ApplicationUser?)null);
+
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await _commentService.CreateCommentAsync(comment));
             _commentRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Comment>()), Times.Never);
         }
 
@@ -93,7 +116,7 @@ namespace BlogWebApp.Tests.CommentTests
             _userServiceMock.Setup(s => s.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
             _articleServiceMock.Setup(s => s.GetArticleByIdAsync(article.ArticleId)).ReturnsAsync(article);
 
-            await _commentService.AddCommentAsync(comment);
+            await _commentService.CreateCommentAsync(comment);
             var result = await _commentService.GetCommentByIdAsync(comment.CommentId);
 
             Assert.That(result, Is.Not.Null);
@@ -103,7 +126,134 @@ namespace BlogWebApp.Tests.CommentTests
             _articleServiceMock.Verify(s => s.GetArticleByIdAsync(article.ArticleId), Times.Once);
         }
 
+        [Test]
+        public async Task GetCommentById_ShouldThrowArgumentException_WhenCommentIdEmpty()
+        {
+            var commentId = Guid.Empty;
 
+            Assert.ThrowsAsync<ArgumentException>(async () =>
+                await _commentService.GetCommentByIdAsync(commentId));
+            _commentRepositoryMock.Verify(r => r.GetByIdAsync(commentId), Times.Never);
+        }
+
+        [Test]
+        public async Task GetCommentByIdAsync_ShouldThrowInvalidOperationException_WhenCommentNotFound()
+        {
+            var comment = new Comment(Guid.NewGuid(), "Test content", "1", Guid.NewGuid());
+
+            _commentRepositoryMock.Setup(s => s.GetByIdAsync(comment.CommentId))
+                .ReturnsAsync((Comment?)null);
+
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await _commentService.GetCommentByIdAsync(comment.CommentId));
+            _commentRepositoryMock.Verify(r => r.GetByIdAsync(comment.CommentId), Times.Once);
+        }
+
+        [Test]
+        public async Task GetCommentsByArticleIdAsync_ShouldReturnComments_WhenCommentsExist()
+        {
+            var comment1 = new Comment(Guid.NewGuid(), "Test content", "1", Guid.NewGuid());
+            var comment2 = new Comment(Guid.NewGuid(), "Test content", "2", comment1.ArticleId);
+            var comments = new List<Comment>();
+
+            comments.Add(comment1);
+            comments.Add(comment2);
+            _commentRepositoryMock.Setup(r => r.GetByArticleIdAsync(comment1.ArticleId)).ReturnsAsync(comments);
+
+            var result = await _commentService.GetCommentsByArticleIdAsync(comment1.ArticleId);
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count(), Is.EqualTo(2));
+            _commentRepositoryMock.Verify(r => r.GetByArticleIdAsync(comment1.ArticleId), Times.Once);
+        }
+
+        [Test]
+        public async Task GetCommentsByArticleIdAsync_ShouldThrowArgumentException_WhenArticleIdEmpty()
+        {
+            var articleId = Guid.Empty;
+
+            Assert.ThrowsAsync<ArgumentException>(async () =>
+                await _commentService.GetCommentsByArticleIdAsync(articleId));
+            _commentRepositoryMock.Verify(r => r.GetByArticleIdAsync(articleId), Times.Never);
+        }
+
+        [Test]
+        public async Task GetCommentByArticleIdAsync_ShouldThrowInvalidOperationException_WhenCommentsNotFound()
+        {
+            var articleId = Guid.NewGuid();
+            _commentRepositoryMock.Setup(r => r.GetByArticleIdAsync(articleId))
+                .ReturnsAsync(new List<Comment>());
+
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await _commentService.GetCommentsByArticleIdAsync(articleId));
+            _commentRepositoryMock.Verify(r => r.GetByArticleIdAsync(articleId), Times.Once);
+        }
+
+        [Test]
+        public async Task UpdateCommentAsync_ShouldUpdateComment_WhenCommentExist()
+        {
+            var existingComment = new Comment(Guid.NewGuid(), "Test content", "1", Guid.NewGuid());
+            var user = new ApplicationUser { Id = existingComment.UserId };
+            var article = new Article(existingComment.ArticleId, "testtitle", "image", "testcontent", Guid.NewGuid());
+            var updatedComment = new Comment(existingComment.CommentId, "Updated", "1", existingComment.ArticleId);
+            _commentRepositoryMock.Setup(r => r.GetByIdAsync(existingComment.CommentId)).ReturnsAsync(existingComment);
+            _userServiceMock.Setup(s => s.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
+            _articleServiceMock.Setup(s => s.GetArticleByIdAsync(article.ArticleId)).ReturnsAsync(article);
+
+            var result = await _commentService.UpdateCommentAsync(updatedComment);
+            
+            _commentRepositoryMock.Verify(r => r.UpdateAsync(It.Is<Comment>(a =>
+                a.CommentId == existingComment.CommentId &&
+                a.Content == "Updated" &&
+                a.UserId == updatedComment.UserId &&
+                a.ArticleId == updatedComment.ArticleId &&
+                a.UpdatedAt.HasValue
+                )), Times.Once);
+            Assert.That(result, Is.EqualTo(existingComment));
+            _commentRepositoryMock.Verify(r => r.GetByIdAsync(existingComment.CommentId), Times.Once);
+        }
+
+        [Test]
+        public void UpdateCommentAsync_ShouldThrowArgumentException_WhenContentEmpty()
+        {
+            var comment = new Comment(Guid.NewGuid(), "", "1", Guid.NewGuid());
+
+            Assert.ThrowsAsync<ArgumentException>(async () =>
+                await _commentService.UpdateCommentAsync(comment));
+            _commentRepositoryMock.Verify(r => r.GetByIdAsync(comment.CommentId), Times.Never);
+        }
+
+        [Test]
+        public void UpdateCommentAsync_ShouldThrowArgumentException_WhenUserIdEmpty()
+        {
+            var comment = new Comment(Guid.NewGuid(), "test content", "", Guid.NewGuid());
+
+            Assert.ThrowsAsync<ArgumentException>(async () =>
+                await _commentService.UpdateCommentAsync(comment));
+            _commentRepositoryMock.Verify(r => r.GetByIdAsync(comment.CommentId), Times.Never);
+        }
+
+        [Test]
+        public void UpdateCommentAsync_ShouldThrowArgumentException_WhenArticleIdEmpty()
+        {
+            var comment = new Comment(Guid.NewGuid(), "test content", "1", Guid.Empty);
+
+            Assert.ThrowsAsync<ArgumentException>(async () =>
+                await _commentService.UpdateCommentAsync(comment));
+            _commentRepositoryMock.Verify(r => r.GetByIdAsync(comment.CommentId), Times.Never);
+        }
+
+        [Test]
+        public void UpdateCommentAsync_ShouldThrowInvalidOperationException_WhenCommentNotFound()
+        {
+            var comment = new Comment(Guid.NewGuid(), "Test content", "1", Guid.NewGuid());
+
+            _commentRepositoryMock.Setup(r => r.GetByIdAsync(comment.CommentId)).ReturnsAsync((Comment?)null);
+
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await _commentService.UpdateCommentAsync(comment));
+            _commentRepositoryMock.Verify(r => r.GetByIdAsync(comment.CommentId), Times.Once);
+        }
 
 
         [Test]

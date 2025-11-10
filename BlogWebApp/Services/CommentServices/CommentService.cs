@@ -20,7 +20,7 @@ namespace BlogWebApp.Services.CommentServices
             _userService = userService;
             _logger = logger;
         }
-        public async Task<Comment> AddCommentAsync(Comment comment)
+        public async Task<Comment> CreateCommentAsync(Comment comment)
         {           
             try
             {
@@ -63,6 +63,9 @@ namespace BlogWebApp.Services.CommentServices
         {            
             try
             {
+                if (commentId == Guid.Empty)
+                    throw new ArgumentException("CommentId cannot be empty.", nameof(commentId));
+
                 var result = await _commentRepository.GetByIdAsync(commentId);
                 if (result == null)
                     throw new InvalidOperationException($"Comment with id: {commentId} not found.");
@@ -81,7 +84,7 @@ namespace BlogWebApp.Services.CommentServices
             }
         }
 
-        public async Task<IEnumerable<Comment?>> GetCommentsByArticleAsync(Guid articleId)
+        public async Task<IEnumerable<Comment?>> GetCommentsByArticleIdAsync(Guid articleId)
         {            
             try
             {
@@ -125,6 +128,7 @@ namespace BlogWebApp.Services.CommentServices
                     throw new InvalidOperationException($"Comment with id: {comment.CommentId} not found.");
                 
                 existingComment.Content = comment.Content;
+                existingComment.UpdatedAt = DateTime.UtcNow;
                 await _commentRepository.UpdateAsync(existingComment);
                 return existingComment;
             }

@@ -142,7 +142,7 @@ namespace BlogWebApp.Tests.LikeTests
         }
 
         [Test]
-        public async Task GetLikesForArticleAsync_ShouldReturnLikes_WhenLikesExist()
+        public async Task GetLikesByArticleAsync_ShouldReturnLikes_WhenLikesExist()
         {
             var like = new Like(_userId, Guid.NewGuid());
             var likes = new List<Like> { like };
@@ -155,7 +155,7 @@ namespace BlogWebApp.Tests.LikeTests
         }
 
         [Test]
-        public async Task GetLikesForArticleAsync_ShouldThrowInvalidOperationException_WhenLikesNotFound()
+        public async Task GetLikesByArticleAsync_ShouldThrowInvalidOperationException_WhenLikesNotFound()
         {
             var articleId = Guid.NewGuid();
             _likeRepositoryMock.Setup(r => r.GetByArticleIdAsync(articleId)).ReturnsAsync(new List<Like>());

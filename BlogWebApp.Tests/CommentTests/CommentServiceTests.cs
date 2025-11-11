@@ -244,6 +244,13 @@ namespace BlogWebApp.Tests.CommentTests
         }
 
         [Test]
+        public void UpdateCommentAsync_ShouldThrowArgumentException_WhenCommentEmpty()
+        {
+            Assert.ThrowsAsync<ArgumentException>(async () =>
+                await _commentService.UpdateCommentAsync(null));
+        }
+
+        [Test]
         public void UpdateCommentAsync_ShouldThrowInvalidOperationException_WhenCommentNotFound()
         {
             var comment = new Comment(Guid.NewGuid(), "Test content", "1", Guid.NewGuid());
@@ -257,7 +264,7 @@ namespace BlogWebApp.Tests.CommentTests
 
 
         [Test]
-        public async Task DeleteCommentAsync_ShouldCallRepositoryDelete_WhenCommentExist()
+        public async Task DeleteCommentAsync_ShouldDeleteComment_WhenCommentExist()
         {
             var comment = new Comment(Guid.NewGuid(), "Test content", "testuser", Guid.NewGuid());
             _commentRepositoryMock.Setup(r => r.GetByIdAsync(comment.CommentId)).ReturnsAsync(comment);
@@ -269,13 +276,20 @@ namespace BlogWebApp.Tests.CommentTests
         }
 
         [Test]
-        public async Task DeleteCommentAsync_ShouldReturnFalse_WhenCommentNotFound()
+        public async Task DeleteCommentAsync_ShouldThrowInvalidOperationException_WhenCommentNotFound()
         {
             var comment = new Comment(Guid.NewGuid(), "Test content", "testuser", Guid.NewGuid());
             _commentRepositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Comment?)null);
 
             _commentRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Comment>()), Times.Never);
             Assert.ThrowsAsync<InvalidOperationException>(async () => await _commentService.DeleteCommentAsync(comment.CommentId));
+        }
+
+        [Test]
+        public async Task DeleteCommentAsync_ShouldThrowArgumentException_WhenCommentEmpty()
+        {
+            Assert.ThrowsAsync<ArgumentException>(async () =>
+               await _commentService.DeleteCommentAsync(Guid.Empty));
         }
     }
 }

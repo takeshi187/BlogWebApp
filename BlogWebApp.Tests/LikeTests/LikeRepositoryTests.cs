@@ -2,13 +2,6 @@
 using BlogWebApp.Models;
 using BlogWebApp.Services.LikeServices;
 using Microsoft.EntityFrameworkCore;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace BlogWebApp.Tests.LikeTests
 {

@@ -20,7 +20,7 @@ namespace BlogWebApp.Services.UserServices
         {
             try
             {
-                if(string.IsNullOrWhiteSpace(username))
+                if (string.IsNullOrWhiteSpace(username))
                     throw new ArgumentException("Username cannot be empty.", nameof(username));
                 if (string.IsNullOrWhiteSpace(email))
                     throw new ArgumentException("Email cannot be empty.", nameof(email));
@@ -39,12 +39,12 @@ namespace BlogWebApp.Services.UserServices
 
                 return result;
             }
-            catch(ArgumentException ex)
+            catch (ArgumentException ex)
             {
                 _logger.LogWarning(ex, "Invalid registration data.");
                 throw;
             }
-            catch(InvalidOperationException ex)
+            catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, $"Failed to register user with email: {email}");
                 throw;
@@ -53,7 +53,7 @@ namespace BlogWebApp.Services.UserServices
             {
                 _logger.LogError(ex, $"Unexpected error while registration for: {email}");
                 throw;
-            }            
+            }
         }
 
         public async Task<bool> LoginAsync(string email, string password)
@@ -73,17 +73,17 @@ namespace BlogWebApp.Services.UserServices
 
                 return result.Succeeded;
             }
-            catch(ArgumentException ex)
+            catch (ArgumentException ex)
             {
                 _logger.LogWarning(ex, "Invalid login data.");
                 throw;
             }
-            catch(InvalidOperationException ex)
+            catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, $"Login failed for: {email}");
                 throw;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"Unexpected error while login for: {email}");
                 throw;
@@ -94,15 +94,15 @@ namespace BlogWebApp.Services.UserServices
         {
             try
             {
-                if(string.IsNullOrWhiteSpace(email))
+                if (string.IsNullOrWhiteSpace(email))
                     throw new ArgumentException("Email cannot be empty.", nameof(email));
 
                 var result = await _userRepository.GetByEmailAsync(email);
                 if (result == null) throw new InvalidOperationException($"User with email: {email} not found.");
 
-                return result;               
+                return result;
             }
-            catch(ArgumentException ex)
+            catch (ArgumentException ex)
             {
                 _logger.LogWarning(ex, $"User with email: {email} not found.");
                 throw;

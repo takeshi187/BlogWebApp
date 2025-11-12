@@ -4,12 +4,6 @@ using BlogWebApp.Services.CommentServices;
 using BlogWebApp.Services.UserServices;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace BlogWebApp.Tests.CommentTests
 {
@@ -201,7 +195,7 @@ namespace BlogWebApp.Tests.CommentTests
             _articleServiceMock.Setup(s => s.GetArticleByIdAsync(article.ArticleId)).ReturnsAsync(article);
 
             var result = await _commentService.UpdateCommentAsync(updatedComment);
-            
+
             _commentRepositoryMock.Verify(r => r.UpdateAsync(It.Is<Comment>(a =>
                 a.CommentId == existingComment.CommentId &&
                 a.Content == "Updated" &&

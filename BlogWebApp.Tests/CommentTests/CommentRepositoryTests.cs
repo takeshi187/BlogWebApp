@@ -1,13 +1,7 @@
 ﻿using BlogWebApp.Db;
 using BlogWebApp.Models;
-using BlogWebApp.Services.ArticleServices;
 using BlogWebApp.Services.CommentServices;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlogWebApp.Tests.CommentTests
 {

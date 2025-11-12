@@ -2,15 +2,8 @@
 using BlogWebApp.Services.ArticleServices;
 using BlogWebApp.Services.LikeServices;
 using BlogWebApp.Services.UserServices;
-using Castle.Core.Logging;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace BlogWebApp.Tests.LikeTests
 {
@@ -127,7 +120,7 @@ namespace BlogWebApp.Tests.LikeTests
             var result = await _likeService.DeleteLikeAsync(like.ArticleId, _userId);
 
             Assert.That(result, Is.True);
-            _likeRepositoryMock.Verify(r=>r.DeleteAsync(like), Times.Once);
+            _likeRepositoryMock.Verify(r => r.DeleteAsync(like), Times.Once);
         }
 
         [Test]

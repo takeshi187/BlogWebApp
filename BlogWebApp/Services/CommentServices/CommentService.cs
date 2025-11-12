@@ -1,7 +1,6 @@
 ﻿using BlogWebApp.Models;
 using BlogWebApp.Services.ArticleServices;
 using BlogWebApp.Services.UserServices;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlogWebApp.Services.CommentServices
@@ -21,7 +20,7 @@ namespace BlogWebApp.Services.CommentServices
             _logger = logger;
         }
         public async Task<Comment> CreateCommentAsync(Comment comment)
-        {           
+        {
             try
             {
                 if (string.IsNullOrWhiteSpace(comment.UserId))
@@ -47,12 +46,12 @@ namespace BlogWebApp.Services.CommentServices
                 _logger.LogWarning(ex, "Invalid comment data for creation.");
                 throw;
             }
-            catch(DbUpdateException ex)
+            catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, $"Database error while adding comment: {comment.CommentId} with content: {comment.Content}");
                 throw new InvalidOperationException("Failed to add comment to database.", ex);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"Unexpected error while adding comment: {comment.CommentId} with content: {comment.Content}");
                 throw;
@@ -60,7 +59,7 @@ namespace BlogWebApp.Services.CommentServices
         }
 
         public async Task<Comment?> GetCommentByIdAsync(Guid commentId)
-        {            
+        {
             try
             {
                 if (commentId == Guid.Empty)
@@ -72,12 +71,12 @@ namespace BlogWebApp.Services.CommentServices
 
                 return result;
             }
-            catch(InvalidOperationException ex)
+            catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, $"Comment not found: {commentId}");
                 throw;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"Unexpected error while searching comment with id: {commentId}");
                 throw;
@@ -85,7 +84,7 @@ namespace BlogWebApp.Services.CommentServices
         }
 
         public async Task<IEnumerable<Comment?>> GetCommentsByArticleIdAsync(Guid articleId)
-        {            
+        {
             try
             {
                 if (articleId == Guid.Empty)
@@ -126,7 +125,7 @@ namespace BlogWebApp.Services.CommentServices
                 var existingComment = await _commentRepository.GetByIdAsync(comment.CommentId);
                 if (existingComment == null)
                     throw new InvalidOperationException($"Comment with id: {comment.CommentId} not found.");
-                
+
                 existingComment.Content = comment.Content;
                 existingComment.UpdatedAt = DateTime.UtcNow;
                 await _commentRepository.UpdateAsync(existingComment);
@@ -150,7 +149,7 @@ namespace BlogWebApp.Services.CommentServices
         }
 
         public async Task<bool> DeleteCommentAsync(Guid commentId)
-        {            
+        {
             try
             {
                 if (commentId == Guid.Empty)

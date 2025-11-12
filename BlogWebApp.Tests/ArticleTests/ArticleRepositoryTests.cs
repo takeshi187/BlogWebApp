@@ -2,12 +2,6 @@
 using BlogWebApp.Models;
 using BlogWebApp.Services.ArticleServices;
 using Microsoft.EntityFrameworkCore;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlogWebApp.Tests.ArticleTests
 {
@@ -46,7 +40,7 @@ namespace BlogWebApp.Tests.ArticleTests
         public async Task GetArticleByIdAsync_ShouldReturnArticle_WhenArticleExist()
         {
             var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
-            
+
             await _articleRepository.AddAsync(article);
             var result = await _articleRepository.GetByIdAsync(article.ArticleId);
 
@@ -58,8 +52,8 @@ namespace BlogWebApp.Tests.ArticleTests
         public async Task UpdateArticleAsync_ShouldUpdateArticle_WhenArticleExist()
         {
             var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
-            
-            await _articleRepository.AddAsync(article);          
+
+            await _articleRepository.AddAsync(article);
             article.Title = "newtitle";
             article.UpdatedAt = DateTime.UtcNow;
 
@@ -74,17 +68,17 @@ namespace BlogWebApp.Tests.ArticleTests
         public async Task DeleteArticleAsync_ShouldDeleteArticle_WhenArticleExist()
         {
             var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
-            
+
             await _articleRepository.AddAsync(article);
             var result = await _articleRepository.DeleteAsync(article);
 
-            Assert.That(result, Is.True);           
+            Assert.That(result, Is.True);
         }
 
         [TearDown]
         public void TearDown()
         {
-            if(_db != null)
+            if (_db != null)
             {
                 _db.Dispose();
             }

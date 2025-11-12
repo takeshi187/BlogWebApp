@@ -1,6 +1,5 @@
 ﻿using BlogWebApp.Db;
 using BlogWebApp.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace BlogWebApp.Services.ArticleServices
 {
@@ -26,7 +25,7 @@ namespace BlogWebApp.Services.ArticleServices
         }
 
         public async Task<bool> UpdateAsync(Article article)
-        { 
+        {
             _db.Articles.Update(article);
             await _db.SaveChangesAsync();
             return true;

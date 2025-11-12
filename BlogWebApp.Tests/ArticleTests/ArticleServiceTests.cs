@@ -1,18 +1,8 @@
 ﻿using BlogWebApp.Models;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using NUnit.Framework.Legacy;
 using BlogWebApp.Services.ArticleServices;
-using NUnit.Framework.Internal;
 using Microsoft.Extensions.Logging;
+using Moq;
+using NUnit.Framework.Internal;
 
 
 namespace BlogWebApp.Tests.ArticleTests
@@ -101,7 +91,7 @@ namespace BlogWebApp.Tests.ArticleTests
         [Test]
         public async Task DeleteArticleAsync_ShouldDeleteArticle_WhenArticleExist()
         {
-            var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());           
+            var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
             _articleRepositoryMock.Setup(r => r.GetByIdAsync(article.ArticleId)).ReturnsAsync(article);
 
             await _articleService.DeleteArticleAsync(article.ArticleId);

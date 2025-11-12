@@ -98,7 +98,7 @@ namespace BlogWebApp.Services.GenreServices
                 _logger.LogError(ex, $"Unexpected error while searching genres");
                 throw;
             }
-        }        
-        
+        }
+
     }
 }

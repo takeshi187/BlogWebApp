@@ -5,11 +5,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlogWebApp.Tests.UserTests
 {
@@ -37,7 +32,7 @@ namespace BlogWebApp.Tests.UserTests
                 userManagerMock.Object, contextAccessor.Object, claimsFactory.Object, null, null, null, null);
 
             _userService = new UserService(_userRepositoryMock.Object, _signInManagerMock.Object, _loggerMock.Object);
-        }       
+        }
 
         [Test]
         public async Task RegisterUserAsync_ShouldReturnSuccess_WhenUserDoesNotExist()
@@ -119,7 +114,7 @@ namespace BlogWebApp.Tests.UserTests
             _userRepositoryMock.Setup(r => r.GetByEmailAsync("test@example.com"))
                 .ReturnsAsync((ApplicationUser?)null);
 
-            Assert.ThrowsAsync<InvalidOperationException>(async () => 
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 await _userService.LoginAsync("test@example.com", "password"));
         }
 
@@ -242,5 +237,5 @@ namespace BlogWebApp.Tests.UserTests
             await _userService.LogoutAsync();
             _signInManagerMock.Verify(s => s.SignOutAsync(), Times.Once);
         }
-    }   
+    }
 }

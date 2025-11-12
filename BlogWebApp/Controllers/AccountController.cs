@@ -1,7 +1,6 @@
 ﻿using BlogWebApp.Models;
 using BlogWebApp.Services.UserServices;
 using BlogWebApp.ViewModels;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogWebApp.Controllers
@@ -33,7 +32,7 @@ namespace BlogWebApp.Controllers
 
                 foreach (var error in result.Errors)
                     ModelState.AddModelError("", error.Description);
-            } 
+            }
 
             return View(model);
         }
@@ -54,8 +53,8 @@ namespace BlogWebApp.Controllers
 
                     if (result)
                         return RedirectToAction("Index", "Home");
-                } 
-                
+                }
+
                 ModelState.AddModelError("", "Неверный логин или пароль.");
             }
 

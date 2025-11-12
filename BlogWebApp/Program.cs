@@ -6,7 +6,6 @@ using BlogWebApp.Services.LikeServices;
 using BlogWebApp.Services.UserServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,8 +32,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.HttpOnly = true;
     options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
     options.LoginPath = "/Account/Login";
-    options.AccessDeniedPath= "/Account/AccessDenied"; 
-    options.SlidingExpiration = true;    
+    options.AccessDeniedPath = "/Account/AccessDenied";
+    options.SlidingExpiration = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // https only
 });
 
@@ -47,7 +46,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles(); 
+app.UseStaticFiles();
 
 app.UseRouting();
 

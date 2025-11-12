@@ -12,7 +12,7 @@ namespace BlogWebApp.Services.GenreServices
         {
             _db = db;
         }
-        
+
         public async Task<Genre> AddAsync(Genre genre)
         {
             await _db.Genres.AddAsync(genre);

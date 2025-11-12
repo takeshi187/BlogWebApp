@@ -18,7 +18,7 @@ namespace BlogWebApp.Services.ArticleServices
         {
             try
             {
-                if(article == null)
+                if (article == null)
                     throw new ArgumentException("Article cannot be empty.", nameof(article));
                 if (string.IsNullOrWhiteSpace(article.Title))
                     throw new ArgumentException("Title cannot be empty.", nameof(article.Title));
@@ -35,16 +35,16 @@ namespace BlogWebApp.Services.ArticleServices
                 _logger.LogWarning(ex, "Invalid article data for creation.");
                 throw;
             }
-            catch(DbUpdateException ex)
+            catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, $"Database error while adding article {article.Title}");
                 throw new InvalidOperationException("Failed to add article to database.", ex);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"Unexpected error while adding article {article.Title}");
                 throw;
-            }           
+            }
         }
 
         public async Task<Article?> GetArticleByIdAsync(Guid articleId)
@@ -59,12 +59,12 @@ namespace BlogWebApp.Services.ArticleServices
 
                 return article;
             }
-            catch(InvalidOperationException ex)
+            catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, $"Article not found: {articleId}");
                 throw;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"Unexpected error while searching article with id: {articleId}");
                 throw;
@@ -95,21 +95,21 @@ namespace BlogWebApp.Services.ArticleServices
                 await _articleRepository.UpdateAsync(existingArticle);
                 return existingArticle;
             }
-            catch(ArgumentException ex)
+            catch (ArgumentException ex)
             {
                 _logger.LogWarning(ex, "Invalid article data for updating.");
                 throw;
             }
-            catch(DbUpdateException ex)
+            catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, $"Database error while updating article: {article.ArticleId}");
                 throw new InvalidOperationException("Failed to update article.", ex);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"Unexpected error while updating article: {article.ArticleId}");
                 throw;
-            }          
+            }
         }
 
         public async Task<bool> DeleteArticleAsync(Guid articleId)
@@ -134,7 +134,7 @@ namespace BlogWebApp.Services.ArticleServices
                 _logger.LogError(ex, $"Database error while deleting article: {articleId}");
                 throw new InvalidOperationException("Failed to delete article.", ex);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"Unexpected error while deleting article: {articleId}");
                 throw;

@@ -2,11 +2,6 @@
 using BlogWebApp.Models;
 using BlogWebApp.Services.GenreServices;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlogWebApp.Tests.GenreTests
 {
@@ -20,7 +15,7 @@ namespace BlogWebApp.Tests.GenreTests
         public void SetUp()
         {
             var options = new DbContextOptionsBuilder<BlogWebAppDbContext>().UseInMemoryDatabase("TestDatabase").Options;
-          
+
             _db = new BlogWebAppDbContext(options);
             _genreRepository = new GenreRepository(_db);
         }
@@ -50,7 +45,7 @@ namespace BlogWebApp.Tests.GenreTests
 
         [Test]
         public async Task GetAllGenresAsync_ShouldReturnAllGenres_WhenGenresExist()
-        { 
+        {
             var genre1 = new Genre(Guid.NewGuid(), "testgenre1");
             var genre2 = new Genre(Guid.NewGuid(), "testgenre2");
             var genre3 = new Genre(Guid.NewGuid(), "testgenre3");

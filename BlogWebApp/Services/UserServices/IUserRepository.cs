@@ -7,7 +7,7 @@ namespace BlogWebApp.Services.UserServices
     {
         Task<IdentityResult> CreateAsync(ApplicationUser user, string passwordHash);
         Task<ApplicationUser?> GetByIdAsync(string userId);
-        Task<ApplicationUser?> GetByEmailAsync(string email);      
+        Task<ApplicationUser?> GetByEmailAsync(string email);
         Task<IdentityResult> DeleteAsync(ApplicationUser user);
         Task<bool> CheckPasswordAsync(ApplicationUser user, string passwordHash);
     }

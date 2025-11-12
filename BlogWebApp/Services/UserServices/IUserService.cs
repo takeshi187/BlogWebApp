@@ -10,6 +10,6 @@ namespace BlogWebApp.Services.UserServices
         Task<ApplicationUser?> GetUserByEmailAsync(string email);
         Task<ApplicationUser?> GetUserByIdAsync(string userId);
         Task<IdentityResult> DeleteUserAsync(string id);
-        Task LogoutAsync();        
+        Task LogoutAsync();
     }
 }

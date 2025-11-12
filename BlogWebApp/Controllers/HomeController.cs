@@ -1,6 +1,6 @@
-using System.Diagnostics;
 using BlogWebApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace BlogWebApp.Controllers
 {

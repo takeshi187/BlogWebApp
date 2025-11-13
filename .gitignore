@@ -380,3 +380,5 @@ FodyWeavers.xsd
 /BlogWebApp/Migrations/20251022155042_UpdateDb.cs
 /BlogWebApp/Migrations/20251023095959_InitialMigration.cs
 /BlogWebApp/Migrations/20251023095959_InitialMigration.Designer.cs
+/BlogWebApp/Migrations/20251113125552_InitialMigration.cs
+/BlogWebApp/Migrations/20251113125552_InitialMigration.Designer.cs

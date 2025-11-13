@@ -26,7 +26,7 @@ namespace BlogWebApp.Tests.UserTests
             var user = new ApplicationUser { Email = "test@example.com" };
             _userManagerMock.Setup(m => m.CreateAsync(user, "password")).ReturnsAsync(IdentityResult.Success);
 
-            var result = await _userRepository.CreateAsync(user, "password");
+            var result = await _userRepository.AddAsync(user, "password");
 
             Assert.That(result.Succeeded, Is.True);
         }

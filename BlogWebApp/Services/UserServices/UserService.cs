@@ -32,7 +32,7 @@ namespace BlogWebApp.Services.UserServices
                     return IdentityResult.Failed(new IdentityError { Description = "User already exist" });
 
                 var user = new ApplicationUser { UserName = username, Email = email };
-                var result = await _userRepository.CreateAsync(user, password);
+                var result = await _userRepository.AddAsync(user, password);
 
                 if (!result.Succeeded)
                     _logger.LogWarning($"Failed to register user: {email}. Errors{string.Join(", ", result.Errors.Select(e => e.Description))}");
@@ -98,14 +98,10 @@ namespace BlogWebApp.Services.UserServices
                     throw new ArgumentException("Email cannot be empty.", nameof(email));
 
                 var result = await _userRepository.GetByEmailAsync(email);
-                if (result == null) throw new InvalidOperationException($"User with email: {email} not found.");
+                if (result == null) 
+                    throw new InvalidOperationException($"User with email: {email} not found.");
 
                 return result;
-            }
-            catch (ArgumentException ex)
-            {
-                _logger.LogWarning(ex, $"User with email: {email} not found.");
-                throw;
             }
             catch (InvalidOperationException ex)
             {
@@ -123,11 +119,12 @@ namespace BlogWebApp.Services.UserServices
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(userId))
+                if (string.IsNullOrWhiteSpace(userId)) 
                     throw new ArgumentException("UserId cannot be empty.", nameof(userId));
 
                 var result = await _userRepository.GetByIdAsync(userId);
-                if (result == null) throw new InvalidOperationException($"User with userId: {userId} not found.");
+                if (result == null) 
+                    throw new InvalidOperationException($"User with userId: {userId} not found.");
 
                 return result;
             }

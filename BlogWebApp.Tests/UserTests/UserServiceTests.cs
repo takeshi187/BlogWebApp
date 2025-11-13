@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework.Internal;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace BlogWebApp.Tests.UserTests
 {
@@ -40,12 +41,13 @@ namespace BlogWebApp.Tests.UserTests
             _userRepositoryMock.Setup(r => r.GetByEmailAsync(It.IsAny<string>()))
                 .ReturnsAsync((ApplicationUser?)null);
 
-            _userRepositoryMock.Setup(r => r.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
+            _userRepositoryMock.Setup(r => r.AddAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
                 .ReturnsAsync(IdentityResult.Success);
 
             var result = await _userService.RegisterAsync("username", "test@example.com", "password");
 
             Assert.That(result.Succeeded, Is.True);
+            _userRepositoryMock.Verify(r => r.AddAsync(It.IsAny<ApplicationUser>(), "password"), Times.Once);
         }
 
         [Test]
@@ -58,6 +60,7 @@ namespace BlogWebApp.Tests.UserTests
 
             Assert.That(result.Succeeded, Is.False);
             Assert.That(result.Errors, Has.One.Matches<IdentityError>(e => e.Description.Contains("User already exist")));
+            _userRepositoryMock.Verify(r => r.AddAsync(It.IsAny<ApplicationUser>(), "password"), Times.Never);
         }
 
         [Test]
@@ -65,6 +68,7 @@ namespace BlogWebApp.Tests.UserTests
         {
             Assert.ThrowsAsync<ArgumentException>(async () =>
                 await _userService.RegisterAsync("", "test@example.com", "password"));
+            _userRepositoryMock.Verify(r => r.AddAsync(It.IsAny<ApplicationUser>(), "password"), Times.Never);
         }
 
         [Test]
@@ -72,6 +76,7 @@ namespace BlogWebApp.Tests.UserTests
         {
             var ex = Assert.ThrowsAsync<ArgumentException>(async () =>
                 await _userService.RegisterAsync("username", "", "password"));
+            _userRepositoryMock.Verify(r => r.AddAsync(It.IsAny<ApplicationUser>(), "password"), Times.Never);
         }
 
         [Test]
@@ -79,6 +84,7 @@ namespace BlogWebApp.Tests.UserTests
         {
             var ex = Assert.ThrowsAsync<ArgumentException>(async () =>
                 await _userService.RegisterAsync("username", "test@example.com", ""));
+            _userRepositoryMock.Verify(r => r.AddAsync(It.IsAny<ApplicationUser>(), "password"), Times.Never);
         }
 
         [Test]
@@ -89,6 +95,7 @@ namespace BlogWebApp.Tests.UserTests
 
             Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _userService.RegisterAsync("user", "a@a.com", "123"));
+            _userRepositoryMock.Verify(r => r.AddAsync(It.IsAny<ApplicationUser>(), "password"), Times.Never);
         }
 
         [Test]
@@ -106,6 +113,7 @@ namespace BlogWebApp.Tests.UserTests
             var result = await _userService.LoginAsync(user.Email, "password");
 
             Assert.That(result, Is.True);
+            _userRepositoryMock.Verify(r => r.GetByEmailAsync(user.Email), Times.Once);
         }
 
         [Test]
@@ -116,6 +124,7 @@ namespace BlogWebApp.Tests.UserTests
 
             Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 await _userService.LoginAsync("test@example.com", "password"));
+            _userRepositoryMock.Verify(r => r.GetByEmailAsync("test@example.com"), Times.Once);
         }
 
         [Test]
@@ -123,6 +132,7 @@ namespace BlogWebApp.Tests.UserTests
         {
             Assert.ThrowsAsync<ArgumentException>(async () =>
                 await _userService.LoginAsync("", "password"));
+            _userRepositoryMock.Verify(r => r.GetByEmailAsync(""), Times.Never);
         }
 
         [Test]
@@ -130,6 +140,7 @@ namespace BlogWebApp.Tests.UserTests
         {
             Assert.ThrowsAsync<ArgumentException>(async () =>
                 await _userService.LoginAsync("test@example.com", ""));
+            _userRepositoryMock.Verify(r => r.GetByEmailAsync("test@example.com"), Times.Never);
         }
 
         [Test]
@@ -148,6 +159,7 @@ namespace BlogWebApp.Tests.UserTests
         public void GetUserByEmailAsync_ShouldThrowArgumentException_WhenEmailEmpty()
         {
             Assert.ThrowsAsync<ArgumentException>(() => _userService.GetUserByEmailAsync(""));
+            _userRepositoryMock.Verify(r => r.GetByEmailAsync(""), Times.Never);
         }
 
         [Test]
@@ -157,6 +169,7 @@ namespace BlogWebApp.Tests.UserTests
                 .ReturnsAsync((ApplicationUser?)null);
 
             Assert.ThrowsAsync<InvalidOperationException>(() => _userService.GetUserByEmailAsync("test@example.com"));
+            _userRepositoryMock.Verify(r => r.GetByEmailAsync("test@example.com"), Times.Once);
         }
 
         [Test]
@@ -175,6 +188,7 @@ namespace BlogWebApp.Tests.UserTests
         public void GetUserByUserIdAsync_ShouldThrowArgumentException_WhenUserIdEmpty()
         {
             Assert.ThrowsAsync<ArgumentException>(() => _userService.GetUserByIdAsync(""));
+            _userRepositoryMock.Verify(r => r.GetByIdAsync(""), Times.Never);
         }
 
         [Test]
@@ -184,6 +198,7 @@ namespace BlogWebApp.Tests.UserTests
                 .ReturnsAsync((ApplicationUser?)null);
 
             Assert.ThrowsAsync<InvalidOperationException>(() => _userService.GetUserByIdAsync("1"));
+            _userRepositoryMock.Verify(r => r.GetByIdAsync("1"), Times.Once);
         }
 
         [Test]
@@ -213,12 +228,14 @@ namespace BlogWebApp.Tests.UserTests
 
             Assert.That(result.Succeeded, Is.False);
             Assert.That(result.Errors, Has.One.Matches<IdentityError>(e => e.Description.Contains("User not found")));
+            _userRepositoryMock.Verify(r => r.DeleteAsync(null), Times.Never);
         }
 
         [Test]
         public async Task DeleteUserAsync_ShouldThrowArgumentException_WhenUserIdEmpty()
         {
             Assert.ThrowsAsync<ArgumentException>(() => _userService.DeleteUserAsync(""));
+            _userRepositoryMock.Verify(r => r.DeleteAsync(null), Times.Never);
         }
 
         [Test]
@@ -229,6 +246,7 @@ namespace BlogWebApp.Tests.UserTests
 
             Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 await _userService.DeleteUserAsync("1"));
+            _userRepositoryMock.Verify(r => r.DeleteAsync(null), Times.Never);
         }
 
         [Test]

@@ -51,11 +51,6 @@ namespace BlogWebApp.Services.LikeServices
                 _logger.LogWarning(ex, "Invalid like data for creation.");
                 throw;
             }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogWarning(ex, $"Like with article id: {articleId}, user id: {userId} not found.");
-                throw;
-            }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, $"Database error while adding like with article id: {articleId}, user id: {userId}");
@@ -125,17 +120,17 @@ namespace BlogWebApp.Services.LikeServices
             {
                 if (articleId == Guid.Empty)
                     throw new ArgumentException("articleId cannot be empty.", nameof(articleId));
-                if (userId == null)
+                if (string.IsNullOrWhiteSpace(userId))
                     throw new ArgumentException("userId cannot be empty.", nameof(userId));
 
                 var likes = await _likeRepository.GetByArticleIdAsync(articleId);
-                if (likes == null)
-                    return false;
+                if (likes == null || !likes.Any())
+                    throw new InvalidOperationException($"Likes for article with id: {articleId} not found.");
 
                 var like = likes.FirstOrDefault(l => l.UserId == userId);
 
                 if (like == null)
-                    return false;
+                    throw new InvalidOperationException($"Like for user with id: {userId} not found.");
 
                 await _likeRepository.DeleteAsync(like);
                 return true;

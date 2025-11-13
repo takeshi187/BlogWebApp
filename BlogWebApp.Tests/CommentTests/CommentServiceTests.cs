@@ -242,6 +242,7 @@ namespace BlogWebApp.Tests.CommentTests
         {
             Assert.ThrowsAsync<ArgumentException>(async () =>
                 await _commentService.UpdateCommentAsync(null));
+            _commentRepositoryMock.Verify(r => r.GetByIdAsync(Guid.Empty), Times.Never);
         }
 
         [Test]
@@ -275,8 +276,8 @@ namespace BlogWebApp.Tests.CommentTests
             var comment = new Comment(Guid.NewGuid(), "Test content", "testuser", Guid.NewGuid());
             _commentRepositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Comment?)null);
 
-            _commentRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Comment>()), Times.Never);
             Assert.ThrowsAsync<InvalidOperationException>(async () => await _commentService.DeleteCommentAsync(comment.CommentId));
+            _commentRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Comment>()), Times.Never);
         }
 
         [Test]
@@ -284,6 +285,7 @@ namespace BlogWebApp.Tests.CommentTests
         {
             Assert.ThrowsAsync<ArgumentException>(async () =>
                await _commentService.DeleteCommentAsync(Guid.Empty));
+            _commentRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Comment>()), Times.Never);
         }
     }
 }

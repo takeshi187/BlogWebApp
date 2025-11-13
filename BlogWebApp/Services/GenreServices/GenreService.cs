@@ -37,11 +37,6 @@ namespace BlogWebApp.Services.GenreServices
                 _logger.LogWarning(ex, "Invalid genre data for adding.");
                 throw;
             }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogWarning(ex, $"Genre with name: {genreName} is already exist");
-                throw;
-            }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, $"Database error while adding genre: {genreName}");

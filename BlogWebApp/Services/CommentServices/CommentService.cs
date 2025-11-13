@@ -66,7 +66,7 @@ namespace BlogWebApp.Services.CommentServices
                     throw new ArgumentException("CommentId cannot be empty.", nameof(commentId));
 
                 var result = await _commentRepository.GetByIdAsync(commentId);
-                if (result == null)
+                if (result == null) 
                     throw new InvalidOperationException($"Comment with id: {commentId} not found.");
 
                 return result;
@@ -156,7 +156,8 @@ namespace BlogWebApp.Services.CommentServices
                     throw new ArgumentException($"CommentId cannot be empty", nameof(commentId));
 
                 var comment = await _commentRepository.GetByIdAsync(commentId);
-                if (comment == null) throw new InvalidOperationException($"Comment with id {commentId} not found.");
+                if (comment == null) 
+                    throw new InvalidOperationException($"Comment with id {commentId} not found.");
 
                 return await _commentRepository.DeleteAsync(comment);
             }

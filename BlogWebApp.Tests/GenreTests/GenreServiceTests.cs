@@ -73,6 +73,13 @@ namespace BlogWebApp.Tests.GenreTests
         }
 
         [Test]
+        public async Task GetGenreById_ShouldThrowArgumentException_WhenGenreEmpty()
+        {
+            Assert.ThrowsAsync<ArgumentException>(async () => await _genreService.GetGenreByIdAsync(Guid.Empty));
+            _genreRepositoryMock.Verify(r => r.GetByIdAsync(Guid.Empty), Times.Never);
+        }
+
+        [Test]
         public async Task GetAllGenresAsync_ShouldReturnAllGenres_WhenGenresExist()
         {
             var genre1 = new Genre(Guid.NewGuid(), "testname1");

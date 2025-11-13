@@ -51,11 +51,12 @@ namespace BlogWebApp.Services.ArticleServices
         {
             try
             {
-                if (articleId == Guid.Empty)
+                if (articleId == Guid.Empty) 
                     throw new ArgumentException("ArticleId cannot be empty.", nameof(articleId));
 
                 var article = await _articleRepository.GetByIdAsync(articleId);
-                if (article == null) throw new InvalidOperationException($"Article with id: {articleId} not found.");
+                if (article == null) 
+                    throw new InvalidOperationException($"Article with id: {articleId} not found.");
 
                 return article;
             }
@@ -85,7 +86,8 @@ namespace BlogWebApp.Services.ArticleServices
                     throw new ArgumentException("GenreId cannot be empty.", nameof(article.GenreId));
 
                 var existingArticle = await _articleRepository.GetByIdAsync(article.ArticleId);
-                if (existingArticle == null) throw new InvalidOperationException($"Article with id: {article.ArticleId} not found.");
+                if (existingArticle == null) 
+                    throw new InvalidOperationException($"Article with id: {article.ArticleId} not found.");
 
                 existingArticle.Title = article.Title;
                 existingArticle.Image = article.Image;
@@ -120,7 +122,8 @@ namespace BlogWebApp.Services.ArticleServices
                     throw new ArgumentException("ArticleId cannot be empty.", nameof(articleId));
 
                 var article = await _articleRepository.GetByIdAsync(articleId);
-                if (article == null) throw new InvalidOperationException($"Article with id: {articleId} not found.");
+                if (article == null) 
+                    throw new InvalidOperationException($"Article with id: {articleId} not found.");
 
                 return await _articleRepository.DeleteAsync(article);
             }

@@ -10,9 +10,9 @@ namespace BlogWebApp.Services.CommentServices
         private readonly ICommentRepository _commentRepository;
         private readonly IArticleService _articleService;
         private readonly IUserService _userService;
-        private readonly ILogger _logger;
+        private readonly ILogger<CommentService> _logger;
 
-        public CommentService(ICommentRepository commentRepository, IArticleService articleService, IUserService userService, ILogger logger)
+        public CommentService(ICommentRepository commentRepository, IArticleService articleService, IUserService userService, ILogger<CommentService> logger)
         {
             _commentRepository = commentRepository;
             _articleService = articleService;

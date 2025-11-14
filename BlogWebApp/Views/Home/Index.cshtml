@@ -1,8 +1,47 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "About Me";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container py-5">
+    <!--HEADER-->
+    <div class="text-center mb-5">
+        <h1 class="fw-bold display-5">Приветствую! Меня зовут Максим!</h1>
+        <p class="lead text-muted">
+            Я backend-разработчик, изучаю .NET платформу, SQL и много других технологий, связанных с IT
+        </p>
+    </div>
+
+    <!--PROFILE-->
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8">
+            <div class="card shadow-sm border p-4 rounded-4">
+                <div class="row align-items-center">
+                    <div class="col text-center">
+                        <img src = "/img/profile.png"
+                            class="img-fluid shadow-sm mb-3"
+                            style="max-width: 140px;"
+                            alt="Profile picture" />
+                    </div>
+                    <div class="col-md-8">
+                        <h3 class="fw-semibold mb-3">Кто я?</h3>
+                        <p>
+                            Я начинающий .NET-разработчик,
+                            сейчас я ищу работу программистом и
+                            разрабатываю этот блог, 
+                            чтобы делиться своим опытом с читателями.
+                        </p>
+                        <p>
+                            Мой стек:
+                        </p>
+                        <ul>
+                            <li>C#, ASP.NET Core MVC / Web API / REST API</li>
+                            <li>PostgreSQL, MSSQL, EF Core, LINQ</li>
+                            <li>Git, GitHub</li>
+                            <li>Python, TypeScript</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

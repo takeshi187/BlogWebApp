@@ -1,0 +1,35 @@
+﻿@using BlogWebApp.ViewModels
+@model ArticleViewModel
+@{
+    ViewData["Title"] = "Создать пост";
+}
+
+<h2>Создать новый пост</h2>
+
+<form asp-action="Create" method="post">
+
+    <div class="form-group mb-3">
+        <label asp-for="Title" class="form-label">Заголовок</label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="GenreId" class="form-label">Жанр</label>
+        <select asp-for="GenreId" asp-items="ViewBag.Genres" class="form-select" />
+        <span asp-validation-for="GenreId" class="text-danger" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Content" class="form-label">Текст поста</label>
+        <textarea asp-for="Content" class="form-control" rows="8" />
+        <span asp-validation-for="Content" class="text-danger" />
+    </div>
+
+    <button class="btn btn-primary" type="submit">Создать пост</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+}
+

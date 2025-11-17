@@ -1,5 +1,6 @@
 ﻿using BlogWebApp.Db;
 using BlogWebApp.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlogWebApp.Services.ArticleServices
 {
@@ -22,6 +23,11 @@ namespace BlogWebApp.Services.ArticleServices
         public async Task<Article?> GetByIdAsync(Guid articleId)
         {
             return await _db.Articles.FindAsync(articleId);
+        }
+
+        public async Task<IEnumerable<Article?>> GetAllAsync()
+        {
+            return await _db.Articles.ToListAsync();
         }
 
         public async Task<bool> UpdateAsync(Article article)

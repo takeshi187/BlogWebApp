@@ -72,6 +72,29 @@ namespace BlogWebApp.Services.ArticleServices
             }
         }
 
+        public async Task<IEnumerable<Article?>> GetAllArticlesAsync()
+        {
+            try
+            {
+                var articles = await _articleRepository.GetAllAsync();
+
+                if (articles == null || !articles.Any())
+                    throw new InvalidOperationException("No one article not found.");
+
+                return articles;
+            }
+            catch(InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "No one article not found");
+                throw;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error while searching articles.");
+                throw;
+            }
+        }
+
         public async Task<Article?> UpdateArticleAsync(Article article)
         {
             try

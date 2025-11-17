@@ -49,6 +49,24 @@ namespace BlogWebApp.Tests.ArticleTests
         }
 
         [Test]
+        public async Task GetAllArticlesAsync_ShouldReturnArticles_WhenArticlesExist()
+        {
+            var article1 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
+            var article2 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
+            var article3 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
+
+            _db.Articles.RemoveRange(_db.Articles);
+            await _db.SaveChangesAsync();
+            await _articleRepository.AddAsync(article1);
+            await _articleRepository.AddAsync(article2);
+            await _articleRepository.AddAsync(article3);
+
+            var result = await _articleRepository.GetAllAsync();
+
+            Assert.That(result.Count, Is.EqualTo(3));
+        }
+
+        [Test]
         public async Task UpdateArticleAsync_ShouldUpdateArticle_WhenArticleExist()
         {
             var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());

@@ -108,6 +108,30 @@ namespace BlogWebApp.Tests.ArticleTests
         }
 
         [Test]
+        public async Task GetAllArticlesAsync_ShouldReturnAllArticles_WhenArticlesExist()
+        {
+            var article1 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
+            var article2 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
+            var article3 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
+            var articles = new List<Article> { article1, article2, article3 };
+            _articleRepositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(articles);
+
+            var result = await _articleService.GetAllArticlesAsync();
+
+            Assert.That(articles, Is.EqualTo(articles));
+            _articleRepositoryMock.Verify(r => r.GetAllAsync(), Times.Once);
+        }
+
+        [Test]
+        public async Task GetAllArticlesAsync_ShouldThrowInvalidOperationException_WhenArticlesNotFound()
+        {
+            _articleRepositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Article>());
+
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await _articleService.GetAllArticlesAsync());
+            _articleRepositoryMock.Verify(r => r.GetAllAsync(), Times.Once);        
+        }
+
+        [Test]
         public async Task DeleteArticleAsync_ShouldDeleteArticle_WhenArticleExist()
         {
             var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());

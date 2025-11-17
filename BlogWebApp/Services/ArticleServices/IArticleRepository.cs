@@ -6,6 +6,7 @@ namespace BlogWebApp.Services.ArticleServices
     {
         Task<Article> AddAsync(Article article);
         Task<Article?> GetByIdAsync(Guid articleId);
+        Task<IEnumerable<Article?>> GetAllAsync();
         Task<bool> UpdateAsync(Article article);
         Task<bool> DeleteAsync(Article article);
     }

@@ -1,27 +1,43 @@
-﻿@{
+﻿@using BlogWebApp.ViewModels
+@model IEnumerable<ArticleViewModel>
+@{
     ViewData["Title"] = "Блог";
 }
 
-<section class="blog-header">
-    <h1>Блог</h1>
-    <p class="subtitle">Статьи, заметки, мысли о разработке и не только</p>
+<section class="widget">
+    <h3>Поиск</h3>
+    <input class="search-input" type="text" placeholder="Найдется почти всё" />
+    <button class="btn btn-primary" type="submit">Поиск</button>
 </section>
 
-<div class="blog-container">
-    <aside class="sidebar">
-        <div class="widget">
-            <h3>Категории</h3>
-            <ul>
-                <li>ASP.NET</li>
-                <li>Тестирование</li>
-            </ul>
-        </div>
+<section class="blog-header">
+    <h1>Блог</h1>
+</section>
 
-        <div class="widget">
-            <h3>Поиск</h3>
-            <input class="search-input" type="text" placeholder="Найдется почти всё..." />
+<div class="blog-container row">
+    
+    @foreach (var article in Model)
+    {
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-bod">
+                    <h3>@article.Title</h3>
+                    <p class="text-muted">@article.GenreId @article.CreatedAt.ToString("dd MMM yyyy")</p>
+
+                    <p>
+                        @(article.Content.Length > 150 
+                            ? article.Content.Substring(0, 150) + "..."
+                            : article.Content)
+                    </p>
+
+                    <a class="btn btn-outline-primary" asp-action="Details" asp-route-id="@article.ArticleViewModelId">
+                        Читать полностью
+                    </a>
+                </div>
+            </div>
         </div>
-    </aside>
+    }
+
 </div>
 
 <style>

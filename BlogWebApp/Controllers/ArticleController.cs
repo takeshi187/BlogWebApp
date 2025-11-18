@@ -1,4 +1,5 @@
-﻿using BlogWebApp.Models;
+﻿using BlogWebApp.Mappers;
+using BlogWebApp.Models;
 using BlogWebApp.Services.ArticleServices;
 using BlogWebApp.Services.GenreServices;
 using BlogWebApp.ViewModels;
@@ -26,41 +27,29 @@ namespace BlogWebApp.Controllers
         public async Task<IActionResult> Index()
         {
             var articles = await _articleService.GetAllArticlesAsync();
+            var vm = articles.Select(ArticleMapper.ToViewModel).ToList();
             return View(articles);
         }
 
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var genres = await _genreService.GetAllGenresAsync();
-
-            var articleViewModel = new ArticleViewModel();
-
-            ViewBag.Genres = new SelectList(genres, "Id", "Name");
-
-            return View(articleViewModel);
+            ViewBag.Genres = new SelectList(await _genreService.GetAllGenresAsync(), "Id", "Name");
+            return View(new ArticleViewModel());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ArticleViewModel articleViewModel)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var genres = await _genreService.GetAllGenresAsync();
-                ViewBag.Genres = new SelectList(genres, "Id", "Name");
-                var article = new Article
-                {
-                    Title = articleViewModel.Title,
-                    Image = articleViewModel.Image,
-                    Content = articleViewModel.Content,
-                    GenreId = articleViewModel.GenreId
-                };
-                
-                await _articleService.CreateArticleAsync(article);
+                ViewBag.Genres = new SelectList(await _genreService.GetAllGenresAsync(), "Id", "Name");
                 return View(articleViewModel);
             }
-          
+
+            var article = ArticleMapper.ToEntity(articleViewModel);
+            await _articleService.CreateArticleAsync(article);
             return RedirectToAction(nameof(Index));
         }
 
@@ -69,8 +58,34 @@ namespace BlogWebApp.Controllers
         {
             var article = await _articleService.GetArticleByIdAsync(articleId);
             if (article == null) return NotFound();
-
+            var vm = ArticleMapper.ToViewModel(article);
             return View(article);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(Guid articleId)
+        {
+            var article = await _articleService.GetArticleByIdAsync(articleId);
+            if (article == null) return NotFound();
+            var vm = ArticleMapper.ToViewModel(article);
+            ViewBag.Genres = new SelectList(await _genreService.GetAllGenresAsync(), "Id", "Name");
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(ArticleViewModel articleViewModel)
+        {
+            if(!ModelState.IsValid)
+            {
+                ViewBag.Genres = new SelectList(await _genreService.GetAllGenresAsync(), "Id", "Name");
+                return View(articleViewModel);
+            }
+            var article = await _articleService.GetArticleByIdAsync(articleViewModel.ArticleViewModelId);
+            if (article == null) return NotFound();
+            ArticleMapper.MapToExistingEntity(articleViewModel, article);
+            await _articleService.UpdateArticleAsync(article);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

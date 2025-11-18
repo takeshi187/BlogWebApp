@@ -5,7 +5,7 @@ namespace BlogWebApp.ViewModels
 {
     public class ArticleViewModel
     {
-        public Guid ArticleViewModelId { get; set; } = Guid.NewGuid();
+        public Guid ArticleViewModelId { get; set; }
         [Required(ErrorMessage = "Заголовок обязателен.")]
         [MaxLength(300, ErrorMessage = "Длина заголовка не должна превышать 300 символов.")]
         public string Title { get; set; } = null!;
@@ -18,7 +18,8 @@ namespace BlogWebApp.ViewModels
 
         [Required(ErrorMessage = "Жанр обязателен.")]
         public Guid GenreId { get; set; }
+        public string GenreName { get; set; } = null!;
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
     }
 }

@@ -6,9 +6,9 @@ namespace BlogWebApp.Services.GenreServices
     public class GenreService : IGenreService
     {
         private readonly IGenreRepository _genreRepository;
-        private readonly ILogger _logger;
+        private readonly ILogger<GenreService> _logger;
 
-        public GenreService(IGenreRepository genreRepository, ILogger logger)
+        public GenreService(IGenreRepository genreRepository, ILogger<GenreService> logger)
         {
             _genreRepository = genreRepository;
             _logger = logger;

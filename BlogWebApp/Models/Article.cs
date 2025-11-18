@@ -50,6 +50,6 @@ namespace BlogWebApp.Models
             GenreId = genreId;
         }
 
-        public Article() { }
+        private Article() { }
     }
 }

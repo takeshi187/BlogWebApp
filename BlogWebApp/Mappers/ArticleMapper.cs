@@ -14,7 +14,9 @@ namespace BlogWebApp.Mappers
                 Content = article.Content,
                 Image = article.Image,
                 GenreId = article.GenreId,
-                GenreName = article.Genre?.GenreName
+                GenreName = article.Genre?.GenreName,
+                CreatedAt = article.CreatedAt,
+                UpdatedAt = article.UpdatedAt
             };
         }
 

@@ -76,24 +76,13 @@ namespace BlogWebApp.Services.GenreServices
         {
             try
             {
-                var genres = await _genreRepository.GetAllAsync();
-
-                if (genres == null || !genres.Any())
-                    throw new InvalidOperationException("No one genre not found.");
-
-                return genres;
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogWarning(ex, "No one genre not found.");
-                throw;
+                return await _genreRepository.GetAllAsync();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unexpected error while searching genres/");
+                _logger.LogError(ex, "Unexpected error while searching genres.");
                 throw;
             }
         }
-
     }
 }

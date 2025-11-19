@@ -76,17 +76,8 @@ namespace BlogWebApp.Services.ArticleServices
         {
             try
             {
-                var articles = await _articleRepository.GetAllAsync();
+                return await _articleRepository.GetAllAsync();
 
-                if (articles == null || !articles.Any())
-                    throw new InvalidOperationException("No one article not found.");
-
-                return articles;
-            }
-            catch(InvalidOperationException ex)
-            {
-                _logger.LogWarning(ex, "No one article not found");
-                throw;
             }
             catch(Exception ex)
             {

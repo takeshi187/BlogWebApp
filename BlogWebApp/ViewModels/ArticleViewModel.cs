@@ -13,13 +13,15 @@ namespace BlogWebApp.ViewModels
         public string? Image { get; set; }
 
         [Required(ErrorMessage = "Текст поста обязателен.")]
-        [MinLength(10, ErrorMessage = "Статья должна содержать минимум 10 символов.")]
         public string Content { get; set; } = null!;
 
         [Required(ErrorMessage = "Жанр обязателен.")]
         public Guid GenreId { get; set; }
         public string GenreName { get; set; } = null!;
 
+        public List<Genre> Genres { get; set; } = new();
+
         public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
 }

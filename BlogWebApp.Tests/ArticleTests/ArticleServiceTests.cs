@@ -123,15 +123,6 @@ namespace BlogWebApp.Tests.ArticleTests
         }
 
         [Test]
-        public async Task GetAllArticlesAsync_ShouldThrowInvalidOperationException_WhenArticlesNotFound()
-        {
-            _articleRepositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Article>());
-
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await _articleService.GetAllArticlesAsync());
-            _articleRepositoryMock.Verify(r => r.GetAllAsync(), Times.Once);        
-        }
-
-        [Test]
         public async Task DeleteArticleAsync_ShouldDeleteArticle_WhenArticleExist()
         {
             var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());

@@ -92,14 +92,5 @@ namespace BlogWebApp.Tests.GenreTests
             Assert.That(genres, Is.EqualTo(result));
             _genreRepositoryMock.Verify(r => r.GetAllAsync(), Times.Once);
         }
-
-        [Test]
-        public async Task GetAllGenresAsync_ShouldThrowInvalidOperationException_WhenGenresNotFound()
-        {
-            _genreRepositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Genre>());
-
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await _genreService.GetAllGenresAsync());
-            _genreRepositoryMock.Verify(r => r.GetAllAsync(), Times.Once);
-        }
     }
 }

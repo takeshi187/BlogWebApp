@@ -17,9 +17,8 @@ namespace BlogWebApp.ViewModels
 
         [Required(ErrorMessage = "Жанр обязателен.")]
         public Guid GenreId { get; set; }
-        public string GenreName { get; set; } = null!;
 
-        public List<Genre> Genres { get; set; } = new();
+        public List<GenreViewModel> Genres { get; set; } = new();
 
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

@@ -1,0 +1,18 @@
+﻿@using BlogWebApp.ViewModels
+@model GenreViewModel
+@{
+    ViewData["Title"] = "Создать жанр";
+}
+
+<h2>Создать жанр</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group mb-3">
+        <label asp-for="GenreName" class="form-label">Жанр</label>
+        <input asp-for="GenreName" class="form-control" />
+        <span asp-validation-for="GenreName" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a asp-controller="Article" asp-action="Create" class="btn btn-secondary">Назад</a>
+</form>

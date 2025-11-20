@@ -6,7 +6,7 @@ namespace BlogWebApp.ViewModels
     {
         public Guid GenreId { get; set; }
         [Required(ErrorMessage = "Имя жанра должно быть заполнено.")]
-        [MaxLength(255, ErrorMessage = "Имя жанра не должно превышать 255 символов.")]
+        [MaxLength(150, ErrorMessage = "Имя жанра не должно превышать 150 символов.")]
         public string GenreName { get; set; } = null!;
     }
 }

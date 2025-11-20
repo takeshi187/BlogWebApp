@@ -47,14 +47,6 @@ namespace BlogWebApp.Controllers
                 return View(articleViewModel);
             }
 
-            foreach (var entry in ModelState)
-            {
-                foreach (var error in entry.Value.Errors)
-                {
-                    Console.WriteLine($"Model error in '{entry.Key}': {error.ErrorMessage}");
-                }
-            } // удолить
-
             var article = ArticleMapper.ToEntity(articleViewModel);
             await _articleService.CreateArticleAsync(article);
             return RedirectToAction("Index", "Blog");

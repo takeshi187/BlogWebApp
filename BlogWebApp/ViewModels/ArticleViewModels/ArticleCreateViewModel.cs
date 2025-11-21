@@ -1,11 +1,10 @@
 ﻿using BlogWebApp.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace BlogWebApp.ViewModels
+namespace BlogWebApp.ViewModels.ArticleViewModels
 {
-    public class ArticleViewModel
+    public class ArticleCreateViewModel
     {
-        public Guid ArticleViewModelId { get; set; }
         [Required(ErrorMessage = "Заголовок обязателен.")]
         [MaxLength(300, ErrorMessage = "Длина заголовка не должна превышать 300 символов.")]
         public string Title { get; set; } = null!;
@@ -19,8 +18,5 @@ namespace BlogWebApp.ViewModels
         public Guid GenreId { get; set; }
 
         public List<GenreViewModel> Genres { get; set; } = new();
-
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
     }
 }

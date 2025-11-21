@@ -1,6 +1,6 @@
 ﻿using BlogWebApp.Mappers;
 using BlogWebApp.Services.ArticleServices;
-using BlogWebApp.ViewModels;
+using BlogWebApp.ViewModels.ArticleViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogWebApp.Controllers
@@ -19,8 +19,8 @@ namespace BlogWebApp.Controllers
         {
             var articles = await _articleService.GetAllArticlesAsync();
             if (!articles.Any())
-                return View(new List<ArticleViewModel>());
-            var articleViewModel = articles.Select(ArticleMapper.ToViewModel).ToList();
+                return View(new List<ArticleCreateViewModel>());
+            var articleViewModel = articles.Select(ArticleMapper.ToListViewModel).ToList();
             return View(articleViewModel);
         }
     }

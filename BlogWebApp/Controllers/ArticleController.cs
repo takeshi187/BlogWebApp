@@ -2,7 +2,7 @@
 using BlogWebApp.Models;
 using BlogWebApp.Services.ArticleServices;
 using BlogWebApp.Services.GenreServices;
-using BlogWebApp.ViewModels;
+using BlogWebApp.ViewModels.ArticleViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Formats.Asn1;
@@ -28,7 +28,7 @@ namespace BlogWebApp.Controllers
         {
             var genres = await _genreService.GetAllGenresAsync();
 
-            var articleViewModel = new ArticleViewModel
+            var articleViewModel = new ArticleCreateViewModel
             {
                 Genres = genres.Select(GenreMapper.ToViewModel).ToList()
             };
@@ -38,7 +38,7 @@ namespace BlogWebApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ArticleViewModel articleViewModel)
+        public async Task<IActionResult> Create(ArticleCreateViewModel articleViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -58,7 +58,7 @@ namespace BlogWebApp.Controllers
             var article = await _articleService.GetArticleByIdAsync(articleId);
             if (article == null) 
                 return NotFound();
-            return View(ArticleMapper.ToViewModel(article));
+            return View(ArticleMapper.ToListViewModel(article));
         }
 
         [HttpGet]
@@ -75,7 +75,7 @@ namespace BlogWebApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(ArticleViewModel articleViewModel)
+        public async Task<IActionResult> Edit(ArticleCreateViewModel articleViewModel)
         {
             if(!ModelState.IsValid)
             {

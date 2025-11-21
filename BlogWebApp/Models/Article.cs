@@ -29,9 +29,6 @@ namespace BlogWebApp.Models
         public List<Comment> Comments { get; set; } = new();
         public List<Like> Likes { get; set; } = new();
 
-        [NotMapped]
-        public int LikesCount => Likes.Count;
-
         public Article(string title, string? image, string content, Guid genreId)
         {
             Title = title;

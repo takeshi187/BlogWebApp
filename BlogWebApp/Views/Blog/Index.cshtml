@@ -1,5 +1,5 @@
-﻿@using BlogWebApp.ViewModels.ArticleViewModels
-@model List<ArticleListViewModel>
+﻿@using BlogWebApp.ViewModels
+@model IEnumerable<ArticleViewModel>
 @{
     ViewData["Title"] = "Блог";
 }
@@ -35,7 +35,11 @@
                 <div class="card-body">
                     <h3>@article.Title</h3>
 
-                    <p>@article.ShortContent</p>
+                    <p>
+                        @(article.Content.Length > 500
+                        ? article.Content.Substring(0, 500) + "..."
+                        : article.Content)
+                    </p>
 
                     <p>
                         <strong>@article.GenreName</strong>
@@ -44,7 +48,7 @@
                         <strong>Коментов:</strong> @article.CommentsCount
                     </p>
 
-                    <a asp-controller="Article" asp-action="Details" asp-route-id="@article.ArticleListViewModelId" 
+                    <a asp-controller="Article" asp-action="Details" asp-route-id="@article.ArticleViewModelId" 
                         class="btn btn-primary">
                         Читать далее
                     </a>
@@ -52,84 +56,4 @@
             </div>
         }
     }
-
 </div>
-
-<style>
-    .blog-header {
-        text-align: center;
-        padding: 40px 0;
-    }
-
-    .subtitle {
-        color: #666;
-    }
-
-    .blog-container {
-        display: flex;
-        gap: 30px;
-    }
-
-    .posts-list {
-        flex: 3;
-    }
-
-    .post-card {
-        background: #fff;
-        padding: 20px;
-        margin-bottom: 25px;
-        border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
-
-    .post-title {
-        margin-bottom: 10px;
-        font-size: 26px;
-    }
-
-    .post-meta {
-        font-size: 14px;
-        color: #999;
-        margin-bottom: 15px;
-    }
-
-    .post-preview {
-        color: #444;
-        margin-bottom: 15px;
-    }
-
-    .read-more {
-        font-weight: bold;
-        text-decoration: none;
-        color: #276ef1;
-    }
-
-    .sidebar {
-        flex: 1;
-    }
-
-    .widget {
-        background: #fff;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-        margin-bottom: 20px;
-    }
-
-        .widget ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .widget li {
-            margin-bottom: 5px;
-            color: #555;
-        }
-
-    .search-input {
-        width: 100%;
-        padding: 8px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-    }
-</style>

@@ -1,6 +1,7 @@
 ﻿using BlogWebApp.Db;
 using BlogWebApp.Models;
 using BlogWebApp.Services.ArticleServices;
+using BlogWebApp.Services.GenreServices;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlogWebApp.Tests.ArticleTests
@@ -9,6 +10,7 @@ namespace BlogWebApp.Tests.ArticleTests
     public class ArticleRepositoryTests
     {
         private ArticleRepository _articleRepository;
+        private GenreRepository _genreRepository;
         private BlogWebAppDbContext _db;
 
         [SetUp]
@@ -18,6 +20,7 @@ namespace BlogWebApp.Tests.ArticleTests
 
             _db = new BlogWebAppDbContext(options);
             _articleRepository = new ArticleRepository(_db);
+            _genreRepository = new GenreRepository(_db);
         }
 
         [Test]
@@ -39,31 +42,45 @@ namespace BlogWebApp.Tests.ArticleTests
         [Test]
         public async Task GetArticleByIdAsync_ShouldReturnArticle_WhenArticleExist()
         {
-            var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
+            var genre = new Genre(Guid.NewGuid(), "testgenre");
+            await _genreRepository.AddAsync(genre);
+            await _db.SaveChangesAsync();
+
+            var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", genre.GenreId);
 
             await _articleRepository.AddAsync(article);
             var result = await _articleRepository.GetByIdAsync(article.ArticleId);
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result.ArticleId, Is.EqualTo(article.ArticleId));
+            Assert.That(result.Genre, Is.Not.Null);
+            Assert.That(result.Genre.GenreName, Is.EqualTo("testgenre"));
         }
 
         [Test]
         public async Task GetAllArticlesAsync_ShouldReturnArticles_WhenArticlesExist()
         {
-            var article1 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
-            var article2 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
-            var article3 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
-
             _db.Articles.RemoveRange(_db.Articles);
+            _db.Genres.RemoveRange(_db.Genres);
             await _db.SaveChangesAsync();
+
+            var genre = new Genre(Guid.NewGuid(), "testgenre");
+            await _genreRepository.AddAsync(genre);
+            await _db.SaveChangesAsync();
+
+            var article1 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", genre.GenreId);
+            var article2 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", genre.GenreId);
+            var article3 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", genre.GenreId);
+           
             await _articleRepository.AddAsync(article1);
             await _articleRepository.AddAsync(article2);
             await _articleRepository.AddAsync(article3);
 
             var result = await _articleRepository.GetAllAsync();
 
+            Assert.That(result, Is.Not.Null);
             Assert.That(result.Count, Is.EqualTo(3));
+            Assert.That(result.All(a => a.Genre != null), Is.True);
         }
 
         [Test]

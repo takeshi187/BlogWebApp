@@ -1,8 +1,9 @@
 ﻿using BlogWebApp.Mappers;
 using BlogWebApp.Models;
 using BlogWebApp.Services.ArticleServices;
+using BlogWebApp.Services.CommentServices;
 using BlogWebApp.Services.GenreServices;
-using BlogWebApp.ViewModels.ArticleViewModels;
+using BlogWebApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Formats.Asn1;
@@ -15,20 +16,21 @@ namespace BlogWebApp.Controllers
         private readonly IArticleService _articleService;
         private readonly ILogger<ArticleController> _logger;
         private readonly IGenreService _genreService;
+        private readonly ICommentService _commentService;
 
-        public ArticleController(IArticleService articleService, ILogger<ArticleController> logger, IGenreService genreService)
+        public ArticleController(IArticleService articleService, ILogger<ArticleController> logger, IGenreService genreService, ICommentService commentService)
         {
             _articleService = articleService;
             _logger = logger;
             _genreService = genreService;
+            _commentService = commentService;
         }      
 
         [HttpGet]
         public async Task<IActionResult> Create()
         {
             var genres = await _genreService.GetAllGenresAsync();
-
-            var articleViewModel = new ArticleCreateViewModel
+            var articleViewModel = new ArticleViewModel
             {
                 Genres = genres.Select(GenreMapper.ToViewModel).ToList()
             };
@@ -38,18 +40,18 @@ namespace BlogWebApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ArticleCreateViewModel articleViewModel)
+        public async Task<IActionResult> Create(ArticleViewModel articleViewModel)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                var genres = await _genreService.GetAllGenresAsync();
-                articleViewModel.Genres = genres.Select(GenreMapper.ToViewModel).ToList();
-                return View(articleViewModel);
+                var article = ArticleMapper.ToEntity(articleViewModel);
+                await _articleService.CreateArticleAsync(article);
+                return RedirectToAction("Index", "Blog");               
             }
 
-            var article = ArticleMapper.ToEntity(articleViewModel);
-            await _articleService.CreateArticleAsync(article);
-            return RedirectToAction("Index", "Blog");
+            var genres = await _genreService.GetAllGenresAsync();
+            articleViewModel.Genres = genres.Select(GenreMapper.ToViewModel).ToList();
+            return View(articleViewModel);
         }
 
         [HttpGet]
@@ -58,7 +60,8 @@ namespace BlogWebApp.Controllers
             var article = await _articleService.GetArticleByIdAsync(articleId);
             if (article == null) 
                 return NotFound();
-            return View(ArticleMapper.ToListViewModel(article));
+
+            return View(ArticleMapper.ToViewModel(article));
         }
 
         [HttpGet]
@@ -67,6 +70,7 @@ namespace BlogWebApp.Controllers
             var article = await _articleService.GetArticleByIdAsync(articleId);
             if (article == null) 
                 return NotFound();
+
             var articleViewModel = ArticleMapper.ToViewModel(article);
             var genres = await _genreService.GetAllGenresAsync();
             articleViewModel.Genres = genres.Select(GenreMapper.ToViewModel).ToList();
@@ -75,20 +79,22 @@ namespace BlogWebApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(ArticleCreateViewModel articleViewModel)
+        public async Task<IActionResult> Edit(ArticleViewModel articleViewModel)
         {
-            if(!ModelState.IsValid)
+            if(ModelState.IsValid)
             {
-                var genres = await _genreService.GetAllGenresAsync();
-                articleViewModel.Genres = genres.Select(GenreMapper.ToViewModel).ToList();
-                return View(articleViewModel);
+                var article = await _articleService.GetArticleByIdAsync(articleViewModel.ArticleViewModelId);
+                if (article == null)
+                    return NotFound();
+
+                ArticleMapper.MapToExistingEntity(articleViewModel, article);
+                await _articleService.UpdateArticleAsync(article);
+                return RedirectToAction("Index", "Blog");              
             }
-            var article = await _articleService.GetArticleByIdAsync(articleViewModel.ArticleViewModelId);
-            if (article == null) 
-                return NotFound();
-            ArticleMapper.MapToExistingEntity(articleViewModel, article);
-            await _articleService.UpdateArticleAsync(article);
-            return RedirectToAction("Index", "Blog");
+
+            var genres = await _genreService.GetAllGenresAsync();
+            articleViewModel.Genres = genres.Select(GenreMapper.ToViewModel).ToList();
+            return View(articleViewModel);
         }
 
         [HttpGet]

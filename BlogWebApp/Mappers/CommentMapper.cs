@@ -1,5 +1,5 @@
 ﻿using BlogWebApp.Models;
-using BlogWebApp.ViewModels.CommentViewModels;
+using BlogWebApp.ViewModels;
 
 namespace BlogWebApp.Mappers
 {

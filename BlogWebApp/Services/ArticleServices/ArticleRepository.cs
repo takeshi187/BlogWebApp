@@ -22,12 +22,22 @@ namespace BlogWebApp.Services.ArticleServices
 
         public async Task<Article?> GetByIdAsync(Guid articleId)
         {
-            return await _db.Articles.FindAsync(articleId);
+            return await _db.Articles
+                .Include(a => a.Genre)
+                .Include(a => a.Likes)
+                .Include(a => a.Comments)
+                    .ThenInclude(c => c.User)
+                .FirstOrDefaultAsync(a => a.ArticleId == articleId);
         }
 
         public async Task<IEnumerable<Article?>> GetAllAsync()
         {
-            return await _db.Articles.ToListAsync();
+            return await _db.Articles
+                .Include(a => a.Genre)
+                .Include(a => a.Likes)
+                .Include(a => a.Comments)
+                    .ThenInclude(c => c.User)
+                .ToListAsync();
         }
 
         public async Task<bool> UpdateAsync(Article article)

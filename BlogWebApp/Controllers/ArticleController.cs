@@ -113,8 +113,8 @@ namespace BlogWebApp.Controllers
             if (article == null)
                 return NotFound();
 
-            //await _commentService.DeleteCommentsByArticleIdAsync(id);
-            //await _likeService.DeleteLikesByArticleIdAsync(id);
+            await _commentService.DeleteCommentsByArticleIdAsync(id);
+            await _likeService.DeleteLikesByArticleIdAsync(id);
             await _articleService.DeleteArticleAsync(id);
             return RedirectToAction("Index", "Blog");
         }

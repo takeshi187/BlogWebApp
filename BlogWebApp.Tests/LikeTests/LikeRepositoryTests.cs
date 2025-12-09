@@ -78,6 +78,25 @@ namespace BlogWebApp.Tests.LikeTests
         }
 
         [Test]
+        public async Task DeleteLikesByArticleIdAsync_ShouldDeleteLikesForArticle_WhenExist()
+        {
+            var articleId = Guid.NewGuid();
+
+            var like1 = new Like(Guid.NewGuid(), "user1", articleId);
+            var like2 = new Like(Guid.NewGuid(), "user2", articleId);
+
+            await _likeRepository.AddAsync(like1);
+            await _likeRepository.AddAsync(like2);
+            await _db.SaveChangesAsync();
+
+            await _likeRepository.DeleteRangeAsync([like1, like2]);
+
+            var result = await _likeRepository.GetByArticleIdAsync(articleId);
+
+            Assert.That(result.Count, Is.EqualTo(0));
+        }
+
+        [Test]
         public async Task DeleteLikeAsync_ShouldDeleteLike_WhenLikeExist()
         {
             var like = new Like(Guid.NewGuid(), _userId, Guid.NewGuid());

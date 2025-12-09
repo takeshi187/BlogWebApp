@@ -8,6 +8,7 @@ namespace BlogWebApp.Services.LikeServices
         Task<Like?> GetByIdAsync(Guid likeId);
         Task<IEnumerable<Like?>> GetByArticleIdAsync(Guid articleId);
         Task<bool> ExistAsync(Guid articleId, string userId);
+        Task<bool> DeleteRangeAsync(IEnumerable<Like> likes);
         Task<bool> DeleteAsync(Like like);
     }
 }

@@ -8,7 +8,7 @@ namespace BlogWebApp.Services.CommentServices
         Task<Comment?> GetCommentByIdAsync(Guid commentId);
         Task<IEnumerable<Comment?>> GetCommentsByArticleIdAsync(Guid articleId);
         Task<Comment?> UpdateCommentAsync(Comment comment);
+        Task<bool> DeleteCommentsByArticleIdAsync(Guid articleId);
         Task<bool> DeleteCommentAsync(Guid commentId);
-
     }
 }

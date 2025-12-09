@@ -19,15 +19,15 @@ namespace BlogWebApp.Mappers
                 UpdatedAt = article.UpdatedAt,
                 LikesCount = article.Likes?.Count ?? 0,
                 CommentsCount = article.Comments?.Count ?? 0,
-                Comments = article.Comments.Select(c => new CommentViewModel
+                Comments = article.Comments?.Select(c => new CommentViewModel
                 {
                     CommentId = c.CommentId,
                     Content = c.Content,
                     ArticleId = c.ArticleId,
-                    UserName = c.User.UserName,
+                    UserName = c.User.UserName ?? "Неизвестный",
                     CreatedAt = c.CreatedAt,
                     UpdatedAt = c.UpdatedAt
-                }).ToList()
+                }).ToList() ?? new List<CommentViewModel>()
             };
         }
 

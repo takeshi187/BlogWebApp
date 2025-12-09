@@ -114,6 +114,37 @@ namespace BlogWebApp.Services.LikeServices
             }
         }
 
+        public async Task<bool> DeleteLikesByArticleIdAsync(Guid articleId)
+        {
+            try
+            {
+                if (articleId == Guid.Empty)
+                    throw new ArgumentException($"ArticleId cannot be empty", nameof(articleId));
+
+                var likes = await _likeRepository.GetByArticleIdAsync(articleId);
+
+                if (likes == null || !likes.Any())
+                    throw new InvalidOperationException($"Likes for article with id: {articleId} not found.");
+
+                return await _likeRepository.DeleteRangeAsync(likes);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, $"Likes for article: {articleId} not found.");
+                throw;
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, $"Database error while deleting likes for article: {articleId}");
+                throw new InvalidOperationException("Failed to delete likes.", ex);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Unexpected error while deleting likes for article: {articleId}");
+                throw;
+            }
+        }
+
         public async Task<bool> DeleteLikeAsync(Guid articleId, string userId)
         {
             try
@@ -150,6 +181,11 @@ namespace BlogWebApp.Services.LikeServices
                 _logger.LogError(ex, $"Unexpected error while deleting like: with article id: {articleId}, user id: {userId}");
                 throw;
             }
+        }
+
+        public Task<IEnumerable<Like?>> GetLikesByArticleIdAsync(Guid articleId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

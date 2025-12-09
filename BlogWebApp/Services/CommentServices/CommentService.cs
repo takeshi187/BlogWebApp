@@ -2,6 +2,7 @@
 using BlogWebApp.Services.ArticleServices;
 using BlogWebApp.Services.UserServices;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.Design;
 
 namespace BlogWebApp.Services.CommentServices
 {
@@ -66,7 +67,7 @@ namespace BlogWebApp.Services.CommentServices
                     throw new ArgumentException("CommentId cannot be empty.", nameof(commentId));
 
                 var result = await _commentRepository.GetByIdAsync(commentId);
-                if (result == null) 
+                if (result == null)
                     throw new InvalidOperationException($"Comment with id: {commentId} not found.");
 
                 return result;
@@ -148,6 +149,37 @@ namespace BlogWebApp.Services.CommentServices
             }
         }
 
+        public async Task<bool> DeleteCommentsByArticleIdAsync(Guid articleId)
+        {
+            try
+            {
+                if(articleId == Guid.Empty)
+                    throw new ArgumentException($"ArticleId cannot be empty", nameof(articleId));
+
+                var comments = await _commentRepository.GetByArticleIdAsync(articleId);
+
+                if (comments == null || !comments.Any())
+                    throw new InvalidOperationException($"Comments for article with id: {articleId} not found.");
+
+                return await _commentRepository.DeleteRangeAsync(comments);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, $"Comments for article: {articleId} not found.");
+                throw;
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, $"Database error while deleting comments for article: {articleId}");
+                throw new InvalidOperationException("Failed to delete comments.", ex);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Unexpected error while deleting comments for article: {articleId}");
+                throw;
+            }            
+        }
+
         public async Task<bool> DeleteCommentAsync(Guid commentId)
         {
             try
@@ -156,7 +188,7 @@ namespace BlogWebApp.Services.CommentServices
                     throw new ArgumentException($"CommentId cannot be empty", nameof(commentId));
 
                 var comment = await _commentRepository.GetByIdAsync(commentId);
-                if (comment == null) 
+                if (comment == null)
                     throw new InvalidOperationException($"Comment with id {commentId} not found.");
 
                 return await _commentRepository.DeleteAsync(comment);

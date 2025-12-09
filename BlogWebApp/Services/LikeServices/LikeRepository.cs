@@ -35,6 +35,13 @@ namespace BlogWebApp.Services.LikeServices
             return await _db.Likes.AnyAsync(l => l.ArticleId == articleId && l.UserId == userId);
         }
 
+        public async Task<bool> DeleteRangeAsync(IEnumerable<Like> likes)
+        {
+            _db.Likes.RemoveRange(likes);
+            await _db.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<bool> DeleteAsync(Like like)
         {
             _db.Likes.Remove(like);

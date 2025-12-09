@@ -1,0 +1,57 @@
+﻿@using BlogWebApp.ViewModels
+@model ArticleViewModel
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<section class="blog-header">
+    <h1>@Model.Title</h1>
+</section>
+
+<div class="card mt-4 mb-4">
+    @if(!string.IsNullOrWhiteSpace(Model.Image))
+    {
+        <img src="@Model.Image" class="card-img-top" alt="Article image" />
+    }
+
+    <div class="card-body">
+        <p class="text-muted">
+            Жанр: <strong>@Model.GenreName</strong> |
+            Дата: <strong>@Model.CreatedAt.ToShortDateString()</strong>
+        </p>
+
+        <p class="article-content">
+            @Html.Raw(Model.Content)
+        </p>
+
+        <div class="mt-3">
+            <strong>Лайков:</strong> @Model.LikesCount |
+            <strong>Комментариев:</strong> @Model.CommentsCount
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<h3>Комментарии</h3>
+
+@if(Model.Comments == null || !Model.Comments.Any())
+{
+    <p class="text-muted">Пока нет комментариев.</p>
+}
+else
+{
+    foreach(var comment in Model.Comments)
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <p><strong>@comment.UserName</strong></p>
+                <p>@comment.Content</p>
+                <p class="text-muted">@comment.CreatedAt.ToShortDateString()</p>
+            </div>
+        </div>
+    }
+}
+
+<a asp-controller="Blog" asp-action="Index" class="btn btn-secondary mt-4">Назад к списку</a>

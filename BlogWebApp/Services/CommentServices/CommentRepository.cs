@@ -37,6 +37,13 @@ namespace BlogWebApp.Services.CommentServices
             return true;
         }
 
+        public async Task<bool> DeleteRangeAsync(IEnumerable<Comment> comments)
+        {
+            _db.Comments.RemoveRange(comments);
+            await _db.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<bool> DeleteAsync(Comment comment)
         {
             _db.Comments.Remove(comment);

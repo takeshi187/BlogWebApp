@@ -78,6 +78,24 @@ namespace BlogWebApp.Tests.CommentTests
         }
 
         [Test]
+        public async Task DeleteCommentsByArticleIdAsync_ShouldDeleteCommentsForArticle_WhenExist()
+        {
+            var articleId = Guid.NewGuid();
+
+            var comment1 = new Comment(Guid.NewGuid(), "content1", "user1", articleId);
+            var comment2 = new Comment(Guid.NewGuid(), "content2", "user2", articleId);
+
+            await _db.Comments.AddAsync(comment1);
+            await _db.Comments.AddAsync(comment2);
+            await _db.SaveChangesAsync();
+
+            await _commentRepository.DeleteRangeAsync([comment1, comment2]);
+            var result = await _commentRepository.GetByArticleIdAsync(articleId);
+
+            Assert.That(result.Count, Is.EqualTo(0));
+        }
+
+        [Test]
         public async Task DeleteCommentAsync_ShouldDeleteComment_WhenCommentExist()
         {
             var comment = new Comment(Guid.NewGuid(), "testcontent", "1", Guid.NewGuid());

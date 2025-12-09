@@ -3,6 +3,7 @@ using BlogWebApp.Models;
 using BlogWebApp.Services.ArticleServices;
 using BlogWebApp.Services.CommentServices;
 using BlogWebApp.Services.GenreServices;
+using BlogWebApp.Services.LikeServices;
 using BlogWebApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -17,13 +18,20 @@ namespace BlogWebApp.Controllers
         private readonly ILogger<ArticleController> _logger;
         private readonly IGenreService _genreService;
         private readonly ICommentService _commentService;
+        private readonly ILikeService _likeService;
 
-        public ArticleController(IArticleService articleService, ILogger<ArticleController> logger, IGenreService genreService, ICommentService commentService)
+        public ArticleController(
+            IArticleService articleService, 
+            ILogger<ArticleController> logger, 
+            IGenreService genreService, 
+            ICommentService commentService,
+            ILikeService likeService)
         {
             _articleService = articleService;
             _logger = logger;
             _genreService = genreService;
             _commentService = commentService;
+            _likeService = likeService;
         }      
 
         [HttpGet]
@@ -55,9 +63,9 @@ namespace BlogWebApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Details(Guid articleId)
+        public async Task<IActionResult> Details(Guid id)
         {
-            var article = await _articleService.GetArticleByIdAsync(articleId);
+            var article = await _articleService.GetArticleByIdAsync(id);
             if (article == null) 
                 return NotFound();
 
@@ -65,9 +73,9 @@ namespace BlogWebApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(Guid articleId)
+        public async Task<IActionResult> Edit(Guid id)
         {
-            var article = await _articleService.GetArticleByIdAsync(articleId);
+            var article = await _articleService.GetArticleByIdAsync(id);
             if (article == null) 
                 return NotFound();
 
@@ -88,6 +96,7 @@ namespace BlogWebApp.Controllers
                     return NotFound();
 
                 ArticleMapper.MapToExistingEntity(articleViewModel, article);
+                article.UpdatedAt = DateTime.UtcNow;
                 await _articleService.UpdateArticleAsync(article);
                 return RedirectToAction("Index", "Blog");              
             }
@@ -98,9 +107,15 @@ namespace BlogWebApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Delete(Guid articleId)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            await _articleService.DeleteArticleAsync(articleId);
+            var article = await _articleService.GetArticleByIdAsync(id);
+            if (article == null)
+                return NotFound();
+
+            //await _commentService.DeleteCommentsByArticleIdAsync(id);
+            //await _likeService.DeleteLikesByArticleIdAsync(id);
+            await _articleService.DeleteArticleAsync(id);
             return RedirectToAction("Index", "Blog");
         }
     }

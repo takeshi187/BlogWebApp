@@ -46,18 +46,13 @@ namespace BlogWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userService.GetUserByEmailAsync(model.Email);
-                if (user != null)
-                {
-                    var result = await _userService.LoginAsync(user.Email, user.PasswordHash);
+                var result = await _userService.LoginAsync(model.Email, model.Password, model.RememberMe);
 
-                    if (result)
-                        return RedirectToAction("Index", "Home");
-                }
-
-                ModelState.AddModelError("", "Неверный логин или пароль.");
+                if (result)
+                    return RedirectToAction("Index", "Home");             
             }
 
+            ModelState.AddModelError("", "Неверный логин или пароль.");
             return View(model);
         }
 

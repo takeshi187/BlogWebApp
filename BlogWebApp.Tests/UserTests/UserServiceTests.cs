@@ -101,19 +101,20 @@ namespace BlogWebApp.Tests.UserTests
         [Test]
         public async Task LoginAsync_ShouldReturnTrue_WhenPasswordIsCorrect()
         {
-            var user = new ApplicationUser { Email = "test@example.com" };
+            var user = new ApplicationUser { Email = "test@example.com", UserName = "testuser" };
 
             _userRepositoryMock.Setup(r => r.GetByEmailAsync(user.Email))
                 .ReturnsAsync(user);
 
             _signInManagerMock
-                .Setup(m => m.PasswordSignInAsync(user, "password", false, false))
+                .Setup(m => m.PasswordSignInAsync(user, "password", true, false))
                 .ReturnsAsync(SignInResult.Success);
 
-            var result = await _userService.LoginAsync(user.Email, "password");
+            var result = await _userService.LoginAsync(user.Email, "password", true);
 
             Assert.That(result, Is.True);
             _userRepositoryMock.Verify(r => r.GetByEmailAsync(user.Email), Times.Once);
+            _signInManagerMock.Verify(m => m.PasswordSignInAsync(user, "password", true, false), Times.Once);
         }
 
         [Test]
@@ -123,7 +124,7 @@ namespace BlogWebApp.Tests.UserTests
                 .ReturnsAsync((ApplicationUser?)null);
 
             Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await _userService.LoginAsync("test@example.com", "password"));
+                await _userService.LoginAsync("test@example.com", "password", true));
             _userRepositoryMock.Verify(r => r.GetByEmailAsync("test@example.com"), Times.Once);
         }
 
@@ -131,7 +132,7 @@ namespace BlogWebApp.Tests.UserTests
         public async Task LoginAsync_ShouldThrowArgumentException_WhenEmailEmpty()
         {
             Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _userService.LoginAsync("", "password"));
+                await _userService.LoginAsync("", "password", true));
             _userRepositoryMock.Verify(r => r.GetByEmailAsync(""), Times.Never);
         }
 
@@ -139,7 +140,7 @@ namespace BlogWebApp.Tests.UserTests
         public async Task LoginAsync_ShouldThrowArgumentException_WhenPasswordEmpty()
         {
             Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _userService.LoginAsync("test@example.com", ""));
+                await _userService.LoginAsync("test@example.com", "", true));
             _userRepositoryMock.Verify(r => r.GetByEmailAsync("test@example.com"), Times.Never);
         }
 

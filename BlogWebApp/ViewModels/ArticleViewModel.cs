@@ -1,10 +1,11 @@
 ﻿using BlogWebApp.Models;
+using BlogWebApp.Validators;
 using System.ComponentModel.DataAnnotations;
 
 namespace BlogWebApp.ViewModels
 {
     public class ArticleViewModel
-    {
+    {        
         public Guid ArticleViewModelId { get; set; }
 
         [Required(ErrorMessage = "Заголовок обязателен.")]
@@ -17,8 +18,9 @@ namespace BlogWebApp.ViewModels
         public string Content { get; set; } = null!;
 
         [Required(ErrorMessage = "Жанр обязателен.")]
+        [NotEmptyGuid(ErrorMessage = "Выберите жанр.")]
         public Guid GenreId { get; set; }
-        public string GenreName { get; set; } = null!;
+        public string? GenreName { get; set; }
 
         public DateTime CreatedAt { get; set; }       
         public DateTime? UpdatedAt { get; set; }

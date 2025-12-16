@@ -159,14 +159,12 @@ namespace BlogWebApp.Services.CommentServices
                 var comments = await _commentRepository.GetByArticleIdAsync(articleId);
 
                 if (comments == null || !comments.Any())
-                    throw new InvalidOperationException($"Comments for article with id: {articleId} not found.");
+                {
+                    _logger.LogInformation($"No one comments not found for article: {articleId}. Skipping delete.");
+                    return false;
+                }
 
                 return await _commentRepository.DeleteRangeAsync(comments);
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogWarning(ex, $"Comments for article: {articleId} not found.");
-                throw;
             }
             catch (DbUpdateException ex)
             {

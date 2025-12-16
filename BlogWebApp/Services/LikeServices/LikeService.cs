@@ -124,14 +124,12 @@ namespace BlogWebApp.Services.LikeServices
                 var likes = await _likeRepository.GetByArticleIdAsync(articleId);
 
                 if (likes == null || !likes.Any())
-                    throw new InvalidOperationException($"Likes for article with id: {articleId} not found.");
+                {
+                    _logger.LogInformation($"No one likes not found for article: {articleId}. Skipping delete.");
+                    return false;
+                }
 
                 return await _likeRepository.DeleteRangeAsync(likes);
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogWarning(ex, $"Likes for article: {articleId} not found.");
-                throw;
             }
             catch (DbUpdateException ex)
             {

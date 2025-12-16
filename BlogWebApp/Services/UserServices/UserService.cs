@@ -56,7 +56,7 @@ namespace BlogWebApp.Services.UserServices
             }
         }
 
-        public async Task<bool> LoginAsync(string email, string password)
+        public async Task<bool> LoginAsync(string email, string password, bool rememberMe)
         {
             try
             {
@@ -69,7 +69,7 @@ namespace BlogWebApp.Services.UserServices
                 if (user == null)
                     throw new InvalidOperationException($"User with email: {email} not found.");
 
-                var result = await _signInManager.PasswordSignInAsync(user, password, isPersistent: false, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(user, password, rememberMe, lockoutOnFailure: false);
 
                 return result.Succeeded;
             }

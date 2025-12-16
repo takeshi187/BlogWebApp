@@ -126,17 +126,6 @@ namespace BlogWebApp.Tests.LikeTests
         }
 
         [Test]
-        public async Task DeleteLikesByArticleIdAsync_ShouldThrowInvalidOperationException_WhenLikesNotFound()
-        {
-            var like = new Like(Guid.NewGuid(), "testuser", Guid.NewGuid());
-            var likes = new List<Like> { like };
-            _likeRepositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Like?)null);
-
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await _likeService.DeleteLikesByArticleIdAsync(like.ArticleId));
-            _likeRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Like>()), Times.Never);
-        }
-
-        [Test]
         public async Task DeleteLikesByArticleIdAsync_ShouldThrowArgumentException_WhenLikesEmpty()
         {
             Assert.ThrowsAsync<ArgumentException>(async () =>

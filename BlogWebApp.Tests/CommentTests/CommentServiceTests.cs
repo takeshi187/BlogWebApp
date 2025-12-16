@@ -269,17 +269,6 @@ namespace BlogWebApp.Tests.CommentTests
         }
 
         [Test]
-        public async Task DeleteCommentsByArticleIdAsync_ShouldThrowInvalidOperationException_WhenCommentsNotFound()
-        {
-            var comment = new Comment(Guid.NewGuid(), "Test content", "testuser", Guid.NewGuid());
-            var comments = new List<Comment> { comment };
-            _commentRepositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Comment?)null);
-
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await _commentService.DeleteCommentsByArticleIdAsync(comment.ArticleId));
-            _commentRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Comment>()), Times.Never);
-        }
-
-        [Test]
         public async Task DeleteCommentsByArticleIdAsync_ShouldThrowArgumentException_WhenCommentsEmpty()
         {
             Assert.ThrowsAsync<ArgumentException>(async () =>

@@ -6,7 +6,7 @@ namespace BlogWebApp.Services.UserServices
     public interface IUserService
     {
         Task<IdentityResult> RegisterAsync(string username, string email, string password);
-        Task<bool> LoginAsync(string email, string password);
+        Task<bool> LoginAsync(string email, string password, bool rememberMe);
         Task<ApplicationUser?> GetUserByEmailAsync(string email);
         Task<ApplicationUser?> GetUserByIdAsync(string userId);
         Task<IdentityResult> DeleteUserAsync(string id);

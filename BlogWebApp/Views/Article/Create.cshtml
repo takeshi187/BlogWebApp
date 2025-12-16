@@ -33,7 +33,9 @@
         }
         else
         {
-            <select asp-for="GenreId" asp-items="@(new SelectList(Model.Genres, "GenreId", "GenreName"))" class="form-control"></select>
+            <select asp-for="GenreId" asp-items="@(new SelectList(Model.Genres, "GenreId", "GenreName"))" class="form-control">
+                <option value="">Выберите жанр</option>
+            </select>
         }          
         <span asp-validation-for="GenreId" class="text-danger" />
 

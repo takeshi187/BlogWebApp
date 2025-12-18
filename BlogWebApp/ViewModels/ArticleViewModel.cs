@@ -1,11 +1,10 @@
-﻿using BlogWebApp.Models;
-using BlogWebApp.Validators;
+﻿using BlogWebApp.Validators;
 using System.ComponentModel.DataAnnotations;
 
 namespace BlogWebApp.ViewModels
 {
     public class ArticleViewModel
-    {        
+    {
         public Guid ArticleViewModelId { get; set; }
 
         [Required(ErrorMessage = "Заголовок обязателен.")]
@@ -22,7 +21,7 @@ namespace BlogWebApp.ViewModels
         public Guid GenreId { get; set; }
         public string? GenreName { get; set; }
 
-        public DateTime CreatedAt { get; set; }       
+        public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
         public int CommentsCount { get; set; }
@@ -30,5 +29,7 @@ namespace BlogWebApp.ViewModels
 
         public List<CommentViewModel> Comments { get; set; } = new();
         public List<GenreViewModel> Genres { get; set; } = new();
+
+        public IFormFile? ImageFile { get; set; }
     }
 }

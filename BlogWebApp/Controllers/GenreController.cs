@@ -2,7 +2,6 @@
 using BlogWebApp.Services.GenreServices;
 using BlogWebApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace BlogWebApp.Controllers
 {
@@ -28,7 +27,7 @@ namespace BlogWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(GenreViewModel genreViewModel)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View(genreViewModel);
             }

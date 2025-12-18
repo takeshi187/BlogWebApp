@@ -98,7 +98,7 @@ namespace BlogWebApp.Services.UserServices
                     throw new ArgumentException("Email cannot be empty.", nameof(email));
 
                 var result = await _userRepository.GetByEmailAsync(email);
-                if (result == null) 
+                if (result == null)
                     throw new InvalidOperationException($"User with email: {email} not found.");
 
                 return result;
@@ -119,11 +119,11 @@ namespace BlogWebApp.Services.UserServices
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(userId)) 
+                if (string.IsNullOrWhiteSpace(userId))
                     throw new ArgumentException("UserId cannot be empty.", nameof(userId));
 
                 var result = await _userRepository.GetByIdAsync(userId);
-                if (result == null) 
+                if (result == null)
                     throw new InvalidOperationException($"User with userId: {userId} not found.");
 
                 return result;

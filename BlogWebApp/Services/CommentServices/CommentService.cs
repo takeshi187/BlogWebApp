@@ -2,7 +2,6 @@
 using BlogWebApp.Services.ArticleServices;
 using BlogWebApp.Services.UserServices;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.Design;
 
 namespace BlogWebApp.Services.CommentServices
 {
@@ -153,7 +152,7 @@ namespace BlogWebApp.Services.CommentServices
         {
             try
             {
-                if(articleId == Guid.Empty)
+                if (articleId == Guid.Empty)
                     throw new ArgumentException($"ArticleId cannot be empty", nameof(articleId));
 
                 var comments = await _commentRepository.GetByArticleIdAsync(articleId);
@@ -175,7 +174,7 @@ namespace BlogWebApp.Services.CommentServices
             {
                 _logger.LogError(ex, $"Unexpected error while deleting comments for article: {articleId}");
                 throw;
-            }            
+            }
         }
 
         public async Task<bool> DeleteCommentAsync(Guid commentId)

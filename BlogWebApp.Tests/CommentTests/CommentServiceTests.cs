@@ -259,7 +259,7 @@ namespace BlogWebApp.Tests.CommentTests
         {
             var comment1 = new Comment(Guid.NewGuid(), "Test content", "1", Guid.NewGuid());
             var comment2 = new Comment(Guid.NewGuid(), "Test content", "2", comment1.ArticleId);
-            var comments = new List<Comment> { comment1, comment2};
+            var comments = new List<Comment> { comment1, comment2 };
             _commentRepositoryMock.Setup(r => r.GetByArticleIdAsync(comment1.ArticleId)).ReturnsAsync(comments);
 
             await _commentService.DeleteCommentsByArticleIdAsync(comment1.ArticleId);

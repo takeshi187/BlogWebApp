@@ -71,7 +71,7 @@ namespace BlogWebApp.Tests.ArticleTests
             var article1 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", genre.GenreId);
             var article2 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", genre.GenreId);
             var article3 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", genre.GenreId);
-           
+
             await _articleRepository.AddAsync(article1);
             await _articleRepository.AddAsync(article2);
             await _articleRepository.AddAsync(article3);

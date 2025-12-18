@@ -49,7 +49,7 @@ namespace BlogWebApp.Controllers
                 var result = await _userService.LoginAsync(model.Email, model.Password, model.RememberMe);
 
                 if (result)
-                    return RedirectToAction("Index", "Home");             
+                    return RedirectToAction("Index", "Home");
             }
 
             ModelState.AddModelError("", "Неверный логин или пароль.");

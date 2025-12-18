@@ -1,13 +1,12 @@
 ﻿using BlogWebApp.Mappers;
-using BlogWebApp.Models;
 using BlogWebApp.Services.ArticleServices;
 using BlogWebApp.Services.CommentServices;
+using BlogWebApp.Services.FileStorageServices;
 using BlogWebApp.Services.GenreServices;
 using BlogWebApp.Services.LikeServices;
 using BlogWebApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Formats.Asn1;
+using System.ComponentModel.DataAnnotations;
 
 namespace BlogWebApp.Controllers
 {
@@ -19,20 +18,23 @@ namespace BlogWebApp.Controllers
         private readonly IGenreService _genreService;
         private readonly ICommentService _commentService;
         private readonly ILikeService _likeService;
+        private readonly IImageStorageService _imageStorageService;
 
         public ArticleController(
-            IArticleService articleService, 
-            ILogger<ArticleController> logger, 
-            IGenreService genreService, 
+            IArticleService articleService,
+            ILogger<ArticleController> logger,
+            IGenreService genreService,
             ICommentService commentService,
-            ILikeService likeService)
+            ILikeService likeService,
+            IImageStorageService imageStorageService)
         {
             _articleService = articleService;
             _logger = logger;
             _genreService = genreService;
             _commentService = commentService;
             _likeService = likeService;
-        }      
+            _imageStorageService = imageStorageService;
+        }
 
         [HttpGet]
         public async Task<IActionResult> Create()
@@ -52,9 +54,10 @@ namespace BlogWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
+                articleViewModel.Image = await _imageStorageService.SaveArticleImageAsync(articleViewModel.ImageFile);
                 var article = ArticleMapper.ToEntity(articleViewModel);
                 await _articleService.CreateArticleAsync(article);
-                return RedirectToAction("Index", "Blog");               
+                return RedirectToAction("Index", "Blog");
             }
 
             var genres = await _genreService.GetAllGenresAsync();
@@ -66,7 +69,7 @@ namespace BlogWebApp.Controllers
         public async Task<IActionResult> Details(Guid id)
         {
             var article = await _articleService.GetArticleByIdAsync(id);
-            if (article == null) 
+            if (article == null)
                 return NotFound();
 
             return View(ArticleMapper.ToViewModel(article));
@@ -76,7 +79,7 @@ namespace BlogWebApp.Controllers
         public async Task<IActionResult> Edit(Guid id)
         {
             var article = await _articleService.GetArticleByIdAsync(id);
-            if (article == null) 
+            if (article == null)
                 return NotFound();
 
             var articleViewModel = ArticleMapper.ToViewModel(article);
@@ -89,7 +92,7 @@ namespace BlogWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ArticleViewModel articleViewModel)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 var article = await _articleService.GetArticleByIdAsync(articleViewModel.ArticleViewModelId);
                 if (article == null)
@@ -98,7 +101,7 @@ namespace BlogWebApp.Controllers
                 ArticleMapper.MapToExistingEntity(articleViewModel, article);
                 article.UpdatedAt = DateTime.UtcNow;
                 await _articleService.UpdateArticleAsync(article);
-                return RedirectToAction("Index", "Blog");              
+                return RedirectToAction("Index", "Blog");
             }
 
             var genres = await _genreService.GetAllGenresAsync();

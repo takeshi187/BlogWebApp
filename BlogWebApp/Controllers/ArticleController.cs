@@ -100,6 +100,11 @@ namespace BlogWebApp.Controllers
 
                 ArticleMapper.MapToExistingEntity(articleViewModel, article);
                 article.UpdatedAt = DateTime.UtcNow;
+                if (articleViewModel.ImageFile != null && articleViewModel.ImageFile.Length > 0)
+                {
+                    var imagePath = await _imageStorageService.SaveArticleImageAsync(articleViewModel.ImageFile);
+                    article.Image = imagePath;
+                }
                 await _articleService.UpdateArticleAsync(article);
                 return RedirectToAction("Index", "Blog");
             }

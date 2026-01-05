@@ -5,7 +5,7 @@ namespace BlogWebApp.Services.FileStorageServices
 {
     public class ImageStorageService : IImageStorageService
     {
-        private static readonly long _maxFileSize = 5 * 1024 * 1024; // 5 mb
+        private static readonly long _maxFileSize = 5 * 1024 * 600; // 5 mb
         private static readonly string[] _allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
         private readonly IWebHostEnvironment _env;
         private readonly ILogger<ImageStorageService> _logger;

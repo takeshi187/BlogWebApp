@@ -1,17 +1,18 @@
 ﻿@using BlogWebApp.ViewModels
 @model IEnumerable<ArticleViewModel>
+
 @{
-    ViewData["Title"] = "Блог";
+    ViewData["Title"] = "Поиск | Блог";
 }
 
 <form method="get" asp-action="Search">
     <h3>Поиск</h3>
-    <input class="search-input" type="text" name="query" placeholder="Найдется почти всё" />
+    <input class="search-input" type="text" name="query" placeholder="Найдется почти всё" value="@Context.Request.Query["query"]" />
     <button class="btn btn-primary" type="submit">Поиск</button>
 </form>
 
 <section class="blog-header">
-    <h1>Блог</h1>
+    <h1>Результаты поиска</h1>
 </section>
 
 <div class="blog-container row">
@@ -19,14 +20,14 @@
     @if (Model == null || !Model.Any())
     {
         <div class="alert alert-info mt-3">
-            Пока нет ни одного поста.
+            Ничего не найдено.
         </div>
     }
     else
     {
         @foreach (var article in Model)
         {
-            <div class="card mb-4">             
+            <div class="card mb-4">
                 <div class="card-body">
                     <h3>@article.Title</h3>
 
@@ -37,8 +38,8 @@
 
                     <p>
                         @(article.Content.Length > 500
-                        ? article.Content.Substring(0, 500) + "..."
-                        : article.Content)
+                                        ? article.Content.Substring(0, 500) + "..."
+                                        : article.Content)
                     </p>
 
                     <p>
@@ -48,8 +49,8 @@
                         <strong>Коментов:</strong> @article.CommentsCount
                     </p>
 
-                    <a asp-controller="Article" asp-action="Details" asp-route-id="@article.ArticleViewModelId" 
-                        class="btn btn-primary">
+                    <a asp-controller="Article" asp-action="Details" asp-route-id="@article.ArticleViewModelId"
+                       class="btn btn-primary">
                         Читать далее
                     </a>
                 </div>
@@ -57,3 +58,5 @@
         }
     }
 </div>
+
+

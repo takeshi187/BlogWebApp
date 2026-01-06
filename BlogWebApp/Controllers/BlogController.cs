@@ -4,6 +4,7 @@ using BlogWebApp.Services.ArticleServices;
 using BlogWebApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BlogWebApp.Controllers
 {
@@ -24,7 +25,8 @@ namespace BlogWebApp.Controllers
             var articles = await _articleService.GetAllArticlesAsync();
             if (!articles.Any())
                 return View(new List<ArticleViewModel>());
-            var articleViewModel = articles.Select(ArticleMapper.ToViewModel).ToList();
+            var userId = User.Identity.IsAuthenticated ? User.FindFirstValue(ClaimTypes.NameIdentifier) : null;
+            var articleViewModel = articles.Select(a => ArticleMapper.ToViewModel(a, userId)).ToList();
             return View(articleViewModel);
         }
 

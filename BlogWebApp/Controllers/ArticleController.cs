@@ -7,6 +7,7 @@ using BlogWebApp.Services.LikeServices;
 using BlogWebApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace BlogWebApp.Controllers
 {
@@ -72,7 +73,8 @@ namespace BlogWebApp.Controllers
             if (article == null)
                 return NotFound();
 
-            return View(ArticleMapper.ToViewModel(article));
+            var userId = User.Identity.IsAuthenticated ? User.FindFirstValue(ClaimTypes.NameIdentifier) : null;
+            return View(ArticleMapper.ToViewModel(article, userId));
         }
 
         [HttpGet]
@@ -82,7 +84,8 @@ namespace BlogWebApp.Controllers
             if (article == null)
                 return NotFound();
 
-            var articleViewModel = ArticleMapper.ToViewModel(article);
+            var userId = User.Identity.IsAuthenticated ? User.FindFirstValue(ClaimTypes.NameIdentifier) : null;
+            var articleViewModel = ArticleMapper.ToViewModel(article, userId);
             var genres = await _genreService.GetAllGenresAsync();
             articleViewModel.Genres = genres.Select(GenreMapper.ToViewModel).ToList();
             return View(articleViewModel);

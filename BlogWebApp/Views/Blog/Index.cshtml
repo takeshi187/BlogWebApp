@@ -48,6 +48,18 @@
                         <strong>Коментов:</strong> @article.CommentsCount
                     </p>
 
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <form asp-action="AddLike" method="post" asp-controller="Like">
+                            <input type="hidden" name="articleId" value="@article.ArticleViewModelId" />
+                            <button class="btn btn-outline-primary @(article.UserHasLiked ? "btn-primary" : "")">Лайк</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <p>Чтобы поставить лайк, <a href="@Url.Action("Login", "Account")">войдите в систему</a>.</p>
+                    }
+
                     <a asp-controller="Article" asp-action="Details" asp-route-id="@article.ArticleViewModelId" 
                         class="btn btn-primary">
                         Читать далее

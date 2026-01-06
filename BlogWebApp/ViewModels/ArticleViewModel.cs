@@ -31,5 +31,7 @@ namespace BlogWebApp.ViewModels
         public List<GenreViewModel> Genres { get; set; } = new();
 
         public IFormFile? ImageFile { get; set; }
+
+        public bool UserHasLiked { get; set; }
     }
 }

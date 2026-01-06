@@ -5,7 +5,7 @@ namespace BlogWebApp.Mappers
 {
     public static class ArticleMapper
     {
-        public static ArticleViewModel ToViewModel(Article article)
+        public static ArticleViewModel ToViewModel(Article article, string userId = null)
         {
             return new ArticleViewModel
             {
@@ -27,7 +27,8 @@ namespace BlogWebApp.Mappers
                     UserName = c.User.UserName ?? "Неизвестный",
                     CreatedAt = c.CreatedAt,
                     UpdatedAt = c.UpdatedAt
-                }).ToList() ?? new List<CommentViewModel>()
+                }).ToList() ?? new List<CommentViewModel>(),
+                UserHasLiked = userId != null && article.Likes.Any(l => l.UserId.ToString() == userId)
             };
         }
 

@@ -10,13 +10,13 @@
 </section>
 
 <div class="card mt-4 mb-4">
-    @if(!string.IsNullOrWhiteSpace(Model.Image))
+    @if (!string.IsNullOrWhiteSpace(Model.Image))
     {
         <img src="@Model.Image" class="card-img-top article-image" alt="Article image" />
     }
 
     <div class="card-body">
-        <p class="text-muted">
+        <p class="text-muted mb-2">
             Жанр: <strong>@Model.GenreName</strong> |
             Дата: <strong>@Model.CreatedAt.ToShortDateString()</strong>
         </p>
@@ -25,20 +25,60 @@
             @Html.Raw(Model.Content)
         </p>
 
-        <div class="mt-3">
-            <strong>Лайков:</strong> @Model.LikesCount |
-            <strong>Комментариев:</strong> @Model.CommentsCount
-        </div>
-    </div>
-    <div class="mt-3">
-        <a asp-controller="Article" asp-action="Edit" asp-route-id="@Model.ArticleViewModelId"
-           class="btn btn-warning">Редактировать</a>
+        <div class="mb-4">
+            <strong>Лайков:</strong> @Model.LikesCount
+            @if (User.Identity.IsAuthenticated)
+            {
+                <form asp-controller="Like"
+                      asp-action="AddLike"
+                      method="post"
+                      class="d-inline ms-3">
 
-        <a asp-controller="Article" asp-action="Delete" asp-route-id="@Model.ArticleViewModelId"
-           class="btn btn-danger"
-           onclick="return confirm('Удалить статью? Все комментарии и лайки тоже будут удалены.')">
-            Удалить
-        </a>
+                    <input type="hidden"
+                           name="articleId"
+                           value="@Model.ArticleViewModelId" />
+
+                    <button type="submit"
+                            class="btn btn-sm @(Model.UserHasLiked ? "btn-danger" : "btn-outline-danger")">
+                        @(Model.UserHasLiked ? "Убрать лайк" : "Лайк")
+                    </button>
+                </form>
+            }
+            else
+            {
+                <a class="btn btn-sm btn-outline-danger ms-3"
+                   asp-controller="Account"
+                   asp-action="Login">
+                    Лайк
+                </a>
+            }
+        </div>
+
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div class="mb-3">
+                <a asp-controller="Article"
+                   asp-action="Edit"
+                   asp-route-id="@Model.ArticleViewModelId"
+                   class="btn btn-warning me-2">
+                    Редактировать
+                </a>
+
+                <a asp-controller="Article"
+                   asp-action="Delete"
+                   asp-route-id="@Model.ArticleViewModelId"
+                   class="btn btn-danger"
+                   onclick="return confirm('Удалить статью? Все комментарии и лайки тоже будут удалены.')">
+                    Удалить
+                </a>
+
+                <a asp-controller="Blog"
+                   asp-action="Index"
+                   class="btn btn-secondary mt-4">
+                    Назад к списку
+                </a>
+            </div>
+        }
     </div>
 </div>
 
@@ -46,22 +86,61 @@
 
 <h3>Комментарии</h3>
 
-@if(Model.Comments == null || !Model.Comments.Any())
+@if (Model.Comments == null || !Model.Comments.Any())
 {
     <p class="text-muted">Пока нет комментариев.</p>
 }
 else
 {
-    foreach(var comment in Model.Comments)
+    foreach (var comment in Model.Comments)
     {
         <div class="card mb-3">
             <div class="card-body">
-                <p><strong>@comment.UserName</strong></p>
-                <p>@comment.Content</p>
-                <p class="text-muted">@comment.CreatedAt.ToShortDateString()</p>
+                <p class="mb-1">
+                    <strong>@comment.UserName</strong>
+                    <span class="text-muted">
+                        (@comment.CreatedAt.ToShortDateString())
+                    </span>
+                </p>
+                <p class="mb-0">@comment.Content</p>
             </div>
         </div>
     }
 }
 
-<a asp-controller="Blog" asp-action="Index" class="btn btn-secondary mt-4">Назад к списку</a>
+@if (User.Identity.IsAuthenticated)
+{
+    <h4 class="mt-4">Оставить комментарий</h4>
+
+    <form asp-controller="Comment"
+          asp-action="AddComment"
+          method="post">
+
+        <input type="hidden"
+               name="articleId"
+               value="@Model.ArticleViewModelId" />
+
+        <div class="mb-3">
+            <textarea name="content"
+                  class="form-control"
+                  rows="4"
+                  required
+                  maxlength="500"></textarea>
+        </div>
+
+        <button type="submit"
+                class="btn btn-secondary">
+            Отправить
+        </button>
+    </form>
+}
+else
+{
+    <p class="mt-4">
+        Чтобы оставить комментарий,
+        <a asp-controller="Account"
+           asp-action="Login">
+            войдите в систему
+        </a>.
+    </p>
+}

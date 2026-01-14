@@ -21,7 +21,7 @@ namespace BlogWebApp.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> AddLike(Guid articleId)
+        public async Task<IActionResult> ToggleLike(Guid articleId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -30,12 +30,11 @@ namespace BlogWebApp.Controllers
 
             if(like != null)
             {
-                await _likeService.DeleteLikeAsync(like.ArticleId, like.UserId);
+                await _likeService.ToggleLikeAsync(like.ArticleId, userId);
             }
             else
             {
-                var newLike = new Like(userId, articleId);
-                await _likeService.AddLikeAsync(newLike.ArticleId, newLike.UserId);
+                await _likeService.ToggleLikeAsync(articleId, userId);
             }
 
             return RedirectToAction("Index", "Blog");

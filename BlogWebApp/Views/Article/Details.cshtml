@@ -30,7 +30,7 @@
             @if (User.Identity.IsAuthenticated)
             {
                 <form asp-controller="Like"
-                      asp-action="AddLike"
+                      asp-action="ToggleLike"
                       method="post"
                       class="d-inline ms-3">
 
@@ -46,11 +46,10 @@
             }
             else
             {
-                <a class="btn btn-sm btn-outline-danger ms-3"
-                   asp-controller="Account"
-                   asp-action="Login">
-                    Лайк
-                </a>
+                <span class="text-muted ms-3">
+                    Чтобы поставить лайк,
+                    <a asp-controller="Account" asp-action="Login">войдите в систему</a>
+                </span>
             }
         </div>
 

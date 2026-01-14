@@ -50,9 +50,19 @@
 
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <form asp-action="AddLike" method="post" asp-controller="Like">
-                            <input type="hidden" name="articleId" value="@article.ArticleViewModelId" />
-                            <button class="btn btn-outline-primary @(article.UserHasLiked ? "btn-primary" : "")">Лайк</button>
+                        <form asp-controller="Like"
+                              asp-action="ToggleLike"
+                              method="post"
+                              class="d-inline">
+
+                            <input type="hidden"
+                                   name="articleId"
+                                   value="@article.ArticleViewModelId" />
+
+                            <button type="submit"
+                                    class="btn btn-sm @(article.UserHasLiked ? "btn-danger" : "btn-outline-danger")">
+                                @(article.UserHasLiked ? "Убрать лайк" : "Лайк")
+                            </button>
                         </form>
                     }
                     else

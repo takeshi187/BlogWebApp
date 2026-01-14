@@ -30,9 +30,14 @@ namespace BlogWebApp.Services.LikeServices
             return await _db.Likes.Where(l => l.ArticleId == articleId).ToListAsync();
         }
 
-        public async Task<bool> ExistAsync(Guid articleId, string userId)
+        public async Task<IEnumerable<Like?>> GetByUserIdAsync(string userId)
         {
-            return await _db.Likes.AnyAsync(l => l.ArticleId == articleId && l.UserId == userId);
+            return await _db.Likes.Where(l => l.UserId == userId).ToListAsync();
+        }
+
+        public async Task<Like> ExistAsync(Guid articleId, string userId)
+        {
+            return await _db.Likes.FirstOrDefaultAsync(l => l.ArticleId == articleId && l.UserId == userId);
         }
 
         public async Task<bool> DeleteRangeAsync(IEnumerable<Like> likes)

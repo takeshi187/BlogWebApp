@@ -67,6 +67,40 @@ namespace BlogWebApp.Tests.LikeTests
         }
 
         [Test]
+        public async Task GetLikesByArticleIdAsync_ShouldReturnEmpty_WhenArticleHasNoLikes()
+        {
+            var result = await _likeRepository.GetByArticleIdAsync(Guid.Parse("a2b2c3d4-e5f6-7890-1234-567890abcdef"));
+
+            Assert.That(result, Is.Empty);
+        }
+
+        [Test]
+        public async Task GetLikesByUserIdAsync_ShouldReturnLikes_WhenLikesExist()
+        {
+            _db.RemoveRange(_db.Likes);
+            var like1 = new Like(Guid.NewGuid(), _userId, _articleId);
+            var like2 = new Like(Guid.NewGuid(), _userId, _articleId);
+            var like3 = new Like(Guid.NewGuid(), "user3", Guid.NewGuid());
+
+            await _likeRepository.AddAsync(like1);
+            await _likeRepository.AddAsync(like2);
+            await _likeRepository.AddAsync(like3);
+
+            var result = await _likeRepository.GetByUserIdAsync(_userId);
+
+            Assert.That(result.Count(), Is.EqualTo(2));
+        }
+
+        [Test]
+        public async Task GetLikesByUserIdAsync_ShouldReturnEmpty_WhenUserHasNoLikes()
+        {
+            var result = await _likeRepository.GetByUserIdAsync("non-existing-user");
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Any(), Is.False);
+        }
+
+        [Test]
         public async Task ExistLikeAsync_ShouldReturnTrue_WhenLikeExist()
         {
             var like = new Like(Guid.NewGuid(), _userId, Guid.NewGuid());
@@ -74,7 +108,7 @@ namespace BlogWebApp.Tests.LikeTests
             await _likeRepository.AddAsync(like);
             var result = await _likeRepository.ExistAsync(like.ArticleId, _userId);
 
-            Assert.That(result, Is.True);
+            Assert.That(result, Is.Not.Null);
         }
 
         [Test]
@@ -105,7 +139,7 @@ namespace BlogWebApp.Tests.LikeTests
             await _likeRepository.DeleteAsync(like);
             var result = await _likeRepository.ExistAsync(like.ArticleId, _userId);
 
-            Assert.That(result, Is.False);
+            Assert.That(result, Is.Null);
         }
 
         [TearDown]

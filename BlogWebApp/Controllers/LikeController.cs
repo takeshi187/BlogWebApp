@@ -25,17 +25,7 @@ namespace BlogWebApp.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var like = await _db.Likes
-                .FirstOrDefaultAsync(l => l.ArticleId == articleId && l.UserId == userId);
-
-            if(like != null)
-            {
-                await _likeService.ToggleLikeAsync(like.ArticleId, userId);
-            }
-            else
-            {
-                await _likeService.ToggleLikeAsync(articleId, userId);
-            }
+            await _likeService.ToggleLikeAsync(articleId, userId);
 
             return RedirectToAction("Index", "Blog");
         }

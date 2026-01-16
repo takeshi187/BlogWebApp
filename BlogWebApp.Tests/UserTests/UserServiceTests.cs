@@ -71,7 +71,7 @@ namespace BlogWebApp.Tests.UserTests
         }
 
         [Test]
-        public void RegisterAsync_ShouldThrowArgumentException_WhenEmailEmpty()
+        public async Task RegisterAsync_ShouldThrowArgumentException_WhenEmailEmpty()
         {
             var ex = Assert.ThrowsAsync<ArgumentException>(async () =>
                 await _userService.RegisterAsync("username", "", "password"));
@@ -79,7 +79,7 @@ namespace BlogWebApp.Tests.UserTests
         }
 
         [Test]
-        public void RegisterAsync_ShouldThrowArgumentException_WhenPasswordEmpty()
+        public async Task RegisterAsync_ShouldThrowArgumentException_WhenPasswordEmpty()
         {
             var ex = Assert.ThrowsAsync<ArgumentException>(async () =>
                 await _userService.RegisterAsync("username", "test@example.com", ""));
@@ -87,13 +87,13 @@ namespace BlogWebApp.Tests.UserTests
         }
 
         [Test]
-        public void RegisterAsync_ShouldThrowInvalidOperationException_WhenFailed()
+        public async Task RegisterAsync_ShouldThrowInvalidOperationException_WhenFailed()
         {
             _userRepositoryMock.Setup(r => r.GetByEmailAsync(It.IsAny<string>()))
                .ThrowsAsync(new InvalidOperationException("Test error"));
 
-            Assert.ThrowsAsync<InvalidOperationException>(() =>
-                _userService.RegisterAsync("user", "a@a.com", "123"));
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await _userService.RegisterAsync("user", "a@a.com", "123"));
             _userRepositoryMock.Verify(r => r.AddAsync(It.IsAny<ApplicationUser>(), "password"), Times.Never);
         }
 
@@ -156,19 +156,19 @@ namespace BlogWebApp.Tests.UserTests
         }
 
         [Test]
-        public void GetUserByEmailAsync_ShouldThrowArgumentException_WhenEmailEmpty()
+        public async Task GetUserByEmailAsync_ShouldThrowArgumentException_WhenEmailEmpty()
         {
-            Assert.ThrowsAsync<ArgumentException>(() => _userService.GetUserByEmailAsync(""));
+            Assert.ThrowsAsync<ArgumentException>(async () => await _userService.GetUserByEmailAsync(""));
             _userRepositoryMock.Verify(r => r.GetByEmailAsync(""), Times.Never);
         }
 
         [Test]
-        public void GetUserByEmailAsync_ShouldThrowInvalidOperationException_WhenUserNotFound()
+        public async Task GetUserByEmailAsync_ShouldThrowInvalidOperationException_WhenUserNotFound()
         {
             _userRepositoryMock.Setup(r => r.GetByEmailAsync("test@example.com"))
                 .ReturnsAsync((ApplicationUser?)null);
 
-            Assert.ThrowsAsync<InvalidOperationException>(() => _userService.GetUserByEmailAsync("test@example.com"));
+            Assert.ThrowsAsync<InvalidOperationException>(async() => await _userService.GetUserByEmailAsync("test@example.com"));
             _userRepositoryMock.Verify(r => r.GetByEmailAsync("test@example.com"), Times.Once);
         }
 
@@ -185,19 +185,19 @@ namespace BlogWebApp.Tests.UserTests
         }
 
         [Test]
-        public void GetUserByUserIdAsync_ShouldThrowArgumentException_WhenUserIdEmpty()
+        public async Task GetUserByUserIdAsync_ShouldThrowArgumentException_WhenUserIdEmpty()
         {
-            Assert.ThrowsAsync<ArgumentException>(() => _userService.GetUserByIdAsync(""));
+            Assert.ThrowsAsync<ArgumentException>(async () => await _userService.GetUserByIdAsync(""));
             _userRepositoryMock.Verify(r => r.GetByIdAsync(""), Times.Never);
         }
 
         [Test]
-        public void GetUserByUserIdAsync_ShouldThrowInvalidOperationException_WhenUserNotFound()
+        public async Task GetUserByUserIdAsync_ShouldThrowInvalidOperationException_WhenUserNotFound()
         {
             _userRepositoryMock.Setup(r => r.GetByIdAsync("1"))
                 .ReturnsAsync((ApplicationUser?)null);
 
-            Assert.ThrowsAsync<InvalidOperationException>(() => _userService.GetUserByIdAsync("1"));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await _userService.GetUserByIdAsync("1"));
             _userRepositoryMock.Verify(r => r.GetByIdAsync("1"), Times.Once);
         }
 

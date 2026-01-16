@@ -12,9 +12,9 @@ namespace BlogWebApp.Services.UserServices
             _userManager = userManager;
         }
 
-        public async Task<IdentityResult> AddAsync(ApplicationUser user, string passwordHash)
+        public async Task<IdentityResult> AddAsync(ApplicationUser user, string password)
         {
-            return await _userManager.CreateAsync(user, passwordHash);
+            return await _userManager.CreateAsync(user, password);
         }
 
         public async Task<ApplicationUser?> GetByIdAsync(string userId)

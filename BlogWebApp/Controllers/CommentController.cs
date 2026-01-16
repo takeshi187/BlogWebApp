@@ -24,15 +24,18 @@ namespace BlogWebApp.Controllers
         {
             if(string.IsNullOrWhiteSpace(content))
             {
-                ModelState.AddModelError("", "Комментарий не может быть пустым.");
+                TempData["Error"] = "Комментарий не может быть пустым.";
                 return RedirectToAction("Details", "Article", new { id = articleId});
             }
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var comment = new Comment(content, userId, articleId);
+            var result = await _commentService.CreateCommentAsync(articleId, userId, content);
 
-            await _commentService.CreateCommentAsync(comment);
+            if (result == null)
+            {
+                TempData["Error"] = "Не удалось добавить комментарий.";
+            }
 
             return RedirectToAction("Details", "Article", new {id = articleId});
         }

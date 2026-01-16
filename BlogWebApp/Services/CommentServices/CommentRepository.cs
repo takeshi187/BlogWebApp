@@ -30,23 +30,14 @@ namespace BlogWebApp.Services.CommentServices
             return await _db.Comments.Where(c => c.ArticleId == articleId).ToListAsync();
         }
 
-        public async Task<bool> UpdateAsync(Comment comment)
+        public async Task<IEnumerable<Comment?>> GetByUserIdAsync(string userId)
         {
-            _db.Comments.Update(comment);
-            await _db.SaveChangesAsync();
-            return true;
-        }
+            return await _db.Comments.Where(c => c.UserId == userId).ToListAsync();
+        }     
 
         public async Task<bool> DeleteRangeAsync(IEnumerable<Comment> comments)
         {
             _db.Comments.RemoveRange(comments);
-            await _db.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<bool> DeleteAsync(Comment comment)
-        {
-            _db.Comments.Remove(comment);
             await _db.SaveChangesAsync();
             return true;
         }

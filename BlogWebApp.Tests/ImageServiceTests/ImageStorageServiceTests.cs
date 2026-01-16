@@ -41,7 +41,7 @@ namespace BlogWebApp.Tests.ImageServiceTests
         }
 
         [Test]
-        public void SaveImageAsync_ShouldThrowArgumentException_WhenInvalidFileType()
+        public async Task SaveImageAsync_ShouldThrowArgumentException_WhenInvalidFileType()
         {
             var mockFile = new Mock<IFormFile>();
             mockFile.Setup(f => f.Length).Returns(1024);

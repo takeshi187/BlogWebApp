@@ -68,19 +68,19 @@ namespace BlogWebApp.Tests.LikeTests
         }
 
         [Test]
-        public void ToggleLikeAsync_ShouldThrowInvalidOperationException_WhenArticleNotFound()
+        public async Task ToggleLikeAsync_ShouldThrowInvalidOperationException_WhenArticleNotFound()
         {
             var articleId = Guid.NewGuid();
 
             _articleServiceMock.Setup(s => s.GetArticleByIdAsync(articleId))
                 .ReturnsAsync((Article?)null);
 
-            Assert.ThrowsAsync<InvalidOperationException>(() =>
-                _likeService.ToggleLikeAsync(articleId, _userId));
+            Assert.ThrowsAsync<InvalidOperationException>(async() =>
+                await _likeService.ToggleLikeAsync(articleId, _userId));
         }
 
         [Test]
-        public void ToggleLikeAsync_ShouldThrowInvalidOperationException_WhenUserNotFound()
+        public async Task ToggleLikeAsync_ShouldThrowInvalidOperationException_WhenUserNotFound()
         {
             var articleId = Guid.NewGuid();
             var article = new Article(articleId, "title", "img", "content", _genreId);
@@ -90,22 +90,22 @@ namespace BlogWebApp.Tests.LikeTests
             _userServiceMock.Setup(s => s.GetUserByIdAsync(_userId))
                 .ReturnsAsync((ApplicationUser?)null);
 
-            Assert.ThrowsAsync<InvalidOperationException>(() =>
-                _likeService.ToggleLikeAsync(articleId, _userId));
+            Assert.ThrowsAsync<InvalidOperationException>(async() =>
+                await _likeService.ToggleLikeAsync(articleId, _userId));
         }
 
         [Test]
-        public void ToggleLikeAsync_ShouldThrowArgumentException_WhenUserIdIsEmpty()
+        public async Task ToggleLikeAsync_ShouldThrowArgumentException_WhenUserIdIsEmpty()
         {
-            Assert.ThrowsAsync<ArgumentException>(() =>
-                _likeService.ToggleLikeAsync(Guid.NewGuid(), ""));
+            Assert.ThrowsAsync<ArgumentException>(async () =>
+                await _likeService.ToggleLikeAsync(Guid.NewGuid(), ""));
         }
 
         [Test]
-        public void ToggleLikeAsync_ShouldThrowArgumentException_WhenArticleIdIsEmpty()
+        public async Task ToggleLikeAsync_ShouldThrowArgumentException_WhenArticleIdIsEmpty()
         {
-            Assert.ThrowsAsync<ArgumentException>(() =>
-                _likeService.ToggleLikeAsync(Guid.Empty, _userId));
+            Assert.ThrowsAsync<ArgumentException>( async () =>
+                await _likeService.ToggleLikeAsync(Guid.Empty, _userId));
         }
 
 
@@ -196,10 +196,10 @@ namespace BlogWebApp.Tests.LikeTests
         }
 
         [Test]
-        public void DeleteLikesByUserIdAsync_ShouldThrow_WhenUserIdIsEmpty()
+        public async Task DeleteLikesByUserIdAsync_ShouldThrow_WhenUserIdIsEmpty()
         {
-            Assert.ThrowsAsync<ArgumentException>(() =>
-                _likeService.DeleteLikesByUserIdAsync(""));
+            Assert.ThrowsAsync<ArgumentException>(async() =>
+                await _likeService.DeleteLikesByUserIdAsync(""));
         }
     }
 }

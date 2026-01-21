@@ -13,11 +13,10 @@ namespace BlogWebApp.Services.LikeServices
             _db = db;
         }
 
-        public async Task<Like> AddAsync(Like like)
+        public async Task AddAsync(Like like)
         {
             await _db.Likes.AddAsync(like);
             await _db.SaveChangesAsync();
-            return like;
         }
 
         public async Task<Like?> GetByIdAsync(Guid likeId)
@@ -40,18 +39,16 @@ namespace BlogWebApp.Services.LikeServices
             return await _db.Likes.FirstOrDefaultAsync(l => l.ArticleId == articleId && l.UserId == userId);
         }
 
-        public async Task<bool> DeleteRangeAsync(IEnumerable<Like> likes)
+        public async Task DeleteRangeAsync(IEnumerable<Like> likes)
         {
             _db.Likes.RemoveRange(likes);
             await _db.SaveChangesAsync();
-            return true;
         }
 
-        public async Task<bool> DeleteAsync(Like like)
+        public async Task DeleteAsync(Like like)
         {
             _db.Likes.Remove(like);
             await _db.SaveChangesAsync();
-            return true;
         }
     }
 }

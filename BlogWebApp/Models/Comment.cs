@@ -15,7 +15,7 @@ namespace BlogWebApp.Models
         public DateTime CreatedAt { get; private set; }
 
         [Required]
-        public string UserId { get; private set; }
+        public string UserId { get; private set; } = null!;
         public ApplicationUser User { get; private set; } = null!;
 
         [Required]

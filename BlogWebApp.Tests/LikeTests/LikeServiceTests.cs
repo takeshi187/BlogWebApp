@@ -15,8 +15,6 @@ namespace BlogWebApp.Tests.LikeTests
         private Mock<IUserService> _userServiceMock;
         private Mock<ILogger<LikeService>> _loggerMock;
         private LikeService _likeService;
-        private Guid _genreId;
-        private string _userId;
 
         [SetUp]
         public void SetUp()
@@ -26,24 +24,21 @@ namespace BlogWebApp.Tests.LikeTests
             _userServiceMock = new Mock<IUserService>();
             _loggerMock = new Mock<ILogger<LikeService>>();
             _likeService = new LikeService(_likeRepositoryMock.Object, _userServiceMock.Object, _articleServiceMock.Object, _loggerMock.Object);
-            _genreId = Guid.Parse("a1b2c3d4-e5f6-7890-1234-567890abcdef");
-            _userId = "b1b2c3d4-e5f6-7890-1234-567890abcdef";
         }
 
         [Test]
         public async Task ToggleLikeAsync_ShouldAddLike_WhenLikeDoesNotExist()
         {
-            var articleId = Guid.NewGuid();
-            var article = new Article(articleId, "title", "img", "content", _genreId);
-            var user = new ApplicationUser { Id = _userId };
+            var article = new Article(Guid.NewGuid(), "title", "img", "content", Guid.NewGuid());
+            var user = new ApplicationUser { Id = "user1" };
 
-            _articleServiceMock.Setup(s => s.GetArticleByIdAsync(articleId)).ReturnsAsync(article);
-            _userServiceMock.Setup(s => s.GetUserByIdAsync(_userId)).ReturnsAsync(user);
-            _likeRepositoryMock.Setup(r => r.ExistAsync(articleId, _userId)).ReturnsAsync((Like?)null);
+            _articleServiceMock.Setup(s => s.GetArticleByIdAsync(article.ArticleId)).ReturnsAsync(article);
+            _userServiceMock.Setup(s => s.GetUserByIdAsync("user1")).ReturnsAsync(user);
+            _likeRepositoryMock.Setup(r => r.ExistAsync(article.ArticleId, "user1")).ReturnsAsync((Like?)null);
 
-            var result = await _likeService.ToggleLikeAsync(articleId, _userId);
+            await _likeService.ToggleLikeAsync(article.ArticleId, "user1");
 
-            Assert.That(result, Is.True);
+            _likeRepositoryMock.Verify(r => r.ExistAsync(article.ArticleId, "user1"), Times.Once);
             _likeRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Like>()), Times.Once);
             _likeRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Like>()), Times.Never);
         }
@@ -51,18 +46,17 @@ namespace BlogWebApp.Tests.LikeTests
         [Test]
         public async Task ToggleLikeAsync_ShouldRemoveLike_WhenLikeExists()
         {
-            var articleId = Guid.NewGuid();
-            var article = new Article(articleId, "title", "img", "content", _genreId);
-            var user = new ApplicationUser { Id = _userId };
-            var like = new Like(_userId, articleId);
+            var article = new Article(Guid.NewGuid(), "title", "img", "content", Guid.NewGuid());
+            var user = new ApplicationUser { Id = "user1" };
+            var like = new Like("user1", article.ArticleId);
 
-            _articleServiceMock.Setup(s => s.GetArticleByIdAsync(articleId)).ReturnsAsync(article);
-            _userServiceMock.Setup(s => s.GetUserByIdAsync(_userId)).ReturnsAsync(user);
-            _likeRepositoryMock.Setup(r => r.ExistAsync(articleId, _userId)).ReturnsAsync(like);
+            _articleServiceMock.Setup(s => s.GetArticleByIdAsync(article.ArticleId)).ReturnsAsync(article);
+            _userServiceMock.Setup(s => s.GetUserByIdAsync("user1")).ReturnsAsync(user);
+            _likeRepositoryMock.Setup(r => r.ExistAsync(article.ArticleId, "user1")).ReturnsAsync(like);
 
-            var result = await _likeService.ToggleLikeAsync(articleId, _userId);
+            await _likeService.ToggleLikeAsync(article.ArticleId, "user1");
 
-            Assert.That(result, Is.False);
+            _likeRepositoryMock.Verify(r => r.ExistAsync(article.ArticleId, "user1"), Times.Once);
             _likeRepositoryMock.Verify(r => r.DeleteAsync(like), Times.Once);
             _likeRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Like>()), Times.Never);
         }
@@ -70,50 +64,47 @@ namespace BlogWebApp.Tests.LikeTests
         [Test]
         public async Task ToggleLikeAsync_ShouldThrowInvalidOperationException_WhenArticleNotFound()
         {
-            var articleId = Guid.NewGuid();
-
-            _articleServiceMock.Setup(s => s.GetArticleByIdAsync(articleId))
+            _articleServiceMock.Setup(s => s.GetArticleByIdAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((Article?)null);
 
             Assert.ThrowsAsync<InvalidOperationException>(async() =>
-                await _likeService.ToggleLikeAsync(articleId, _userId));
+                await _likeService.ToggleLikeAsync(Guid.NewGuid(), "user1"));
         }
 
         [Test]
         public async Task ToggleLikeAsync_ShouldThrowInvalidOperationException_WhenUserNotFound()
         {
-            var articleId = Guid.NewGuid();
-            var article = new Article(articleId, "title", "img", "content", _genreId);
+            var article = new Article(Guid.NewGuid(), "title", "img", "content", Guid.NewGuid());
 
-            _articleServiceMock.Setup(s => s.GetArticleByIdAsync(articleId))
+            _articleServiceMock.Setup(s => s.GetArticleByIdAsync(article.ArticleId))
                 .ReturnsAsync(article);
-            _userServiceMock.Setup(s => s.GetUserByIdAsync(_userId))
+            _userServiceMock.Setup(s => s.GetUserByIdAsync("user1"))
                 .ReturnsAsync((ApplicationUser?)null);
 
             Assert.ThrowsAsync<InvalidOperationException>(async() =>
-                await _likeService.ToggleLikeAsync(articleId, _userId));
+                await _likeService.ToggleLikeAsync(article.ArticleId, "user1"));
         }
 
         [Test]
-        public async Task ToggleLikeAsync_ShouldThrowArgumentException_WhenUserIdIsEmpty()
+        public async Task ToggleLikeAsync_ShouldThrowInvalidOperationException_WhenUserIdIsEmpty()
         {
-            Assert.ThrowsAsync<ArgumentException>(async () =>
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 await _likeService.ToggleLikeAsync(Guid.NewGuid(), ""));
         }
 
         [Test]
-        public async Task ToggleLikeAsync_ShouldThrowArgumentException_WhenArticleIdIsEmpty()
+        public async Task ToggleLikeAsync_ShouldThrowInvalidOperationException_WhenArticleIdIsEmpty()
         {
-            Assert.ThrowsAsync<ArgumentException>( async () =>
-                await _likeService.ToggleLikeAsync(Guid.Empty, _userId));
+            Assert.ThrowsAsync<InvalidOperationException>( async () =>
+                await _likeService.ToggleLikeAsync(Guid.Empty, "user1"));
         }
 
 
         [Test]
         public async Task DeleteLikesByArticleIdAsync_ShouldDeleteLikesForArticle_WhenLikesExist()
         {
-            var like1 = new Like(Guid.NewGuid(), "testuser", Guid.NewGuid());
-            var like2 = new Like(Guid.NewGuid(), "testuser1", like1.ArticleId);
+            var like1 = new Like("testuser", Guid.NewGuid());
+            var like2 = new Like("testuser1", like1.ArticleId);
             var likes = new List<Like> { like1, like2 };
             _likeRepositoryMock.Setup(r => r.GetByArticleIdAsync(like1.ArticleId)).ReturnsAsync(likes);
 
@@ -121,6 +112,19 @@ namespace BlogWebApp.Tests.LikeTests
 
             _likeRepositoryMock.Verify(r => r.DeleteRangeAsync(likes), Times.Once);
             _likeRepositoryMock.Verify(r => r.GetByArticleIdAsync(like1.ArticleId), Times.Once);
+        }
+
+        [Test]
+        public async Task DeleteLikesByArticleIdAsync_ShouldReturnFalse_WhenNoLikes()
+        {
+            var articleId = Guid.NewGuid();
+            _likeRepositoryMock.Setup(r => r.GetByArticleIdAsync(articleId))
+                .ReturnsAsync(new List<Like>());
+
+            await _likeService.DeleteLikesByArticleIdAsync(articleId);
+
+            _likeRepositoryMock.Verify(r => r.DeleteRangeAsync(It.IsAny<IEnumerable<Like>>()), Times.Once);
+            _likeRepositoryMock.Verify(r => r.GetByArticleIdAsync(It.IsAny<Guid>()), Times.Once);
         }
 
         [Test]
@@ -168,31 +172,29 @@ namespace BlogWebApp.Tests.LikeTests
         {
             var likes = new List<Like>
             {
-                new Like(_userId, Guid.NewGuid()),
-                new Like(_userId, Guid.NewGuid())
+                new Like("user1", Guid.NewGuid()),
+                new Like("user1", Guid.NewGuid())
             };
 
-            _likeRepositoryMock.Setup(r => r.GetByUserIdAsync(_userId))
+            _likeRepositoryMock.Setup(r => r.GetByUserIdAsync("user1"))
                 .ReturnsAsync(likes);
-            _likeRepositoryMock.Setup(r => r.DeleteRangeAsync(likes))
-                .ReturnsAsync(true);
+            _likeRepositoryMock.Setup(r => r.DeleteRangeAsync(likes));
 
-            var result = await _likeService.DeleteLikesByUserIdAsync(_userId);
+            await _likeService.DeleteLikesByUserIdAsync("user1");
 
-            Assert.That(result, Is.True);
             _likeRepositoryMock.Verify(r => r.DeleteRangeAsync(likes), Times.Once);
         }
 
         [Test]
         public async Task DeleteLikesByUserIdAsync_ShouldReturnFalse_WhenNoLikes()
         {
-            _likeRepositoryMock.Setup(r => r.GetByUserIdAsync(_userId))
+            _likeRepositoryMock.Setup(r => r.GetByUserIdAsync("user1"))
                 .ReturnsAsync(new List<Like>());
 
-            var result = await _likeService.DeleteLikesByUserIdAsync(_userId);
+            await _likeService.DeleteLikesByUserIdAsync("user1");
 
-            Assert.That(result, Is.False);
-            _likeRepositoryMock.Verify(r => r.DeleteRangeAsync(It.IsAny<IEnumerable<Like>>()), Times.Never);
+            _likeRepositoryMock.Verify(r => r.DeleteRangeAsync(It.IsAny<IEnumerable<Like>>()), Times.Once);
+            _likeRepositoryMock.Verify(r => r.GetByUserIdAsync(It.IsAny<string>()), Times.Once);
         }
 
         [Test]
@@ -200,6 +202,7 @@ namespace BlogWebApp.Tests.LikeTests
         {
             Assert.ThrowsAsync<ArgumentException>(async() =>
                 await _likeService.DeleteLikesByUserIdAsync(""));
+            _likeRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Like>()), Times.Never);
         }
     }
 }

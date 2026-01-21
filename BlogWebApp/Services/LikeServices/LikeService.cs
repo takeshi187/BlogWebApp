@@ -20,16 +20,10 @@ namespace BlogWebApp.Services.LikeServices
             _logger = logger;
         }
 
-        public async Task<bool> ToggleLikeAsync(Guid articleId, string userId)
+        public async Task ToggleLikeAsync(Guid articleId, string userId)
         {
             try
-            {
-                if (string.IsNullOrEmpty(userId))
-                    throw new ArgumentException("UserId cannot be empty.", nameof(userId));
-
-                if (articleId == Guid.Empty)
-                    throw new ArgumentException("ArticleId cannot be empty.", nameof(articleId));
-
+            {             
                 var article = await _articleService.GetArticleByIdAsync(articleId);
                 if (article == null)
                     throw new InvalidOperationException($"Article with id {articleId} not found.");
@@ -42,17 +36,12 @@ namespace BlogWebApp.Services.LikeServices
                 if (existingLike != null)
                 {
                     await _likeRepository.DeleteAsync(existingLike);
-                    return false;
                 }
-                   
-                var like = new Like(userId, articleId);
-                await _likeRepository.AddAsync(like);
-                return true;
-            }
-            catch (ArgumentException ex)
-            {
-                _logger.LogWarning(ex, "Invalid like data for creation.");
-                throw;
+                else
+                {
+                    var like = new Like(userId, articleId);
+                    await _likeRepository.AddAsync(like);
+                }                             
             }
             catch (DbUpdateException ex)
             {
@@ -91,7 +80,7 @@ namespace BlogWebApp.Services.LikeServices
             }
         }     
 
-        public async Task<bool> DeleteLikesByArticleIdAsync(Guid articleId)
+        public async Task DeleteLikesByArticleIdAsync(Guid articleId)
         {
             try
             {
@@ -103,10 +92,9 @@ namespace BlogWebApp.Services.LikeServices
                 if (likes == null || !likes.Any())
                 {
                     _logger.LogInformation($"No one likes not found for article: {articleId}. Skipping delete.");
-                    return false;
                 }
 
-                return await _likeRepository.DeleteRangeAsync(likes);
+                await _likeRepository.DeleteRangeAsync(likes);
             }
             catch (DbUpdateException ex)
             {
@@ -120,7 +108,7 @@ namespace BlogWebApp.Services.LikeServices
             }
         }
 
-        public async Task<bool> DeleteLikesByUserIdAsync(string userId)
+        public async Task DeleteLikesByUserIdAsync(string userId)
         {
             try
             {
@@ -132,10 +120,9 @@ namespace BlogWebApp.Services.LikeServices
                 if (likes == null || !likes.Any())
                 {
                     _logger.LogInformation($"No one likes not found for user: {userId}. Skipping delete.");
-                    return false;
                 }
 
-                return await _likeRepository.DeleteRangeAsync(likes);
+                await _likeRepository.DeleteRangeAsync(likes);
             }
             catch (DbUpdateException ex)
             {

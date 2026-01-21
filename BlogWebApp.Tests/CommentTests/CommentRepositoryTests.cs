@@ -77,32 +77,28 @@ namespace BlogWebApp.Tests.CommentTests
         [Test]
         public async Task DeleteCommentsByArticleIdAsync_ShouldDeleteComments_WhenExist()
         {
-            var articleId = Guid.NewGuid();
-
-            var comment1 = new Comment("content1", "user1", articleId);
-            var comment2 = new Comment("content2", "user2", articleId);
+            var comment1 = new Comment("content1", "user1", Guid.NewGuid());
+            var comment2 = new Comment("content2", "user2", comment1.ArticleId);
 
             await _db.Comments.AddAsync(comment1);
             await _db.Comments.AddAsync(comment2);
 
             await _commentRepository.DeleteRangeAsync([comment1, comment2]);
-            var result = await _commentRepository.GetByArticleIdAsync(articleId);
+            var result = await _commentRepository.GetByArticleIdAsync(comment1.ArticleId);
 
             Assert.That(result.Count, Is.EqualTo(0));
         }
 
         public async Task DeleteCommentsByUserIdAsync_ShouldDeleteComments_WhenExist()
         {
-            var userId = "user1";
-
-            var comment1 = new Comment("content1", userId, Guid.NewGuid());
-            var comment2 = new Comment("content2", userId, Guid.NewGuid());
+            var comment1 = new Comment("content1", "user1", Guid.NewGuid());
+            var comment2 = new Comment("content2", "user1", Guid.NewGuid());
 
             await _db.Comments.AddAsync(comment1);
             await _db.Comments.AddAsync(comment2);
 
             await _commentRepository.DeleteRangeAsync([comment1, comment2]);
-            var result = await _commentRepository.GetByUserIdAsync(userId);
+            var result = await _commentRepository.GetByUserIdAsync(comment1.UserId);
 
             Assert.That(result.Count, Is.EqualTo(0));
         }

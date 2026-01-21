@@ -13,11 +13,10 @@ namespace BlogWebApp.Services.CommentServices
             _db = db;
         }
 
-        public async Task<Comment> AddAsync(Comment comment)
+        public async Task AddAsync(Comment comment)
         {
             await _db.Comments.AddAsync(comment);
             await _db.SaveChangesAsync();
-            return comment;
         }
 
         public async Task<Comment?> GetByIdAsync(Guid commentId)
@@ -35,11 +34,10 @@ namespace BlogWebApp.Services.CommentServices
             return await _db.Comments.Where(c => c.UserId == userId).ToListAsync();
         }     
 
-        public async Task<bool> DeleteRangeAsync(IEnumerable<Comment> comments)
+        public async Task DeleteRangeAsync(IEnumerable<Comment> comments)
         {
             _db.Comments.RemoveRange(comments);
             await _db.SaveChangesAsync();
-            return true;
         }
     }
 }

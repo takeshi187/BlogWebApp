@@ -30,9 +30,11 @@ namespace BlogWebApp.Controllers
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var result = await _commentService.CreateCommentAsync(articleId, userId, content);
-
-            if (result == null)
+            try
+            {
+                await _commentService.CreateCommentAsync(articleId, userId, content);
+            }
+            catch (Exception)
             {
                 TempData["Error"] = "Не удалось добавить комментарий.";
             }

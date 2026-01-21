@@ -26,7 +26,6 @@ namespace BlogWebApp.Mappers
                     ArticleId = c.ArticleId,
                     UserName = c.User.UserName ?? "Неизвестный",
                     CreatedAt = c.CreatedAt,
-                    UpdatedAt = c.UpdatedAt
                 }).ToList() ?? new List<CommentViewModel>(),
                 UserHasLiked = userId != null && article.Likes.Any(l => l.UserId.ToString() == userId)
             };

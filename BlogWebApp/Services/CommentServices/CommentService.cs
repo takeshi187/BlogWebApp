@@ -20,17 +20,10 @@ namespace BlogWebApp.Services.CommentServices
             _logger = logger;
         }
 
-        public async Task<Comment> CreateCommentAsync(Guid articleId, string userId, string content)
+        public async Task CreateCommentAsync(Guid articleId, string userId, string content)
         {
             try
-            {
-                if (articleId == Guid.Empty)
-                    throw new ArgumentException("ArticleId cannot be empty.", nameof(articleId));
-                if (string.IsNullOrWhiteSpace(userId))
-                    throw new ArgumentException("UserId cannot be empty.", nameof(userId));
-                if (string.IsNullOrWhiteSpace(content))
-                    throw new ArgumentException("Content cannot be empty.", nameof(content));
-
+            {             
                 var article = await _articleService.GetArticleByIdAsync(articleId);
                 if (article == null)
                     throw new InvalidOperationException($"Article with id: {articleId} not found.");
@@ -41,12 +34,6 @@ namespace BlogWebApp.Services.CommentServices
 
                 var comment = new Comment(content, userId, articleId);
                 await _commentRepository.AddAsync(comment);
-                return comment;
-            }
-            catch (ArgumentException ex)
-            {
-                _logger.LogWarning(ex, "Invalid comment data for creation.");
-                throw;
             }
             catch (DbUpdateException ex)
             {
@@ -85,7 +72,7 @@ namespace BlogWebApp.Services.CommentServices
             }
         }            
 
-        public async Task<bool> DeleteCommentsByArticleIdAsync(Guid articleId)
+        public async Task DeleteCommentsByArticleIdAsync(Guid articleId)
         {
             try
             {
@@ -97,10 +84,9 @@ namespace BlogWebApp.Services.CommentServices
                 if (comments == null || !comments.Any())
                 {
                     _logger.LogInformation($"No one comments not found for article: {articleId}. Skipping delete.");
-                    return false;
                 }
 
-                return await _commentRepository.DeleteRangeAsync(comments);
+                await _commentRepository.DeleteRangeAsync(comments);
             }
             catch (DbUpdateException ex)
             {
@@ -114,7 +100,7 @@ namespace BlogWebApp.Services.CommentServices
             }
         }
         
-        public async Task<bool> DeleteCommentsByUserIdAsync(string userId)
+        public async Task DeleteCommentsByUserIdAsync(string userId)
         {
             try
             {
@@ -126,10 +112,9 @@ namespace BlogWebApp.Services.CommentServices
                 if (comments == null || !comments.Any())
                 {
                     _logger.LogInformation($"No one comments not found for user: {userId}. Skipping delete.");
-                    return false;
                 }
 
-                return await _commentRepository.DeleteRangeAsync(comments);
+                await _commentRepository.DeleteRangeAsync(comments);
             }
             catch (DbUpdateException ex)
             {

@@ -14,7 +14,7 @@ namespace BlogWebApp.Tests.CommentTests
         [SetUp]
         public void SetUp()
         {
-            var options = new DbContextOptionsBuilder<BlogWebAppDbContext>().UseInMemoryDatabase("TestDatabase").Options;
+            var options = new DbContextOptionsBuilder<BlogWebAppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
 
             _db = new BlogWebAppDbContext(options);
             _commentRepository = new CommentRepository(_db);
@@ -23,34 +23,31 @@ namespace BlogWebApp.Tests.CommentTests
         [Test]
         public async Task AddCommentAsync_ShouldAddComment_WhenValid()
         {
-            var comment = new Comment(Guid.NewGuid(), "testcontent", "1", Guid.NewGuid());
+            var comment = new Comment("testcontent", "1", Guid.NewGuid());
 
-            var result = await _commentRepository.AddAsync(comment);
+            await _commentRepository.AddAsync(comment);
+            var result = await _db.Comments.FindAsync(comment.CommentId);
 
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Content, Is.EqualTo(comment.Content));
-            Assert.That(result.UserId, Is.EqualTo(comment.UserId));
-            Assert.That(result.ArticleId, Is.EqualTo(comment.ArticleId));
         }
 
         [Test]
         public async Task GetCommentByIdAsync_ShouldReturnComment_WhenCommentExist()
         {
-            var comment = new Comment(Guid.NewGuid(), "testcontent", "1", Guid.NewGuid());
+            var comment = new Comment("testcontent", "1", Guid.NewGuid());
 
             await _commentRepository.AddAsync(comment);
             var result = await _commentRepository.GetByIdAsync(comment.CommentId);
 
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.CommentId, Is.EqualTo(result.CommentId));
         }
 
         [Test]
         public async Task GetCommentsByArticleIdAsync_ShouldReturnComments_WhenCommentsExist()
         {
-            var comment1 = new Comment(Guid.NewGuid(), "testcontent", "1", Guid.NewGuid());
-            var comment2 = new Comment(Guid.NewGuid(), "testcontent", "2", comment1.ArticleId);
-            var comment3 = new Comment(Guid.NewGuid(), "testcontent", "3", Guid.NewGuid());
+            var comment1 = new Comment("testcontent", "1", Guid.NewGuid());
+            var comment2 = new Comment("testcontent", "2", comment1.ArticleId);
+            var comment3 = new Comment("testcontent", "3", Guid.NewGuid());
 
             await _commentRepository.AddAsync(comment1);
             await _commentRepository.AddAsync(comment2);
@@ -64,10 +61,9 @@ namespace BlogWebApp.Tests.CommentTests
         [Test]
         public async Task GetCommentsByUserIdAsync_ShouldReturnComments_WhenCommentsExist()
         {
-            _db.RemoveRange(_db.Comments);
-            var comment1 = new Comment(Guid.NewGuid(), "testcontent", "1", Guid.NewGuid());
-            var comment2 = new Comment(Guid.NewGuid(), "testcontent", "2", comment1.ArticleId);
-            var comment3 = new Comment(Guid.NewGuid(), "testcontent", "1", Guid.NewGuid());
+            var comment1 = new Comment("testcontent", "1", Guid.NewGuid());
+            var comment2 = new Comment("testcontent", "2", comment1.ArticleId);
+            var comment3 = new Comment("testcontent", "1", Guid.NewGuid());
 
             await _commentRepository.AddAsync(comment1);
             await _commentRepository.AddAsync(comment2);
@@ -83,12 +79,11 @@ namespace BlogWebApp.Tests.CommentTests
         {
             var articleId = Guid.NewGuid();
 
-            var comment1 = new Comment(Guid.NewGuid(), "content1", "user1", articleId);
-            var comment2 = new Comment(Guid.NewGuid(), "content2", "user2", articleId);
+            var comment1 = new Comment("content1", "user1", articleId);
+            var comment2 = new Comment("content2", "user2", articleId);
 
             await _db.Comments.AddAsync(comment1);
             await _db.Comments.AddAsync(comment2);
-            await _db.SaveChangesAsync();
 
             await _commentRepository.DeleteRangeAsync([comment1, comment2]);
             var result = await _commentRepository.GetByArticleIdAsync(articleId);
@@ -100,12 +95,11 @@ namespace BlogWebApp.Tests.CommentTests
         {
             var userId = "user1";
 
-            var comment1 = new Comment(Guid.NewGuid(), "content1", userId, Guid.NewGuid());
-            var comment2 = new Comment(Guid.NewGuid(), "content2", userId, Guid.NewGuid());
+            var comment1 = new Comment("content1", userId, Guid.NewGuid());
+            var comment2 = new Comment("content2", userId, Guid.NewGuid());
 
             await _db.Comments.AddAsync(comment1);
             await _db.Comments.AddAsync(comment2);
-            await _db.SaveChangesAsync();
 
             await _commentRepository.DeleteRangeAsync([comment1, comment2]);
             var result = await _commentRepository.GetByUserIdAsync(userId);

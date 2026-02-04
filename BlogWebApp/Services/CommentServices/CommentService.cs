@@ -8,69 +8,39 @@ namespace BlogWebApp.Services.CommentServices
     public class CommentService : ICommentService
     {
         private readonly ICommentRepository _commentRepository;
-        private readonly IArticleService _articleService;
-        private readonly IUserService _userService;
         private readonly ILogger<CommentService> _logger;
 
-        public CommentService(ICommentRepository commentRepository, IArticleService articleService, IUserService userService, ILogger<CommentService> logger)
+        public CommentService(ICommentRepository commentRepository, ILogger<CommentService> logger)
         {
             _commentRepository = commentRepository;
-            _articleService = articleService;
-            _userService = userService;
             _logger = logger;
         }
 
         public async Task CreateCommentAsync(Guid articleId, string userId, string content)
         {
             try
-            {             
-                var article = await _articleService.GetArticleByIdAsync(articleId);
-                if (article == null)
-                    throw new InvalidOperationException($"Article with id: {articleId} not found.");
-
-                var user = await _userService.GetUserByIdAsync(userId);
-                if (user == null)
-                    throw new InvalidOperationException($"User with id: {userId} not found.");
-
+            {
                 var comment = new Comment(content, userId, articleId);
                 await _commentRepository.AddAsync(comment);
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, $"Database error while adding comment with content: {content}");
+                _logger.LogError(ex, $"Database error while adding comment. ArticleId={articleId}, UserId={userId}");
                 throw new InvalidOperationException("Failed to add comment to database.", ex);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Unexpected error while adding comment with content: {content}");
-                throw;
             }
         }
 
         public async Task<Comment?> GetCommentByIdAsync(Guid commentId)
         {
-            try
-            {
-                if (commentId == Guid.Empty)
-                    throw new ArgumentException("CommentId cannot be empty.", nameof(commentId));
+            if (commentId == Guid.Empty)
+                throw new ArgumentException("CommentId cannot be empty.", nameof(commentId));
 
-                var result = await _commentRepository.GetByIdAsync(commentId);
-                if (result == null)
-                    throw new InvalidOperationException($"Comment with id: {commentId} not found.");
+            var comment = await _commentRepository.GetByIdAsync(commentId);
+            if (comment == null)
+                throw new InvalidOperationException($"Comment with id: {commentId} not found.");
 
-                return result;
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogWarning(ex, $"Comment not found: {commentId}");
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Unexpected error while searching comment with id: {commentId}");
-                throw;
-            }
-        }            
+            return comment;
+        }
 
         public async Task DeleteCommentsByArticleIdAsync(Guid articleId)
         {
@@ -82,9 +52,7 @@ namespace BlogWebApp.Services.CommentServices
                 var comments = await _commentRepository.GetByArticleIdAsync(articleId);
 
                 if (comments == null || !comments.Any())
-                {
-                    _logger.LogInformation($"No one comments not found for article: {articleId}. Skipping delete.");
-                }
+                    return;
 
                 await _commentRepository.DeleteRangeAsync(comments);
             }
@@ -93,13 +61,8 @@ namespace BlogWebApp.Services.CommentServices
                 _logger.LogError(ex, $"Database error while deleting comments for article: {articleId}");
                 throw new InvalidOperationException("Failed to delete comments.", ex);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Unexpected error while deleting comments for article: {articleId}");
-                throw;
-            }
         }
-        
+
         public async Task DeleteCommentsByUserIdAsync(string userId)
         {
             try
@@ -110,9 +73,7 @@ namespace BlogWebApp.Services.CommentServices
                 var comments = await _commentRepository.GetByUserIdAsync(userId);
 
                 if (comments == null || !comments.Any())
-                {
-                    _logger.LogInformation($"No one comments not found for user: {userId}. Skipping delete.");
-                }
+                    return;
 
                 await _commentRepository.DeleteRangeAsync(comments);
             }
@@ -120,11 +81,6 @@ namespace BlogWebApp.Services.CommentServices
             {
                 _logger.LogError(ex, $"Database error while deleting comments for user: {userId}");
                 throw new InvalidOperationException("Failed to delete comments.", ex);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Unexpected error while deleting comments for user: {userId}");
-                throw;
             }
         }
     }

@@ -9,6 +9,5 @@ namespace BlogWebApp.Services.UserServices
         Task<ApplicationUser?> GetByIdAsync(string userId);
         Task<ApplicationUser?> GetByEmailAsync(string email);
         Task<IdentityResult> DeleteAsync(ApplicationUser user);
-        Task<bool> CheckPasswordAsync(ApplicationUser user, string passwordHash);
     }
 }

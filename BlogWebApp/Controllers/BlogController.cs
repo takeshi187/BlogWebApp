@@ -1,5 +1,6 @@
 ﻿using BlogWebApp.Db;
 using BlogWebApp.Mappers;
+using BlogWebApp.Models;
 using BlogWebApp.Services.ArticleServices;
 using BlogWebApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -11,52 +12,36 @@ namespace BlogWebApp.Controllers
     public class BlogController : Controller
     {
         private readonly IArticleService _articleService;
-        private readonly BlogWebAppDbContext _db;
 
-        public BlogController(IArticleService articleService, BlogWebAppDbContext db)
+        public BlogController(IArticleService articleService)
         {
             _articleService = articleService;
-            _db = db;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? query)
         {
             var articles = await _articleService.GetAllArticlesAsync();
-            if (!articles.Any())
+            if (articles == null || !articles.Any())
                 return View(new List<ArticleViewModel>());
-            var userId = User.Identity.IsAuthenticated ? User.FindFirstValue(ClaimTypes.NameIdentifier) : null;
-            var articleViewModel = articles.Select(a => ArticleMapper.ToViewModel(a, userId)).ToList();
-            return View(articleViewModel);
-        }
 
-        [HttpGet]
-        public async Task<IActionResult> Search(string query)
-        {
-            var articlesQuery = _db.Articles.AsQueryable();
+            IEnumerable<Article> filteredArticles = articles;
 
             if (!string.IsNullOrWhiteSpace(query))
             {
-                articlesQuery = articlesQuery
-                    .Where(a => a.Title.ToLower().Contains(query.ToLower()) || a.Content.ToLower().Contains(query.ToLower()));
+                query = query.Trim();
+
+                filteredArticles = filteredArticles.Where(a =>
+                    a.Title.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                    a.Content.Contains(query, StringComparison.OrdinalIgnoreCase));
             }
 
-            var articles = await articlesQuery
-                .OrderByDescending(a => a.CreatedAt)
-                .Select(a => new ArticleViewModel
-                {
-                    ArticleViewModelId = a.ArticleId,
-                    Title = a.Title,
-                    Content = a.Content,
-                    Image = a.Image,
-                    GenreName = a.Genre.GenreName,
-                    CreatedAt = a.CreatedAt,
-                    LikesCount = a.Likes.Count,
-                    CommentsCount = a.Comments.Count
-                })
-                .ToListAsync();
+            var userId = User.Identity.IsAuthenticated ? User.FindFirstValue(ClaimTypes.NameIdentifier) : null;
+            var articleViewModel = filteredArticles.Select(a => ArticleMapper.ToViewModel(a, userId)).ToList();
 
-            return View("Search", articles);
-        }
+            ViewBag.Query = query;
+
+            return View(articleViewModel);
+        }      
     }
 }

@@ -21,20 +21,20 @@ namespace BlogWebApp.Services.CommentServices
 
         public async Task<Comment?> GetByIdAsync(Guid commentId)
         {
-            return await _db.Comments.FindAsync(commentId);
+            return await _db.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
         }
 
-        public async Task<IEnumerable<Comment?>> GetByArticleIdAsync(Guid articleId)
+        public async Task<IReadOnlyList<Comment>> GetByArticleIdAsync(Guid articleId)
         {
             return await _db.Comments.Where(c => c.ArticleId == articleId).ToListAsync();
         }
 
-        public async Task<IEnumerable<Comment?>> GetByUserIdAsync(string userId)
+        public async Task<IReadOnlyList<Comment>> GetByUserIdAsync(string userId)
         {
             return await _db.Comments.Where(c => c.UserId == userId).ToListAsync();
-        }     
+        }
 
-        public async Task DeleteRangeAsync(IEnumerable<Comment> comments)
+        public async Task DeleteRangeAsync(IReadOnlyCollection<Comment> comments)
         {
             _db.Comments.RemoveRange(comments);
             await _db.SaveChangesAsync();

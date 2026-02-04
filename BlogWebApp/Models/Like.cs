@@ -32,19 +32,6 @@ namespace BlogWebApp.Models
             CreatedAt = DateTime.UtcNow;
         }
 
-        public Like(ApplicationUser user, Guid articleId)
-        {
-            if (user == null)
-                throw new ArgumentNullException("User cannot be empty.", nameof(user));
-            if (articleId == Guid.Empty)
-                throw new ArgumentException("ArticleId cannot be empty.", nameof(articleId));
-
-            LikeId = Guid.NewGuid();
-            User = user;
-            ArticleId = articleId;
-            CreatedAt = DateTime.UtcNow;
-        }
-
         protected Like() { }
     }
 }

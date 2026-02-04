@@ -5,23 +5,20 @@ namespace BlogWebApp.Models
     public class Genre
     {
         [Key]
-        public Guid GenreId { get; private set; } = Guid.NewGuid();
+        public Guid GenreId { get; private set; }
+
         [Required]
-        [MaxLength(200)]
-        public string GenreName { get; set; } = null!;
+        [MaxLength(150)]
+        public string GenreName { get; private set; } = null!;
 
         public Genre(string genreName)
         {
+            if (string.IsNullOrWhiteSpace(genreName))
+                throw new ArgumentException("Genre name cannot be empty.", nameof(genreName));
+            GenreId = Guid.NewGuid();
             GenreName = genreName;
         }
 
-        // for tests
-        public Genre(Guid genreId, string genreName)
-        {
-            GenreId = genreId;
-            GenreName = genreName;
-        }
-
-        private Genre() { }
+        protected Genre() { }
     }
 }

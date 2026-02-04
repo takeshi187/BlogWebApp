@@ -29,6 +29,7 @@
                             @if(User.Identity.IsAuthenticated)
                             {
                                 <form asp-controller="Account" asp-action="Logout" method="post">
+                                    @Html.AntiForgeryToken()
                                     <button type="submit">Выйти (@User.Identity.Name)</button>
                                 </form>
                             }

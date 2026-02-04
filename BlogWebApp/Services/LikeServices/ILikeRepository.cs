@@ -6,10 +6,10 @@ namespace BlogWebApp.Services.LikeServices
     {
         Task AddAsync(Like like);
         Task<Like?> GetByIdAsync(Guid likeId);
-        Task<IEnumerable<Like?>> GetByArticleIdAsync(Guid articleId);
-        Task<IEnumerable<Like?>> GetByUserIdAsync(string userId);
-        Task<Like> ExistAsync(Guid articleId, string userId);
-        Task DeleteRangeAsync(IEnumerable<Like> likes);
+        Task<IReadOnlyList<Like>> GetByArticleIdAsync(Guid articleId);
+        Task<IReadOnlyList<Like>> GetByUserIdAsync(string userId);
+        Task<Like> GetByArticleIdAndUserIdAsync(Guid articleId, string userId);
+        Task DeleteRangeAsync(IReadOnlyCollection<Like> likes);
         Task DeleteAsync(Like like);
     }
 }

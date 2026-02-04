@@ -8,7 +8,7 @@ namespace BlogWebApp.ViewModels
         public Guid ArticleViewModelId { get; set; }
 
         [Required(ErrorMessage = "Заголовок обязателен.")]
-        [MaxLength(300, ErrorMessage = "Длина заголовка не должна превышать 300 символов.")]
+        [MaxLength(300, ErrorMessage = "Длина заголовка не должна превышать '300' символов.")]
         public string Title { get; set; } = null!;
 
         public string? Image { get; set; }

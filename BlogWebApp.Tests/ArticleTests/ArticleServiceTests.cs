@@ -1,5 +1,6 @@
 ﻿using BlogWebApp.Models;
 using BlogWebApp.Services.ArticleServices;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework.Internal;
@@ -25,66 +26,42 @@ namespace BlogWebApp.Tests.ArticleTests
         [Test]
         public async Task CreateArticleAsync_ShouldCreateArticle_WhenValid()
         {
-            var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
-            _articleRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Article>())).ReturnsAsync(article);
+            _articleRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Article>()));
 
-            var result = await _articleService.CreateArticleAsync(article);
+            await _articleService.CreateArticleAsync("testtitle", "testimage", "testcontent", Guid.NewGuid());
+            _articleRepositoryMock.Verify(r =>
+                r.AddAsync(It.Is<Article>(a =>
+                    a.Title == "testtitle" &&
+                    a.Image == "testimage" &&
+                    a.Content == "testcontent"
+                )),
+                Times.Once);
+        }
 
-            Assert.That(result, Is.EqualTo(article));
+        [Test]
+        public void CreateArticleAsync_ShouldThrowInvalidOperationException_WhenDbFails()
+        {
+            _articleRepositoryMock
+                .Setup(r => r.AddAsync(It.IsAny<Article>()))
+                .ThrowsAsync(new DbUpdateException());
+
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await _articleService.CreateArticleAsync("testtitle", "testimage", "testcontent", Guid.NewGuid()));
             _articleRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Article>()), Times.Once);
-        }
-
-        [Test]
-        public async Task CreateArticleAsync_ShouldThrowArgumentException_WhenTitleEmpty()
-        {
-            var article = new Article(Guid.NewGuid(), "", "testimage", "testcontent", Guid.NewGuid());
-
-            Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _articleService.CreateArticleAsync(article));
-            _articleRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Article>()), Times.Never);
-        }
-
-        [Test]
-        public async Task CreateArticleAsync_ShouldThrowArgumentException_WhenContentEmpty()
-        {
-            var article = new Article(Guid.NewGuid(), "testtitle", "testimage", "", Guid.NewGuid());
-
-            Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _articleService.CreateArticleAsync(article));
-            _articleRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Article>()), Times.Never);
-        }
-
-        [Test]
-        public async Task CreateArticleAsync_ShouldThrowArgumentException_WhenGenreGuidEmpty()
-        {
-            var article = new Article(Guid.NewGuid(), "testtitle", "testimage", "testcontent", Guid.Empty);
-
-            Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _articleService.CreateArticleAsync(article));
-            _articleRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Article>()), Times.Never);
-        }
-
-        [Test]
-        public async Task CreateArticleAsync_ShouldThrowArgumentException_WhenArticleEmpty()
-        {
-            Article article = null;
-
-            Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _articleService.CreateArticleAsync(article));
-            _articleRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Article>()), Times.Never);
         }
 
         [Test]
         public async Task GetArticleByIdAsync_ShouldReturnArticle_WhenArticleExist()
         {
-            var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
-            _articleRepositoryMock.Setup(r => r.GetByIdAsync(article.ArticleId)).ReturnsAsync(article);
+            var article = new Article("testtitle", "testimage", "testcontent", Guid.NewGuid());
 
-            await _articleService.CreateArticleAsync(article);
+            _articleRepositoryMock
+                .Setup(r => r.GetByIdAsync(article.ArticleId))
+                .ReturnsAsync(article);
+
             var result = await _articleService.GetArticleByIdAsync(article.ArticleId);
 
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.ArticleId, Is.EqualTo(article.ArticleId));
+            Assert.That(result, Is.EqualTo(article));
             _articleRepositoryMock.Verify(r => r.GetByIdAsync(article.ArticleId), Times.Once);
         }
 
@@ -94,25 +71,25 @@ namespace BlogWebApp.Tests.ArticleTests
             var articleId = Guid.NewGuid();
             _articleRepositoryMock.Setup(r => r.GetByIdAsync(articleId)).ReturnsAsync((Article?)null);
 
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await _articleService.GetArticleByIdAsync(articleId));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => 
+                await _articleService.GetArticleByIdAsync(articleId));
             _articleRepositoryMock.Verify(r => r.GetByIdAsync(articleId), Times.Once);
         }
 
         [Test]
-        public async Task GetArticleByIdAsync_ShouldThrowArgumentException_WhenArticleIdEmpty()
+        public void GetArticleByIdAsync_ShouldThrowArgumentException_WhenArticleIdEmpty()
         {
-            var articleId = Guid.Empty;
-
-            Assert.ThrowsAsync<ArgumentException>(async () => await _articleService.GetArticleByIdAsync(articleId));
-            _articleRepositoryMock.Verify(r => r.GetByIdAsync(articleId), Times.Never);
+            Assert.ThrowsAsync<ArgumentException>(async() =>
+                await _articleService.GetArticleByIdAsync(Guid.Empty));
+            _articleRepositoryMock.Verify(r => r.GetByIdAsync(It.IsAny<Guid>()), Times.Never);
         }
 
         [Test]
         public async Task GetAllArticlesAsync_ShouldReturnAllArticles_WhenArticlesExist()
         {
-            var article1 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
-            var article2 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
-            var article3 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
+            var article1 = new Article("testtitle", "testimage", "testcontent", Guid.NewGuid());
+            var article2 = new Article("testtitle", "testimage", "testcontent", Guid.NewGuid());
+            var article3 = new Article("testtitle", "testimage", "testcontent", Guid.NewGuid());
             var articles = new List<Article> { article1, article2, article3 };
             _articleRepositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(articles);
 
@@ -125,7 +102,7 @@ namespace BlogWebApp.Tests.ArticleTests
         [Test]
         public async Task DeleteArticleAsync_ShouldDeleteArticle_WhenArticleExist()
         {
-            var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
+            var article = new Article("testtitle", "image", "testcontent", Guid.NewGuid());
             _articleRepositoryMock.Setup(r => r.GetByIdAsync(article.ArticleId)).ReturnsAsync(article);
 
             await _articleService.DeleteArticleAsync(article.ArticleId);
@@ -137,86 +114,47 @@ namespace BlogWebApp.Tests.ArticleTests
         [Test]
         public async Task DeleteArticleAsync_ShouldThrowInvalidOperationException_WhenArticleNotFound()
         {
-            var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
+            var article = new Article("testtitle", "image", "testcontent", Guid.NewGuid());
             _articleRepositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Article?)null);
 
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await _articleService.DeleteArticleAsync(article.ArticleId));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => 
+                await _articleService.DeleteArticleAsync(article.ArticleId));
             _articleRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Article>()), Times.Never);
         }
 
         [Test]
         public async Task DeleteArticleAsync_ShouldArgumentException_WhenArticleIdEmpty()
         {
-            var articleId = Guid.Empty;
-
-            Assert.ThrowsAsync<ArgumentException>(async () => await _articleService.DeleteArticleAsync(articleId));
+            Assert.ThrowsAsync<ArgumentException>(async () =>
+                await _articleService.DeleteArticleAsync(Guid.Empty));
             _articleRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Article>()), Times.Never);
         }
 
         [Test]
         public async Task UpdateArticleAsync_ShouldUpdateArticle_WhenArticleExist()
         {
-            var existingArticle = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
-            var updatedArticle = new Article(existingArticle.ArticleId, "newtitle", "newimage", "newcontent", Guid.NewGuid());
-            _articleRepositoryMock.Setup(r => r.GetByIdAsync(existingArticle.ArticleId)).ReturnsAsync(existingArticle);
+            var article = new Article("old", "old", "old", Guid.NewGuid());
 
-            var result = await _articleService.UpdateArticleAsync(updatedArticle);
+            _articleRepositoryMock.Setup(r => r.GetByIdAsync(article.ArticleId)).ReturnsAsync(article);
 
-            Assert.That(result, Is.EqualTo(existingArticle));
-            _articleRepositoryMock.Verify(r => r.GetByIdAsync(existingArticle.ArticleId), Times.Once);
-            _articleRepositoryMock.Verify(r => r.UpdateAsync(It.Is<Article>(a =>
-                a.ArticleId == existingArticle.ArticleId &&
-                a.Title == "newtitle" &&
-                a.Image == "newimage" &&
-                a.Content == "newcontent" &&
-                a.GenreId == updatedArticle.GenreId &&
-                a.UpdatedAt.HasValue
-                )), Times.Once);
+            await _articleService.UpdateArticleAsync(article.ArticleId, "newtitle", "newimage", "newcontent", Guid.NewGuid());
+
+            _articleRepositoryMock.Verify(r =>
+                r.UpdateAsync(It.Is<Article>(a =>
+                    a.Title == "newtitle" &&
+                    a.Image == "newimage" &&
+                    a.Content == "newcontent"
+                )),
+                Times.Once);
         }
 
         [Test]
         public async Task UpdateArticleAsync_ShouldThrowInvalidOperationException_WhenArticleNotFound()
         {
-            var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
-            _articleRepositoryMock.Setup(r => r.GetByIdAsync(article.ArticleId)).ReturnsAsync((Article?)null);
+            _articleRepositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Article?)null);
 
-            Assert.ThrowsAsync<InvalidOperationException>(async () => await _articleService.UpdateArticleAsync(article));
-            _articleRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Article>()), Times.Never);
-        }
-
-        [Test]
-        public async Task UpdateArticleAsync_ShouldThrowArgumentException_WhenArticleEmpty()
-        {
-            Article article = null;
-
-            Assert.ThrowsAsync<ArgumentException>(async () => await _articleService.UpdateArticleAsync(article));
-            _articleRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Article>()), Times.Never);
-        }
-
-        [Test]
-        public async Task UpdateArticleAsync_ShouldThrowArgumentException_WhenTitleEmpty()
-        {
-            var article = new Article(Guid.NewGuid(), "", "image", "testcontent", Guid.NewGuid());
-
-            Assert.ThrowsAsync<ArgumentException>(async () => await _articleService.UpdateArticleAsync(article));
-            _articleRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Article>()), Times.Never);
-        }
-
-        [Test]
-        public async Task UpdateArticleAsync_ShouldThrowArgumentException_WhenContentEmpty()
-        {
-            var article = new Article(Guid.NewGuid(), "testtitle", "image", "", Guid.NewGuid());
-
-            Assert.ThrowsAsync<ArgumentException>(async () => await _articleService.UpdateArticleAsync(article));
-            _articleRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Article>()), Times.Never);
-        }
-
-        [Test]
-        public async Task UpdateArticleAsync_ShouldThrowArgumentException_WhenGenreIdEmpty()
-        {
-            var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.Empty);
-
-            Assert.ThrowsAsync<ArgumentException>(async () => await _articleService.UpdateArticleAsync(article));
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await _articleService.UpdateArticleAsync(Guid.NewGuid(), "testtitle", "testimage", "testcontent", Guid.NewGuid()));
             _articleRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Article>()), Times.Never);
         }
     }

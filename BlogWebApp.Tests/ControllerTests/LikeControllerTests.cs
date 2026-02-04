@@ -1,18 +1,10 @@
 ﻿using BlogWebApp.Controllers;
-using BlogWebApp.Models;
-using BlogWebApp.Services.ArticleServices;
-using BlogWebApp.Services.CommentServices;
 using BlogWebApp.Services.LikeServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlogWebApp.Tests.ControllerTests
 {
@@ -27,7 +19,7 @@ namespace BlogWebApp.Tests.ControllerTests
         public void SetUp()
         {
             _likeServiceMock = new Mock<ILikeService>();
-            _controller = new LikeController(null!, _likeServiceMock.Object);
+            _controller = new LikeController(_likeServiceMock.Object);
             var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, UserId)
@@ -65,8 +57,8 @@ namespace BlogWebApp.Tests.ControllerTests
 
             var redirect = result as RedirectToActionResult;
             Assert.That(redirect, Is.Not.Null);
-            Assert.That(redirect.ActionName, Is.EqualTo("Index"));
-            Assert.That(redirect.ControllerName, Is.EqualTo("Blog"));
+            Assert.That(redirect.ActionName, Is.EqualTo("Details"));
+            Assert.That(redirect.ControllerName, Is.EqualTo("Article"));
         }
 
         [TearDown]

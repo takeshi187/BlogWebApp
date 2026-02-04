@@ -11,7 +11,7 @@ namespace BlogWebApp.Mappers
             {
                 CommentId = comment.CommentId,
                 Content = comment.Content,
-                UserName = comment.User.UserName,
+                UserName = comment.User?.UserName ?? "Неизвествный",
                 CreatedAt = comment.CreatedAt
             };
         }

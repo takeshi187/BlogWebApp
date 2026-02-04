@@ -98,7 +98,7 @@ namespace BlogWebApp.Tests.LikeTests
             var like = new Like("user1", Guid.NewGuid());
 
             await _likeRepository.AddAsync(like);
-            var result = await _likeRepository.ExistAsync(like.ArticleId, like.UserId);
+            var result = await _likeRepository.GetByArticleIdAndUserIdAsync(like.ArticleId, like.UserId);
 
             Assert.That(result, Is.Not.Null);
         }
@@ -144,7 +144,7 @@ namespace BlogWebApp.Tests.LikeTests
 
             await _likeRepository.AddAsync(like);
             await _likeRepository.DeleteAsync(like);
-            var result = await _likeRepository.ExistAsync(like.ArticleId, like.UserId);
+            var result = await _likeRepository.GetByArticleIdAndUserIdAsync(like.ArticleId, like.UserId);
 
             Assert.That(result, Is.Null);
         }

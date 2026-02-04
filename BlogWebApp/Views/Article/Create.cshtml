@@ -7,6 +7,10 @@
 <h2>Создать новый пост</h2>
 <form asp-action="Create" method="post" enctype="multipart/form-data">
 
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    @Html.AntiForgeryToken()
+
     <div class="form-group mb-3">
         <label asp-for="Title" class="form-label">Заголовок</label>
         <input asp-for="Title" class="form-control" />
@@ -37,17 +41,17 @@
                 <option value="">Выберите жанр</option>
             </select>
         }          
-        <span asp-validation-for="GenreId" class="text-danger" />
-
-        <div class="mt-2">
-            <a asp-controller="Genre" asp-action="Create" class="btn btn-outline-primary btn-sm">
-                Создать жанр
-            </a>
-        </div>
+        <span asp-validation-for="GenreId" class="text-danger" />      
     </div>  
 
     <button class="btn btn-primary mt-3" type="submit">Создать пост</button>
 </form>
+
+<div class="mt-2">
+    <a asp-controller="Genre" asp-action="Create" class="btn btn-outline-primary btn-sm">
+        Создать жанр
+    </a>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial"/>

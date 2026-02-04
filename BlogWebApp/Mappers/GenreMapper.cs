@@ -13,10 +13,5 @@ namespace BlogWebApp.Mappers
                 GenreName = genre.GenreName
             };
         }
-
-        public static Genre ToEntity(GenreViewModel genreViewModel)
-        {
-            return new Genre(genreViewModel.GenreName);
-        }
     }
 }

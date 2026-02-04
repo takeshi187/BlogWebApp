@@ -89,6 +89,7 @@ namespace BlogWebApp.Tests.CommentTests
             Assert.That(result.Count, Is.EqualTo(0));
         }
 
+        [Test]
         public async Task DeleteCommentsByUserIdAsync_ShouldDeleteComments_WhenExist()
         {
             var comment1 = new Comment("content1", "user1", Guid.NewGuid());

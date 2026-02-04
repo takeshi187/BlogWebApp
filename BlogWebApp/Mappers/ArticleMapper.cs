@@ -14,7 +14,7 @@ namespace BlogWebApp.Mappers
                 Content = article.Content,
                 Image = article.Image,
                 GenreId = article.GenreId,
-                GenreName = article.Genre.GenreName,
+                GenreName = article.Genre?.GenreName,
                 CreatedAt = article.CreatedAt,
                 UpdatedAt = article.UpdatedAt,
                 LikesCount = article.Likes?.Count ?? 0,
@@ -24,25 +24,11 @@ namespace BlogWebApp.Mappers
                     CommentId = c.CommentId,
                     Content = c.Content,
                     ArticleId = c.ArticleId,
-                    UserName = c.User.UserName ?? "Неизвестный",
+                    UserName = c.User?.UserName ?? "Неизвестный",
                     CreatedAt = c.CreatedAt,
                 }).ToList() ?? new List<CommentViewModel>(),
-                UserHasLiked = userId != null && article.Likes.Any(l => l.UserId.ToString() == userId)
+                UserHasLiked = userId != null && article.Likes != null && article.Likes.Any(l => l.UserId.ToString() == userId)
             };
-        }
-
-        public static Article ToEntity(ArticleViewModel articleViewModel)
-        {
-            return new Article
-                (articleViewModel.Title, articleViewModel.Image, articleViewModel.Content, articleViewModel.GenreId);
-        }
-
-        public static void MapToExistingEntity(ArticleViewModel articleViewModel, Article article)
-        {
-            article.Title = articleViewModel.Title;
-            article.Content = articleViewModel.Content;
-            article.Image = articleViewModel.Image;
-            article.GenreId = articleViewModel.GenreId;
         }
     }
 }

@@ -1,41 +1,39 @@
 ﻿using BlogWebApp.Mappers;
 using BlogWebApp.Services.GenreServices;
 using BlogWebApp.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogWebApp.Controllers
 {
+    [Authorize]
     [Route("[controller]/[action]")]
     public class GenreController : Controller
     {
         private readonly IGenreService _genreService;
-        private readonly ILogger<GenreController> _logger;
 
-        public GenreController(IGenreService genreService, ILogger<GenreController> logger)
+        public GenreController(IGenreService genreService)
         {
             _genreService = genreService;
-            _logger = logger;
         }
 
         [HttpGet]
-        public IActionResult Create()
-        {
-            return View(new GenreViewModel());
-        }
+        public IActionResult Create() => View(new GenreViewModel());
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(GenreViewModel genreViewModel)
         {
-            if (!ModelState.IsValid)
+            try
             {
+                await _genreService.CreateGenreAsync(genreViewModel.GenreName);
+                return RedirectToAction("Create", "Article");
+            }
+            catch
+            {
+                ModelState.AddModelError(nameof(genreViewModel.GenreName),"Жанр с таким именем уже существует.");
                 return View(genreViewModel);
             }
-
-            var genre = GenreMapper.ToEntity(genreViewModel);
-            await _genreService.CreateGenreAsync(genre.GenreName);
-
-            return RedirectToAction("Create", "Article");
         }
     }
 }

@@ -21,25 +21,25 @@ namespace BlogWebApp.Services.LikeServices
 
         public async Task<Like?> GetByIdAsync(Guid likeId)
         {
-            return await _db.Likes.FindAsync(likeId);
+            return await _db.Likes.FirstOrDefaultAsync(l => l.LikeId == likeId);
         }
 
-        public async Task<IEnumerable<Like?>> GetByArticleIdAsync(Guid articleId)
+        public async Task<IReadOnlyList<Like>> GetByArticleIdAsync(Guid articleId)
         {
             return await _db.Likes.Where(l => l.ArticleId == articleId).ToListAsync();
         }
 
-        public async Task<IEnumerable<Like?>> GetByUserIdAsync(string userId)
+        public async Task<IReadOnlyList<Like>> GetByUserIdAsync(string userId)
         {
             return await _db.Likes.Where(l => l.UserId == userId).ToListAsync();
         }
 
-        public async Task<Like> ExistAsync(Guid articleId, string userId)
+        public async Task<Like?> GetByArticleIdAndUserIdAsync(Guid articleId, string userId)
         {
             return await _db.Likes.FirstOrDefaultAsync(l => l.ArticleId == articleId && l.UserId == userId);
         }
 
-        public async Task DeleteRangeAsync(IEnumerable<Like> likes)
+        public async Task DeleteRangeAsync(IReadOnlyCollection<Like> likes)
         {
             _db.Likes.RemoveRange(likes);
             await _db.SaveChangesAsync();

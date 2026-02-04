@@ -5,8 +5,8 @@ using BlogWebApp.Services.FileStorageServices;
 using BlogWebApp.Services.GenreServices;
 using BlogWebApp.Services.LikeServices;
 using BlogWebApp.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
 namespace BlogWebApp.Controllers
@@ -15,7 +15,6 @@ namespace BlogWebApp.Controllers
     public class ArticleController : Controller
     {
         private readonly IArticleService _articleService;
-        private readonly ILogger<ArticleController> _logger;
         private readonly IGenreService _genreService;
         private readonly ICommentService _commentService;
         private readonly ILikeService _likeService;
@@ -23,14 +22,12 @@ namespace BlogWebApp.Controllers
 
         public ArticleController(
             IArticleService articleService,
-            ILogger<ArticleController> logger,
             IGenreService genreService,
             ICommentService commentService,
             ILikeService likeService,
             IImageStorageService imageStorageService)
         {
             _articleService = articleService;
-            _logger = logger;
             _genreService = genreService;
             _commentService = commentService;
             _likeService = likeService;
@@ -38,31 +35,39 @@ namespace BlogWebApp.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Create()
         {
-            var genres = await _genreService.GetAllGenresAsync();
-            var articleViewModel = new ArticleViewModel
-            {
-                Genres = genres.Select(GenreMapper.ToViewModel).ToList()
-            };
-
+            var articleViewModel = new ArticleViewModel();
+            await LoadGenres(articleViewModel);         
             return View(articleViewModel);
         }
 
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ArticleViewModel articleViewModel)
         {
             if (ModelState.IsValid)
             {
-                articleViewModel.Image = await _imageStorageService.SaveArticleImageAsync(articleViewModel.ImageFile);
-                var article = ArticleMapper.ToEntity(articleViewModel);
-                await _articleService.CreateArticleAsync(article);
-                return RedirectToAction("Index", "Blog");
+                try
+                {
+                    articleViewModel.Image = await _imageStorageService.SaveArticleImageAsync(articleViewModel.ImageFile);
+                    await _articleService.CreateArticleAsync(articleViewModel.Title, 
+                        articleViewModel.Image, 
+                        articleViewModel.Content, 
+                        articleViewModel.GenreId);
+                    return RedirectToAction("Index", "Blog");
+                }
+                catch
+                {
+                    ModelState.AddModelError("", "Не удалось создать пост.");
+                    await LoadGenres(articleViewModel);
+                    return View(articleViewModel);
+                }               
             }
 
-            var genres = await _genreService.GetAllGenresAsync();
-            articleViewModel.Genres = genres.Select(GenreMapper.ToViewModel).ToList();
+            await LoadGenres(articleViewModel);
             return View(articleViewModel);
         }
 
@@ -78,6 +83,7 @@ namespace BlogWebApp.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Edit(Guid id)
         {
             var article = await _articleService.GetArticleByIdAsync(id);
@@ -86,12 +92,12 @@ namespace BlogWebApp.Controllers
 
             var userId = User.Identity.IsAuthenticated ? User.FindFirstValue(ClaimTypes.NameIdentifier) : null;
             var articleViewModel = ArticleMapper.ToViewModel(article, userId);
-            var genres = await _genreService.GetAllGenresAsync();
-            articleViewModel.Genres = genres.Select(GenreMapper.ToViewModel).ToList();
+            await LoadGenres(articleViewModel);
             return View(articleViewModel);
         }
 
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ArticleViewModel articleViewModel)
         {
@@ -99,25 +105,33 @@ namespace BlogWebApp.Controllers
             {
                 var article = await _articleService.GetArticleByIdAsync(articleViewModel.ArticleViewModelId);
                 if (article == null)
-                    return NotFound();
-
-                ArticleMapper.MapToExistingEntity(articleViewModel, article);
-                article.UpdatedAt = DateTime.UtcNow;
-                if (articleViewModel.ImageFile != null && articleViewModel.ImageFile.Length > 0)
                 {
-                    var imagePath = await _imageStorageService.SaveArticleImageAsync(articleViewModel.ImageFile);
-                    article.Image = imagePath;
+                    ModelState.AddModelError("", "Статья не найдена.");
+                    await LoadGenres(articleViewModel);
+                    return View(articleViewModel);
                 }
-                await _articleService.UpdateArticleAsync(article);
+
+                string? imagePath = article.Image;
+                if (articleViewModel.ImageFile != null && articleViewModel.ImageFile.Length > 0)
+                    imagePath = await _imageStorageService.SaveArticleImageAsync(articleViewModel.ImageFile);
+
+                await _articleService.UpdateArticleAsync(
+                    article.ArticleId,
+                    articleViewModel.Title,
+                    imagePath,
+                    articleViewModel.Content,
+                    articleViewModel.GenreId
+                );
                 return RedirectToAction("Index", "Blog");
             }
 
-            var genres = await _genreService.GetAllGenresAsync();
-            articleViewModel.Genres = genres.Select(GenreMapper.ToViewModel).ToList();
+            await LoadGenres(articleViewModel);
             return View(articleViewModel);
         }
 
-        [HttpGet]
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id)
         {
             var article = await _articleService.GetArticleByIdAsync(id);
@@ -128,6 +142,12 @@ namespace BlogWebApp.Controllers
             await _likeService.DeleteLikesByArticleIdAsync(id);
             await _articleService.DeleteArticleAsync(id);
             return RedirectToAction("Index", "Blog");
+        }
+
+        private async Task LoadGenres(ArticleViewModel articleViewModel)
+        {
+            var genres = await _genreService.GetAllGenresAsync();
+            articleViewModel.Genres = genres.Select(GenreMapper.ToViewModel).ToList();
         }
     }
 }

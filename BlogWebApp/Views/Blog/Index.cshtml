@@ -4,14 +4,23 @@
     ViewData["Title"] = "Блог";
 }
 
-<form method="get" asp-action="Search">
+<form method="get" asp-action="Index" class="mb-4">
     <h3>Поиск</h3>
-    <input class="search-input" type="text" name="query" placeholder="Найдется почти всё" />
+    <input class="search-input" type="text" name="query" placeholder="Найдется почти всё" value="@ViewBag.Query" />
     <button class="btn btn-primary" type="submit">Поиск</button>
 </form>
 
 <section class="blog-header">
-    <h1>Блог</h1>
+    <h1>
+        @if (!string.IsNullOrWhiteSpace(ViewBag.Query))
+        {
+            <span>Результаты поиска: “@ViewBag.Query”</span>
+        }
+        else
+        {
+            <span>Блог</span>
+        }
+    </h1>
 </section>
 
 <div class="blog-container row">
@@ -19,7 +28,14 @@
     @if (Model == null || !Model.Any())
     {
         <div class="alert alert-info mt-3">
-            Пока нет ни одного поста.
+            @if (!string.IsNullOrWhiteSpace(ViewBag.Query))
+            {
+                <span>Ничего не найдено.</span>
+            }
+            else
+            {
+                <span>Пока нет ни одного поста.</span>
+            }
         </div>
     }
     else
@@ -42,36 +58,16 @@
                     </p>
 
                     <p>
-                        <strong>@article.GenreName</strong>
-                        <strong>@article.CreatedAt.ToShortDateString()</strong>
-                        <strong>Лайк:</strong> @article.LikesCount
-                        <strong>Коментов:</strong> @article.CommentsCount
+                        <strong>@article.GenreName</strong> |
+                        <strong>@article.CreatedAt.ToShortDateString()</strong> |
+                        <strong>Лайк:</strong> @article.LikesCount |
+                        <strong>Коментов:</strong> @article.CommentsCount 
                     </p>
 
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        <form asp-controller="Like"
-                              asp-action="ToggleLike"
-                              method="post"
-                              class="d-inline">
-
-                            <input type="hidden"
-                                   name="articleId"
-                                   value="@article.ArticleViewModelId" />
-
-                            <button type="submit"
-                                    class="btn btn-sm @(article.UserHasLiked ? "btn-danger" : "btn-outline-danger")">
-                                @(article.UserHasLiked ? "Убрать лайк" : "Лайк")
-                            </button>
-                        </form>
-                    }
-                    else
-                    {
-                        <p>Чтобы поставить лайк, <a href="@Url.Action("Login", "Account")">войдите в систему</a>.</p>
-                    }
+                    
 
                     <a asp-controller="Article" asp-action="Details" asp-route-id="@article.ArticleViewModelId" 
-                        class="btn btn-primary">
+                        class="btn btn-primary ms-2">
                         Читать далее
                     </a>
                 </div>
@@ -79,3 +75,7 @@
         }
     }
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

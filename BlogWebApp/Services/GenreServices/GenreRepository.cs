@@ -13,19 +13,23 @@ namespace BlogWebApp.Services.GenreServices
             _db = db;
         }
 
-        public async Task<Genre> AddAsync(Genre genre)
+        public async Task AddAsync(Genre genre)
         {
             await _db.Genres.AddAsync(genre);
             await _db.SaveChangesAsync();
-            return genre;
         }
 
         public async Task<Genre?> GetByIdAsync(Guid genreId)
         {
-            return await _db.Genres.FindAsync(genreId);
+            return await _db.Genres.FirstOrDefaultAsync(g => g.GenreId == genreId);
         }
 
-        public async Task<IEnumerable<Genre?>> GetAllAsync()
+        public async Task<Genre?> GetByNameAsync(string genreName)
+        {
+            return await _db.Genres.FirstOrDefaultAsync(g => g.GenreName == genreName);
+        }
+
+        public async Task<IReadOnlyList<Genre>> GetAllAsync()
         {
             return await _db.Genres.ToListAsync();
         }

@@ -31,10 +31,5 @@ namespace BlogWebApp.Services.UserServices
         {
             return await _userManager.DeleteAsync(user);
         }
-
-        public async Task<bool> CheckPasswordAsync(ApplicationUser user, string passwordHash)
-        {
-            return await _userManager.CheckPasswordAsync(user, passwordHash);
-        }
     }
 }

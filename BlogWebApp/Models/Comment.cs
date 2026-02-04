@@ -50,6 +50,7 @@ namespace BlogWebApp.Models
             CommentId = Guid.NewGuid();
             Content = content;
             User = user;
+            UserId = user.Id;
             ArticleId = articleId;
             CreatedAt = DateTime.UtcNow;
         }

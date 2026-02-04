@@ -1,11 +1,5 @@
 ﻿using BlogWebApp.Mappers;
 using BlogWebApp.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace BlogWebApp.Tests.MapperTests
 {

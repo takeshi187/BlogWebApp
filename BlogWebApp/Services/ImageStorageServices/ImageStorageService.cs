@@ -1,7 +1,4 @@
-﻿using BlogWebApp.Models;
-using BlogWebApp.Services.ArticleServices;
-
-namespace BlogWebApp.Services.FileStorageServices
+﻿namespace BlogWebApp.Services.FileStorageServices
 {
     public class ImageStorageService : IImageStorageService
     {
@@ -42,17 +39,17 @@ namespace BlogWebApp.Services.FileStorageServices
             {
                 _logger.LogError(ex, $"Unexpected error while adding image");
                 throw;
-            }           
+            }
         }
 
         private static void Validate(IFormFile file)
-        {           
+        {
             if (file.Length > _maxFileSize)
-                throw new InvalidOperationException("The image size must not exceed 5 MB.");
+                throw new InvalidOperationException("Размер изображения не должен превышать 5 МБ.");
 
             var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
             if (!_allowedExtensions.Contains(extension))
-                throw new ArgumentException("Invalid image format.");
+                throw new ArgumentException("Недопустимый формат изображения.");
         }
 
         private static string GenerateFileName(string extension)

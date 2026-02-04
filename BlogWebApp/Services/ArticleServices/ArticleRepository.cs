@@ -13,11 +13,10 @@ namespace BlogWebApp.Services.ArticleServices
             _db = db;
         }
 
-        public async Task<Article> AddAsync(Article article)
+        public async Task AddAsync(Article article)
         {
             await _db.Articles.AddAsync(article);
             await _db.SaveChangesAsync();
-            return article;
         }
 
         public async Task<Article?> GetByIdAsync(Guid articleId)
@@ -30,7 +29,7 @@ namespace BlogWebApp.Services.ArticleServices
                 .FirstOrDefaultAsync(a => a.ArticleId == articleId);
         }
 
-        public async Task<IEnumerable<Article?>> GetAllAsync()
+        public async Task<IReadOnlyList<Article>> GetAllAsync()
         {
             return await _db.Articles
                 .Include(a => a.Genre)
@@ -40,18 +39,16 @@ namespace BlogWebApp.Services.ArticleServices
                 .ToListAsync();
         }
 
-        public async Task<bool> UpdateAsync(Article article)
+        public async Task UpdateAsync(Article article)
         {
             _db.Articles.Update(article);
             await _db.SaveChangesAsync();
-            return true;
         }
 
-        public async Task<bool> DeleteAsync(Article article)
+        public async Task DeleteAsync(Article article)
         {
             _db.Articles.Remove(article);
             await _db.SaveChangesAsync();
-            return true;
         }
     }
 }

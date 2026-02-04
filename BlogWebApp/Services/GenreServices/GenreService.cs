@@ -14,75 +14,39 @@ namespace BlogWebApp.Services.GenreServices
             _logger = logger;
         }
 
-        public async Task<Genre> CreateGenreAsync(string genreName)
+        public async Task CreateGenreAsync(string genreName)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(genreName))
                     throw new ArgumentException("Genre name cannot be empty.", nameof(genreName));
 
-                var existingGenre = (await _genreRepository.GetAllAsync())
-                    .FirstOrDefault(g => g.GenreName.Equals(genreName, StringComparison.OrdinalIgnoreCase));
-
-                if (existingGenre != null)
-                    throw new InvalidOperationException($"Genre with name: {genreName} is already exist.");
-
                 var genre = new Genre(genreName);
-
                 await _genreRepository.AddAsync(genre);
-                return genre;
-            }
-            catch (ArgumentException ex)
-            {
-                _logger.LogWarning(ex, "Invalid genre data for adding.");
-                throw;
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, $"Database error while adding genre: {genreName}");
-                throw new InvalidOperationException("Failed to add genre to database.", ex);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Unexpected error while adding genre: {genreName}");
-                throw;
+                _logger.LogWarning(ex, $"Genre '{genreName}' already exists (race condition).");
+                throw new InvalidOperationException($"Genre '{genreName}' already exists.", ex);
             }
         }
 
         public async Task<Genre?> GetGenreByIdAsync(Guid genreId)
         {
-            try
-            {
-                if (genreId == Guid.Empty)
-                    throw new ArgumentException("genreId cannot be empty.", nameof(genreId));
-                var genre = await _genreRepository.GetByIdAsync(genreId);
-                if (genre == null) throw new InvalidOperationException($"Genre with id: {genreId} not found.");
 
-                return genre;
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogWarning(ex, $"Genre with id: {genreId} not found.");
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Unexpected error while searching genre with id: {genreId}");
-                throw;
-            }
+            if (genreId == Guid.Empty)
+                throw new ArgumentException("genreId cannot be empty.", nameof(genreId));
+
+            var genre = await _genreRepository.GetByIdAsync(genreId);
+            if (genre == null)
+                throw new InvalidOperationException($"Genre with id: {genreId} not found.");
+
+            return genre;
         }
 
-        public async Task<IEnumerable<Genre?>> GetAllGenresAsync()
+        public async Task<IReadOnlyList<Genre>> GetAllGenresAsync()
         {
-            try
-            {
-                return await _genreRepository.GetAllAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Unexpected error while searching genres.");
-                throw;
-            }
+            return await _genreRepository.GetAllAsync();
         }
     }
 }

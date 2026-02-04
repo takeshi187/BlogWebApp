@@ -2,7 +2,7 @@
 @model ArticleViewModel
 
 @{
-    ViewData["Title"] = Model.Title;
+    ViewData["Title"] = Model?.Title ?? "Пост";
 }
 
 <section class="blog-header">
@@ -32,11 +32,10 @@
                 <form asp-controller="Like"
                       asp-action="ToggleLike"
                       method="post"
-                      class="d-inline ms-3">
+                      class="d-inline">
 
-                    <input type="hidden"
-                           name="articleId"
-                           value="@Model.ArticleViewModelId" />
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="articleId" value="@Model.ArticleViewModelId" />
 
                     <button type="submit"
                             class="btn btn-sm @(Model.UserHasLiked ? "btn-danger" : "btn-outline-danger")">
@@ -46,10 +45,7 @@
             }
             else
             {
-                <span class="text-muted ms-3">
-                    Чтобы поставить лайк,
-                    <a asp-controller="Account" asp-action="Login">войдите в систему</a>
-                </span>
+                <p>Чтобы поставить лайк, <a href="@Url.Action("Login", "Account")">войдите в систему</a>.</p>
             }
         </div>
 
@@ -63,13 +59,17 @@
                     Редактировать
                 </a>
 
-                <a asp-controller="Article"
-                   asp-action="Delete"
-                   asp-route-id="@Model.ArticleViewModelId"
-                   class="btn btn-danger"
-                   onclick="return confirm('Удалить статью? Все комментарии и лайки тоже будут удалены.')">
-                    Удалить
-                </a>
+                <form asp-controller="Article"
+                      asp-action="Delete"
+                      method="post"
+                      class="d-inline"
+                      onsubmit="return confirm('Удалить статью? Все комментарии и лайки тоже будут удалены.')">
+
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.ArticleViewModelId" />
+
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
 
                 <a asp-controller="Blog"
                    asp-action="Index"
@@ -97,14 +97,17 @@ else
             <div class="card-body">
                 <p class="mb-1">
                     <strong>@comment.UserName</strong>
-                    <span class="text-muted">
-                        (@comment.CreatedAt.ToShortDateString())
-                    </span>
+                    <span class="text-muted">(@comment.CreatedAt.ToShortDateString())</span>
                 </p>
                 <p class="mb-0">@comment.Content</p>
             </div>
         </div>
     }
+}
+
+@if (TempData["CommentError"] != null)
+{
+    <div class="text-danger mb-2">@TempData["CommentError"]</div>
 }
 
 @if (User.Identity.IsAuthenticated)
@@ -120,7 +123,7 @@ else
                value="@Model.ArticleViewModelId" />
 
         <div class="mb-3">
-            <textarea name="content"
+            <textarea name="Content"
                   class="form-control"
                   rows="4"
                   required
@@ -137,9 +140,10 @@ else
 {
     <p class="mt-4">
         Чтобы оставить комментарий,
-        <a asp-controller="Account"
-           asp-action="Login">
-            войдите в систему
-        </a>.
+        <a asp-controller="Account" asp-action="Login">войдите в систему</a>.
     </p>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

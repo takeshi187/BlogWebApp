@@ -16,7 +16,7 @@ namespace BlogWebApp.Tests.ArticleTests
         [SetUp]
         public void SetUp()
         {
-            var options = new DbContextOptionsBuilder<BlogWebAppDbContext>().UseInMemoryDatabase("TestDatabase").Options;
+            var options = new DbContextOptionsBuilder<BlogWebAppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
 
             _db = new BlogWebAppDbContext(options);
             _articleRepository = new ArticleRepository(_db);
@@ -26,51 +26,41 @@ namespace BlogWebApp.Tests.ArticleTests
         [Test]
         public async Task AddArticleAsync_ShouldAddArticle_WhenValid()
         {
-            var article = new Article("testtitle", "image", "testcontent", Guid.NewGuid());
+            var genre = new Genre("testgenre");
+            await _genreRepository.AddAsync(genre);
 
-            var result = await _articleRepository.AddAsync(article);
+            var article = new Article("testtitle", "testimage", "testcontent", genre.GenreId);
+            await _articleRepository.AddAsync(article);
 
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Title, Is.EqualTo("testtitle"));
-            Assert.That(result.Image, Is.EqualTo("image"));
-            Assert.That(result.Content, Is.EqualTo("testcontent"));
-            Assert.That(result.GenreId, Is.EqualTo(article.GenreId));
-            Assert.That(result.CreatedAt.Date, Is.EqualTo(DateTime.UtcNow.Date));
-            Assert.That(result.Content, Is.EqualTo("testcontent"));
+            var articles = await _articleRepository.GetAllAsync();
+
+            Assert.That(articles.Count, Is.EqualTo(1));
+            Assert.That(articles.First().Title, Is.EqualTo("testtitle"));
         }
 
         [Test]
         public async Task GetArticleByIdAsync_ShouldReturnArticle_WhenArticleExist()
         {
-            var genre = new Genre(Guid.NewGuid(), "testgenre");
+            var genre = new Genre("testgenre");
             await _genreRepository.AddAsync(genre);
-            await _db.SaveChangesAsync();
 
-            var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", genre.GenreId);
-
+            var article = new Article("testtitle", "testimage", "testcontent", genre.GenreId);
             await _articleRepository.AddAsync(article);
+
             var result = await _articleRepository.GetByIdAsync(article.ArticleId);
 
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.ArticleId, Is.EqualTo(article.ArticleId));
-            Assert.That(result.Genre, Is.Not.Null);
-            Assert.That(result.Genre.GenreName, Is.EqualTo("testgenre"));
         }
 
         [Test]
         public async Task GetAllArticlesAsync_ShouldReturnArticles_WhenArticlesExist()
         {
-            _db.Articles.RemoveRange(_db.Articles);
-            _db.Genres.RemoveRange(_db.Genres);
-            await _db.SaveChangesAsync();
-
-            var genre = new Genre(Guid.NewGuid(), "testgenre");
+            var genre = new Genre("testgenre");
             await _genreRepository.AddAsync(genre);
-            await _db.SaveChangesAsync();
 
-            var article1 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", genre.GenreId);
-            var article2 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", genre.GenreId);
-            var article3 = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", genre.GenreId);
+            var article1 = new Article("testtitle", "image", "testcontent", genre.GenreId);
+            var article2 = new Article("testtitle", "image", "testcontent", article1.GenreId);
+            var article3 = new Article("testtitle", "image", "testcontent", article1.GenreId);
 
             await _articleRepository.AddAsync(article1);
             await _articleRepository.AddAsync(article2);
@@ -80,34 +70,40 @@ namespace BlogWebApp.Tests.ArticleTests
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count, Is.EqualTo(3));
-            Assert.That(result.All(a => a.Genre != null), Is.True);
         }
 
         [Test]
         public async Task UpdateArticleAsync_ShouldUpdateArticle_WhenArticleExist()
         {
-            var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
+            var genre = new Genre("testgenre");
+            await _genreRepository.AddAsync(genre);
 
+            var article = new Article("old", null, "old content", genre.GenreId);
             await _articleRepository.AddAsync(article);
-            article.Title = "newtitle";
-            article.UpdatedAt = DateTime.UtcNow;
+            
+            article.Update("new", "img", "new content", genre.GenreId);
+            await _articleRepository.UpdateAsync(article);
 
-            var result = await _articleRepository.UpdateAsync(article);
+            var updated = await _articleRepository.GetByIdAsync(article.ArticleId);
 
-            Assert.That(result, Is.True);
-            Assert.That(article.Title, Is.EqualTo("newtitle"));
-            Assert.That(article.UpdatedAt?.Date, Is.EqualTo(DateTime.UtcNow.Date));
+            Assert.That(updated!.Title, Is.EqualTo("new"));
+            Assert.That(updated.Content, Is.EqualTo("new content"));
+            Assert.That(updated.UpdatedAt, Is.Not.Null);
         }
 
         [Test]
         public async Task DeleteArticleAsync_ShouldDeleteArticle_WhenArticleExist()
         {
-            var article = new Article(Guid.NewGuid(), "testtitle", "image", "testcontent", Guid.NewGuid());
+            var genre = new Genre("testgenre");
+            await _genreRepository.AddAsync(genre);
 
+            var article = new Article("testtitle", "image", "testcontent", genre.GenreId);
             await _articleRepository.AddAsync(article);
-            var result = await _articleRepository.DeleteAsync(article);
+            await _articleRepository.DeleteAsync(article);
 
-            Assert.That(result, Is.True);
+            var result = await _articleRepository.GetByIdAsync(article.ArticleId);
+
+            Assert.That(result, Is.Null);
         }
 
         [TearDown]

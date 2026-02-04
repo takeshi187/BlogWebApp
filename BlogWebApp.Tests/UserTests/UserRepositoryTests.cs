@@ -12,7 +12,7 @@ namespace BlogWebApp.Tests.UserTests
         private UserRepository _userRepository;
 
         [SetUp]
-        public void Setup()
+        public void SetUp()
         {
             _userManagerMock = new Mock<UserManager<ApplicationUser>>(
                 Mock.Of<IUserStore<ApplicationUser>>(), null, null, null, null, null, null, null, null);
@@ -51,18 +51,7 @@ namespace BlogWebApp.Tests.UserTests
             var result = await _userRepository.GetByEmailAsync(user.Email);
 
             Assert.That(result, Is.EqualTo(user));
-        }
-
-        [Test]
-        public async Task CheckUserPassword_ShouldReturnTrue_WhenCorrect()
-        {
-            var user = new ApplicationUser { Email = "test@example.com" };
-            _userManagerMock.Setup(m => m.CheckPasswordAsync(user, "password")).ReturnsAsync(true);
-
-            var result = await _userRepository.CheckPasswordAsync(user, "password");
-
-            Assert.That(result, Is.True);
-        }
+        }      
 
         [Test]
         public async Task DeleteUserAsync_ShouldReturnIdentityResult_WhenUserExist()

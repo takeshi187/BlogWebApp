@@ -8,6 +8,11 @@
 <h1>Редактирование поста</h1>
 
 <form asp-action="Edit" method="post" enctype="multipart/form-data">
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    @Html.AntiForgeryToken()
+
     <input type="hidden" asp-for="ArticleViewModelId" />
     <input type="hidden" asp-for="Image" />
 
@@ -46,3 +51,7 @@
     <button class="btn btn-primary mt-3" type="submit">Сохранить</button>
     <a asp-controller="Blog" asp-action="Index" class="btn btn-secondary mt-3">Назад</a>
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

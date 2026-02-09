@@ -1,5 +1,4 @@
-﻿using BlogWebApp.Mappers;
-using BlogWebApp.Services.GenreServices;
+﻿using BlogWebApp.Services.GenreServices;
 using BlogWebApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +30,7 @@ namespace BlogWebApp.Controllers
             }
             catch
             {
-                ModelState.AddModelError(nameof(genreViewModel.GenreName),"Жанр с таким именем уже существует.");
+                ModelState.AddModelError(nameof(genreViewModel.GenreName), "Жанр с таким именем уже существует.");
                 return View(genreViewModel);
             }
         }

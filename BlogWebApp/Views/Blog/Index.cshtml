@@ -59,9 +59,17 @@
 
                     <p>
                         <strong>@article.GenreName</strong> |
-                        <strong>@article.CreatedAt.ToShortDateString()</strong> |
+                        <strong>@article.CreatedAt.ToShortDateString()</strong>
+
+                        @if (article.UpdatedAt.HasValue)
+                        {
+                            <span class="text-muted ms-1">
+                                (ред. @article.UpdatedAt.Value.ToShortDateString())
+                            </span>
+                        }
+                        |
                         <strong>Лайк:</strong> @article.LikesCount |
-                        <strong>Коментов:</strong> @article.CommentsCount 
+                        <strong>Коментов:</strong> @article.CommentsCount
                     </p>
 
                     

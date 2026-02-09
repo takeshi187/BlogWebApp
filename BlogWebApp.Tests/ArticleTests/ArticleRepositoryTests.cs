@@ -80,7 +80,7 @@ namespace BlogWebApp.Tests.ArticleTests
 
             var article = new Article("old", null, "old content", genre.GenreId);
             await _articleRepository.AddAsync(article);
-            
+
             article.Update("new", "img", "new content", genre.GenreId);
             await _articleRepository.UpdateAsync(article);
 

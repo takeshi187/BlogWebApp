@@ -39,7 +39,7 @@ namespace BlogWebApp.Controllers
         public async Task<IActionResult> Create()
         {
             var articleViewModel = new ArticleViewModel();
-            await LoadGenres(articleViewModel);         
+            await LoadGenres(articleViewModel);
             return View(articleViewModel);
         }
 
@@ -53,9 +53,9 @@ namespace BlogWebApp.Controllers
                 try
                 {
                     articleViewModel.Image = await _imageStorageService.SaveArticleImageAsync(articleViewModel.ImageFile);
-                    await _articleService.CreateArticleAsync(articleViewModel.Title, 
-                        articleViewModel.Image, 
-                        articleViewModel.Content, 
+                    await _articleService.CreateArticleAsync(articleViewModel.Title,
+                        articleViewModel.Image,
+                        articleViewModel.Content,
                         articleViewModel.GenreId);
                     return RedirectToAction("Index", "Blog");
                 }
@@ -64,7 +64,7 @@ namespace BlogWebApp.Controllers
                     ModelState.AddModelError("", "Не удалось создать пост.");
                     await LoadGenres(articleViewModel);
                     return View(articleViewModel);
-                }               
+                }
             }
 
             await LoadGenres(articleViewModel);

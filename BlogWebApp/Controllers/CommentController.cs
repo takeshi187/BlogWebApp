@@ -1,8 +1,4 @@
-﻿using BlogWebApp.Mappers;
-using BlogWebApp.Models;
-using BlogWebApp.Services.ArticleServices;
-using BlogWebApp.Services.CommentServices;
-using BlogWebApp.ViewModels;
+﻿using BlogWebApp.Services.CommentServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

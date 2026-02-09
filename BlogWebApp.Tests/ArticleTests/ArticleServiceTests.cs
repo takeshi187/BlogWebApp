@@ -71,7 +71,7 @@ namespace BlogWebApp.Tests.ArticleTests
             var articleId = Guid.NewGuid();
             _articleRepositoryMock.Setup(r => r.GetByIdAsync(articleId)).ReturnsAsync((Article?)null);
 
-            Assert.ThrowsAsync<InvalidOperationException>(async () => 
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 await _articleService.GetArticleByIdAsync(articleId));
             _articleRepositoryMock.Verify(r => r.GetByIdAsync(articleId), Times.Once);
         }
@@ -79,7 +79,7 @@ namespace BlogWebApp.Tests.ArticleTests
         [Test]
         public void GetArticleByIdAsync_ShouldThrowArgumentException_WhenArticleIdEmpty()
         {
-            Assert.ThrowsAsync<ArgumentException>(async() =>
+            Assert.ThrowsAsync<ArgumentException>(async () =>
                 await _articleService.GetArticleByIdAsync(Guid.Empty));
             _articleRepositoryMock.Verify(r => r.GetByIdAsync(It.IsAny<Guid>()), Times.Never);
         }
@@ -117,7 +117,7 @@ namespace BlogWebApp.Tests.ArticleTests
             var article = new Article("testtitle", "image", "testcontent", Guid.NewGuid());
             _articleRepositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Article?)null);
 
-            Assert.ThrowsAsync<InvalidOperationException>(async () => 
+            Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 await _articleService.DeleteArticleAsync(article.ArticleId));
             _articleRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Article>()), Times.Never);
         }

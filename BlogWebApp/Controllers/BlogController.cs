@@ -1,10 +1,8 @@
-﻿using BlogWebApp.Db;
-using BlogWebApp.Mappers;
+﻿using BlogWebApp.Mappers;
 using BlogWebApp.Models;
 using BlogWebApp.Services.ArticleServices;
 using BlogWebApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace BlogWebApp.Controllers
@@ -42,6 +40,6 @@ namespace BlogWebApp.Controllers
             ViewBag.Query = query;
 
             return View(articleViewModel);
-        }      
+        }
     }
 }

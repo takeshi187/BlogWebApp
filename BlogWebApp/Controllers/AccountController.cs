@@ -1,5 +1,4 @@
-﻿using BlogWebApp.Models;
-using BlogWebApp.Services.UserServices;
+﻿using BlogWebApp.Services.UserServices;
 using BlogWebApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,8 +26,8 @@ namespace BlogWebApp.Controllers
             if (ModelState.IsValid)
             {
                 var result = await _userService.RegisterAsync(
-                    registerViewModel.UserName, 
-                    registerViewModel.Email, 
+                    registerViewModel.UserName,
+                    registerViewModel.Email,
                     registerViewModel.Password);
 
                 if (result.Succeeded)
@@ -73,8 +72,8 @@ namespace BlogWebApp.Controllers
             if (ModelState.IsValid)
             {
                 var result = await _userService.LoginAsync(
-                    model.Email, 
-                    model.Password, 
+                    model.Email,
+                    model.Password,
                     model.RememberMe);
 
                 if (result)

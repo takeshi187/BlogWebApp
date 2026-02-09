@@ -1,7 +1,5 @@
 ﻿using BlogWebApp.Models;
-using BlogWebApp.Services.ArticleServices;
 using BlogWebApp.Services.LikeServices;
-using BlogWebApp.Services.UserServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;

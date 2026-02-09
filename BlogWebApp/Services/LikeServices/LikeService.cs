@@ -1,6 +1,4 @@
 ﻿using BlogWebApp.Models;
-using BlogWebApp.Services.ArticleServices;
-using BlogWebApp.Services.UserServices;
 using BlogWebApp.Validators;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,7 +38,7 @@ namespace BlogWebApp.Services.LikeServices
             }
             catch (DbUpdateException ex) when (ex.IsUniqueViolation())
             {
-                _logger.LogWarning(ex,$"Race condition while adding like. ArticleId={articleId}, UserId={userId}");
+                _logger.LogWarning(ex, $"Race condition while adding like. ArticleId={articleId}, UserId={userId}");
             }
             catch (DbUpdateException ex)
             {

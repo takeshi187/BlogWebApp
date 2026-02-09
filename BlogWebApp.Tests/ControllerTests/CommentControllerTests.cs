@@ -1,8 +1,5 @@
 ﻿using BlogWebApp.Controllers;
-using BlogWebApp.Models;
-using BlogWebApp.Services.ArticleServices;
 using BlogWebApp.Services.CommentServices;
-using BlogWebApp.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -46,7 +43,7 @@ namespace BlogWebApp.Tests.ControllerTests
         }
 
         [Test]
-        public async Task AddComment_ShouldAddComment_WhenValid()
+        public async Task AddCommentPost_ShouldAddComment_WhenValid()
         {
             var articleId = Guid.NewGuid();
             var commentContent = "This is a valid comment";
@@ -56,7 +53,7 @@ namespace BlogWebApp.Tests.ControllerTests
 
             var result = await _commentController.AddComment(articleId, commentContent);
 
-            _commentServiceMock.Verify(s => s.CreateCommentAsync(articleId, UserId, commentContent),Times.Once);
+            _commentServiceMock.Verify(s => s.CreateCommentAsync(articleId, UserId, commentContent), Times.Once);
 
             var redirect = result as RedirectToActionResult;
             Assert.That(redirect, Is.Not.Null);
@@ -66,15 +63,14 @@ namespace BlogWebApp.Tests.ControllerTests
         }
 
         [Test]
-        public async Task AddComment_ShouldRedirectWithError_WhenContentEmpty()
+        public async Task AddCommentPost_ShouldRedirectWithError_WhenContentEmpty()
         {
             var articleId = Guid.NewGuid();
-            var commentContent = "";  
+            var commentContent = "";
 
             var result = await _commentController.AddComment(articleId, commentContent);
 
-            _commentServiceMock.Verify(s => s.CreateCommentAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()),
-                Times.Never);
+            _commentServiceMock.Verify(s => s.CreateCommentAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
 
             var redirect = result as RedirectToActionResult;
             Assert.That(redirect, Is.Not.Null);
@@ -85,7 +81,7 @@ namespace BlogWebApp.Tests.ControllerTests
         }
 
         [Test]
-        public async Task AddComment_ShouldRedirectWithError_WhenExceptionOccurs()
+        public async Task AddCommentPost_ShouldRedirectWithError_WhenExceptionOccurs()
         {
             var articleId = Guid.NewGuid();
             var commentContent = "This is a valid comment";
@@ -95,7 +91,7 @@ namespace BlogWebApp.Tests.ControllerTests
 
             var result = await _commentController.AddComment(articleId, commentContent);
 
-            _commentServiceMock.Verify( s => s.CreateCommentAsync(articleId, UserId, commentContent),Times.Once);
+            _commentServiceMock.Verify(s => s.CreateCommentAsync(articleId, UserId, commentContent), Times.Once);
 
             var redirect = result as RedirectToActionResult;
             Assert.That(redirect, Is.Not.Null);

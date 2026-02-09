@@ -7,7 +7,7 @@ namespace BlogWebApp.Models
         public DateTime CreatedAt { get; private set; }
 
         public List<Comment> Comments { get; private set; } = new();
-        public List<Like> Likes { get; private set; } = new(); 
+        public List<Like> Likes { get; private set; } = new();
 
         public ApplicationUser()
         {

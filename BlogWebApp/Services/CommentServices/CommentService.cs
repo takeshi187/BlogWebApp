@@ -1,6 +1,4 @@
 ﻿using BlogWebApp.Models;
-using BlogWebApp.Services.ArticleServices;
-using BlogWebApp.Services.UserServices;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlogWebApp.Services.CommentServices

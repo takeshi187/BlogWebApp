@@ -41,19 +41,15 @@ namespace BlogWebApp.Tests.ControllerTests
         }
 
         [Test]
-        public async Task ToggleLike_ShouldToggleLike_WhenValid()
+        public async Task ToggleLikePost_ShouldToggleLike_WhenValid()
         {
             var articleId = Guid.NewGuid();
 
-            _likeServiceMock
-                .Setup(s => s.ToggleLikeAsync(articleId, UserId));
+            _likeServiceMock.Setup(s => s.ToggleLikeAsync(articleId, UserId));
 
             var result = await _controller.ToggleLike(articleId);
 
-            _likeServiceMock.Verify(
-                s => s.ToggleLikeAsync(articleId, UserId),
-                Times.Once
-            );
+            _likeServiceMock.Verify(s => s.ToggleLikeAsync(articleId, UserId), Times.Once);
 
             var redirect = result as RedirectToActionResult;
             Assert.That(redirect, Is.Not.Null);

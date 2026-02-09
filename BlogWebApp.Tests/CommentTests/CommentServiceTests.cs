@@ -1,7 +1,5 @@
 ﻿using BlogWebApp.Models;
-using BlogWebApp.Services.ArticleServices;
 using BlogWebApp.Services.CommentServices;
-using BlogWebApp.Services.UserServices;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -41,7 +39,7 @@ namespace BlogWebApp.Tests.CommentTests
         [Test]
         public void CreateCommentAsync_ShouldThrowArgumentException_WhenInvalidData()
         {
-            Assert.ThrowsAsync<ArgumentException>(async() =>
+            Assert.ThrowsAsync<ArgumentException>(async () =>
                 await _commentService.CreateCommentAsync(Guid.Empty, "", ""));
             _commentRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Comment>()), Times.Never);
         }
@@ -59,7 +57,7 @@ namespace BlogWebApp.Tests.CommentTests
 
             Assert.That(result, Is.EqualTo(comment));
             _commentRepositoryMock.Verify(r => r.GetByIdAsync(comment.CommentId), Times.Once);
-        }        
+        }
 
         [Test]
         public async Task DeleteCommentsByArticleIdAsync_ShouldDeleteComments_WhenCommentsExist()

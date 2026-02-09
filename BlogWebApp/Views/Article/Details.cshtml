@@ -19,6 +19,13 @@
         <p class="text-muted mb-2">
             Жанр: <strong>@Model.GenreName</strong> |
             Дата: <strong>@Model.CreatedAt.ToShortDateString()</strong>
+
+            @if (Model.UpdatedAt.HasValue)
+            {
+                <span class="ms-2">
+                    (ред. @Model.UpdatedAt.Value.ToShortDateString())
+                </span>
+            }
         </p>
 
         <p class="article-content">

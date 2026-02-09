@@ -51,7 +51,7 @@ namespace BlogWebApp.Tests.UserTests
             var result = await _userRepository.GetByEmailAsync(user.Email);
 
             Assert.That(result, Is.EqualTo(user));
-        }      
+        }
 
         [Test]
         public async Task DeleteUserAsync_ShouldReturnIdentityResult_WhenUserExist()

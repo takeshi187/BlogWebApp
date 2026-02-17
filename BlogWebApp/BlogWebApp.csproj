@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\img\ArticleImages\**" />
+    <Content Remove="wwwroot\img\ArticleImages\**" />
+    <EmbeddedResource Remove="wwwroot\img\ArticleImages\**" />
+    <None Remove="wwwroot\img\ArticleImages\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.20" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.20" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.20" />
@@ -17,10 +24,6 @@
     </PackageReference>
     <PackageReference Include="Npgsql" Version="8.0.8" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\img\ArticleImages\" />
   </ItemGroup>
 
 </Project>

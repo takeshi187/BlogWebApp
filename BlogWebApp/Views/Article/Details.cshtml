@@ -56,13 +56,13 @@
             }
         </div>
 
-        @if (User.Identity.IsAuthenticated)
+        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
         {
             <div class="mb-3">
                 <a asp-controller="Article"
-                   asp-action="Edit"
-                   asp-route-id="@Model.ArticleViewModelId"
-                   class="btn btn-warning me-2">
+                       asp-action="Edit"
+                       asp-route-id="@Model.ArticleViewModelId"
+                       class="btn btn-warning me-2">
                     Редактировать
                 </a>
 
@@ -79,11 +79,19 @@
                 </form>
 
                 <a asp-controller="Blog"
-                   asp-action="Index"
-                   class="btn btn-secondary mt-4">
+                       asp-action="Index"
+                       class="btn btn-secondary mt-4">
                     Назад к списку
                 </a>
             </div>
+        }
+        else
+        {
+            <a asp-controller="Blog"
+                   asp-action="Index"
+                   class="btn btn-secondary mt-4">
+                Назад к списку
+            </a>
         }
     </div>
 </div>

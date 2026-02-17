@@ -11,6 +11,7 @@ using System.Security.Claims;
 
 namespace BlogWebApp.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [Route("[controller]/[action]")]
     public class ArticleController : Controller
     {
@@ -35,7 +36,6 @@ namespace BlogWebApp.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> Create()
         {
             var articleViewModel = new ArticleViewModel();
@@ -44,7 +44,6 @@ namespace BlogWebApp.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ArticleViewModel articleViewModel)
         {
@@ -71,6 +70,7 @@ namespace BlogWebApp.Controllers
             return View(articleViewModel);
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)
         {
@@ -83,7 +83,6 @@ namespace BlogWebApp.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> Edit(Guid id)
         {
             var article = await _articleService.GetArticleByIdAsync(id);
@@ -97,7 +96,6 @@ namespace BlogWebApp.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ArticleViewModel articleViewModel)
         {
@@ -130,7 +128,6 @@ namespace BlogWebApp.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id)
         {

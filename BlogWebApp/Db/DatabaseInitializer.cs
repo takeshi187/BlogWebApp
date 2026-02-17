@@ -16,7 +16,7 @@ namespace BlogWebApp.Db
 
             await context.Database.MigrateAsync();
 
-            string[] roles = { "SuperUser", "User" };
+            string[] roles = { "Admin", "User" };
 
             foreach (var role in roles)
             {
@@ -24,22 +24,22 @@ namespace BlogWebApp.Db
                     await roleManager.CreateAsync(new IdentityRole(role));
             }
 
-            var superUserEmail = "Super@local.com";
-            var superUserPassword = "Super&2000";
+            var adminEmail = "Admin@local.com";
+            var adminPassword = "Admin&2000";
 
-            var superUser = await userManager.FindByNameAsync(superUserEmail);
+            var admin = await userManager.FindByNameAsync(adminEmail);
 
-            if(superUser == null)
+            if(admin == null)
             {
-                superUser = new ApplicationUser
+                admin = new ApplicationUser
                 {
                     UserName = "Admin",
-                    Email = superUserEmail,
+                    Email = adminEmail,
                     EmailConfirmed = true
                 };
 
-                await userManager.CreateAsync(superUser, superUserPassword);
-                await userManager.AddToRoleAsync(superUser, "SuperUser");
+                await userManager.CreateAsync(admin, adminPassword);
+                await userManager.AddToRoleAsync(admin, "Admin");
             }
         }
     }

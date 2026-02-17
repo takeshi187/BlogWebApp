@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BlogWebApp.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [Route("[controller]/[action]")]
     public class GenreController : Controller
     {

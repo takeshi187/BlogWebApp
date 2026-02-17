@@ -92,5 +92,11 @@ namespace BlogWebApp.Controllers
             await _userService.LogoutAsync();
             return RedirectToAction("Index", "Home");
         }
+
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
     }
 }

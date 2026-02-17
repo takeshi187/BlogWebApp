@@ -380,3 +380,4 @@ FodyWeavers.xsd
 /BlogWebApp/Properties/launchSettings.json
 /BlogWebApp/Program.cs
 /BlogWebApp/Db/BlogWebAppDbContext.cs
+/BlogWebApp/Db/DatabaseInitializer.cs

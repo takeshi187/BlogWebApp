@@ -21,29 +21,6 @@ namespace BlogWebApp.Tests.GenreTests
         }
 
         [Test]
-        public async Task AddGenreAsync_ShouldAddGenre_WhenValid()
-        {
-            var genre = new Genre("testname");
-
-            await _genreRepository.AddAsync(genre);
-            var result = await _genreRepository.GetByNameAsync("testname");
-
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.GenreName, Is.EqualTo(genre.GenreName));
-        }
-
-        [Test]
-        public async Task GetGenreByIdAsync_ShouldReturnGenre_WhenGenreExist()
-        {
-            var genre = new Genre("testname");
-
-            await _genreRepository.AddAsync(genre);
-            var result = await _genreRepository.GetByIdAsync(genre.GenreId);
-
-            Assert.That(result, Is.Not.Null);
-        }
-
-        [Test]
         public async Task GetAllGenresAsync_ShouldReturnAllGenres_WhenGenresExist()
         {
             var genre1 = new Genre("testgenre1");
@@ -57,6 +34,17 @@ namespace BlogWebApp.Tests.GenreTests
             var result = await _genreRepository.GetAllAsync();
 
             Assert.That(result.Count(), Is.EqualTo(3));
+        }
+
+        [Test]
+        public async Task GetByNameAsync_ShouldReturnGenre_WhenExist()
+        {
+            var genre = new Genre("testgenre1");
+            await _genreRepository.AddAsync(genre);
+
+            var result = await _genreRepository.GetByNameAsync(genre.GenreName);
+
+            Assert.That(result, Is.EqualTo(genre));
         }
 
         [TearDown]

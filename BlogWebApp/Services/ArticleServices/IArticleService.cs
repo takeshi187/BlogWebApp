@@ -7,7 +7,7 @@ namespace BlogWebApp.Services.ArticleServices
         Task CreateArticleAsync(string title, string? image, string content, Guid genreId);
         Task<Article?> GetArticleByIdAsync(Guid ArticleId);
         Task<IReadOnlyList<Article>> GetAllArticlesAsync();
-        Task UpdateArticleAsync(Guid articleId, string title, string? image, string content, Guid genreId);
-        Task DeleteArticleAsync(Guid articleId);
+        Task<bool> UpdateArticleAsync(Guid articleId, string title, string? image, string content, Guid genreId);
+        Task<bool> DeleteArticleAsync(Guid articleId);
     }
 }

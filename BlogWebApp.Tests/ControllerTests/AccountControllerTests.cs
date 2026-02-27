@@ -56,6 +56,7 @@ namespace BlogWebApp.Tests.ControllerTests
             Assert.That(redirect, Is.Not.Null);
             Assert.That(redirect.ActionName, Is.EqualTo("Index"));
             Assert.That(redirect.ControllerName, Is.EqualTo("Home"));
+            _userServiceMock.Verify(s => s.RegisterAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Test]
@@ -84,6 +85,7 @@ namespace BlogWebApp.Tests.ControllerTests
 
             var error = _accountController.ModelState[string.Empty].Errors.First().ErrorMessage;
             Assert.That(error, Is.EqualTo("Имя пользователя уже занято."));
+            _userServiceMock.Verify(s => s.RegisterAsync(registerViewModel.UserName, registerViewModel.Email, registerViewModel.Password), Times.Once);
         }
 
         [Test]
@@ -104,6 +106,7 @@ namespace BlogWebApp.Tests.ControllerTests
             Assert.That(redirect, Is.Not.Null);
             Assert.That(redirect.ActionName, Is.EqualTo("Index"));
             Assert.That(redirect.ControllerName, Is.EqualTo("Home"));
+            _userServiceMock.Verify(s => s.LoginAsync(loginViewModel.Email, loginViewModel.Password, loginViewModel.RememberMe), Times.Once);
         }
 
         [Test]
@@ -125,18 +128,18 @@ namespace BlogWebApp.Tests.ControllerTests
             Assert.That(_accountController.ModelState.IsValid, Is.False);
             var error = _accountController.ModelState[string.Empty].Errors.First().ErrorMessage;
             Assert.That(error, Is.EqualTo("Неверный логин или пароль."));
+            _userServiceMock.Verify(s => s.LoginAsync(loginViewModel.Email, loginViewModel.Password, loginViewModel.RememberMe), Times.Once);
         }
 
         [Test]
         public async Task AccountLogoutPost_ShouldCallServiceAndRedirect()
         {
             var result = await _accountController.Logout();
-
-            _userServiceMock.Verify(s => s.LogoutAsync(), Times.Once);
-
             var redirect = result as RedirectToActionResult;
+
             Assert.That(redirect.ActionName, Is.EqualTo("Index"));
             Assert.That(redirect.ControllerName, Is.EqualTo("Home"));
+            _userServiceMock.Verify(s => s.LogoutAsync(), Times.Once);
         }
 
         [TearDown]

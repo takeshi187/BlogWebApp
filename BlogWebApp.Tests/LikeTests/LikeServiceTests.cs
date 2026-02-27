@@ -36,7 +36,7 @@ namespace BlogWebApp.Tests.LikeTests
         }
 
         [Test]
-        public async Task ToggleLikeAsync_ShouldRemoveLike_WhenLikeExists()
+        public async Task ToggleLikeAsync_ShouldDeleteLike_WhenLikeExists()
         {
             var articleId = Guid.NewGuid();
             var userId = "user1";
@@ -51,25 +51,70 @@ namespace BlogWebApp.Tests.LikeTests
         }
 
         [Test]
-        public async Task ToggleLikeAsync_ShouldNotThrow_WhenRaceCondition()
+        public async Task ToggleLikeAsync_ShouldThrowDbUpdateException_WhenRaceCondition()
         {
             var articleId = Guid.NewGuid();
             var userId = "user1";
 
             _likeRepositoryMock.Setup(r => r.GetByArticleIdAndUserIdAsync(articleId, userId)).ReturnsAsync((Like?)null);
-            _likeRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Like>())).ThrowsAsync(new DbUpdateException());
+            var dbException = new DbUpdateException("Unique constraint violation");
+            _likeRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Like>())).ThrowsAsync(dbException);
 
-            Assert.DoesNotThrowAsync(async () =>
+            Assert.ThrowsAsync<DbUpdateException>(async () =>
                 await _likeService.ToggleLikeAsync(articleId, userId));
             _likeRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Like>()), Times.Once);
         }
 
         [Test]
-        public async Task ToggleLikeAsync_ShouldThrowArgumentException_WhenInputInvalid()
+        public void ToggleLikeAsync_ShouldThrowArgumentException_WhenUserIdInvalid()
         {
             Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _likeService.ToggleLikeAsync(Guid.Empty, ""));
-            _likeRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Like>()), Times.Never);
+                await _likeService.ToggleLikeAsync(Guid.NewGuid(), ""));
+            _likeRepositoryMock.VerifyNoOtherCalls();
+        }
+
+        [Test]
+        public void ToggleLikeAsync_ShouldThrowArgumentException_WhenArticleIdEmpty()
+        {
+            Assert.ThrowsAsync<ArgumentException>(async () =>
+                await _likeService.ToggleLikeAsync(Guid.Empty, "user"));
+            _likeRepositoryMock.VerifyNoOtherCalls();
+        }
+
+        [Test]
+        public void ToggleLikeAsync_ShouldThrowDbUpdateException_WhenUnexpectedError()
+        {
+            var articleId = Guid.NewGuid();
+            var userId = "user1";
+            _likeRepositoryMock.Setup(r => r.GetByArticleIdAndUserIdAsync(articleId, userId)).ReturnsAsync((Like?)null);
+            var dbException = new DbUpdateException("Unexpected error");
+            _likeRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Like>())).ThrowsAsync(dbException);
+
+            Assert.ThrowsAsync<DbUpdateException>(async () =>
+                await _likeService.ToggleLikeAsync(articleId, userId));
+            _likeRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Like>()), Times.Once);
+        }
+
+        [Test]
+        public void ToggleLikeAsync_ShouldThrow_WhenUnexpectedDbError()
+        {
+            var articleId = Guid.NewGuid();
+            var userId = "user1";
+            _likeRepositoryMock.Setup(r => r.GetByArticleIdAndUserIdAsync(articleId, userId)).ReturnsAsync((Like?)null);
+            var dbException = new DbUpdateException("Some db error");
+            _likeRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Like>())).ThrowsAsync(dbException);
+
+            Assert.ThrowsAsync<DbUpdateException>(async () =>
+                await _likeService.ToggleLikeAsync(articleId, userId));
+
+            _loggerMock.Verify(
+                x => x.Log(
+                    LogLevel.Error,
+                    It.IsAny<EventId>(),
+                    It.IsAny<It.IsAnyType>(),
+                    dbException,
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
         }
 
         [Test]
@@ -84,15 +129,16 @@ namespace BlogWebApp.Tests.LikeTests
             Assert.That(result, Is.EqualTo(like));
             _likeRepositoryMock.Verify(r => r.GetByIdAsync(likeId), Times.Once);
         }
-
+        
         [Test]
-        public async Task GetLikeByIdAsync_ShouldThrowInvalidOperationException_WhenLikeNotFound()
+        public async Task GetLikeByIdAsync_ShouldReturnNull_WhenLikeNotFound()
         {
             var likeId = Guid.NewGuid();
             _likeRepositoryMock.Setup(r => r.GetByIdAsync(likeId)).ReturnsAsync((Like?)null);
 
-            Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await _likeService.GetLikeByIdAsync(likeId));
+            var result = await _likeService.GetLikeByIdAsync(likeId);
+
+            Assert.That(result, Is.Null);
             _likeRepositoryMock.Verify(r => r.GetByIdAsync(likeId), Times.Once);
         }
 
@@ -119,15 +165,15 @@ namespace BlogWebApp.Tests.LikeTests
         }
 
         [Test]
-        public async Task DeleteLikesByArticleIdAsync_ShouldNotThrow_WhenNoLikes()
+        public async Task DeleteLikesByArticleIdAsync_ShouldReturnFalse_WhenNoLikes()
         {
             var articleId = Guid.NewGuid();
-
             _likeRepositoryMock.Setup(r => r.GetByArticleIdAsync(articleId)).ReturnsAsync(new List<Like>());
 
-            Assert.DoesNotThrowAsync(async () =>
-                await _likeService.DeleteLikesByArticleIdAsync(articleId));
-            _likeRepositoryMock.Verify(r => r.DeleteRangeAsync(It.IsAny<IReadOnlyCollection<Like>>()), Times.Once);
+            var result = await _likeService.DeleteLikesByArticleIdAsync(articleId);
+
+            Assert.That(result, Is.False);
+            _likeRepositoryMock.Verify(r => r.DeleteRangeAsync(It.IsAny<IReadOnlyCollection<Like>>()), Times.Never);
         }
 
         [Test]
@@ -136,6 +182,17 @@ namespace BlogWebApp.Tests.LikeTests
             Assert.ThrowsAsync<ArgumentException>(async () =>
                await _likeService.DeleteLikesByArticleIdAsync(Guid.Empty));
             _likeRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Like>()), Times.Never);
+        }
+
+        [Test]
+        public void DeleteLikesByArticleIdAsync_ShouldThrowDbUpdateException_WhenInvalid()
+        {
+            var articleId = Guid.NewGuid();
+            _likeRepositoryMock.Setup(r => r.GetByArticleIdAsync(articleId)).ThrowsAsync(new DbUpdateException());
+
+            Assert.ThrowsAsync<DbUpdateException>(async () =>
+                await _likeService.DeleteLikesByArticleIdAsync(articleId));
+            _likeRepositoryMock.Verify(r => r.GetByArticleIdAsync(articleId), Times.Once);
         }
 
         [Test]
@@ -160,11 +217,10 @@ namespace BlogWebApp.Tests.LikeTests
         {
             var userId = "user1";
 
-            _likeRepositoryMock.Setup(r => r.GetByUserIdAsync(userId)).ReturnsAsync(new List<Like>());
+            var result = await _likeService.DeleteLikesByUserIdAsync(userId);
 
-            Assert.DoesNotThrowAsync(async () =>
-                await _likeService.DeleteLikesByUserIdAsync(userId));
-            _likeRepositoryMock.Verify(r => r.GetByUserIdAsync(userId), Times.Once);
+            Assert.That(result, Is.False);
+            _likeRepositoryMock.Verify(r => r.DeleteRangeAsync(It.IsAny<IReadOnlyCollection<Like>>()), Times.Never);
         }
 
         [Test]
@@ -173,6 +229,17 @@ namespace BlogWebApp.Tests.LikeTests
             Assert.ThrowsAsync<ArgumentException>(async () =>
                 await _likeService.DeleteLikesByUserIdAsync(""));
             _likeRepositoryMock.Verify(r => r.DeleteRangeAsync(It.IsAny<IReadOnlyCollection<Like>>()), Times.Never);
+        }
+
+        [Test]
+        public void DeleteLikesByUserIdAsync_ShouldThrowDbUpdateException_WhenInvalid()
+        {
+            var userId = "test";
+            _likeRepositoryMock.Setup(r => r.GetByUserIdAsync("test")).ThrowsAsync(new DbUpdateException());
+
+            Assert.ThrowsAsync<DbUpdateException>(async () =>
+                await _likeService.DeleteLikesByUserIdAsync("test"));
+            _likeRepositoryMock.Verify(r => r.GetByUserIdAsync("test"), Times.Once);
         }
     }
 }

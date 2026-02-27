@@ -6,7 +6,8 @@ namespace BlogWebApp.Services.CommentServices
     {
         Task CreateCommentAsync(Guid articleId, string userId, string content);
         Task<Comment?> GetCommentByIdAsync(Guid commentId);
-        Task DeleteCommentsByArticleIdAsync(Guid articleId);
-        Task DeleteCommentsByUserIdAsync(string userId);
+        Task<bool> DeleteCommentsByArticleIdAsync(Guid articleId);
+        Task<bool> DeleteCommentsByUserIdAsync(string userId);
+        Task<bool> DeleteCommentByIdAsync(Guid commentId);
     }
 }

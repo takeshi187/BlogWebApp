@@ -35,7 +35,7 @@ namespace BlogWebApp.Tests.ControllerTests
             {
                 GenreName = "testgenre"
             };
-            _genreServiceMock.Setup(s => s.CreateGenreAsync(genreViewModel.GenreName)).Returns(Task.CompletedTask);
+            _genreServiceMock.Setup(s => s.CreateGenreAsync(genreViewModel.GenreName)).ReturnsAsync(true);
 
             var result = await _genreController.Create(genreViewModel);
 
@@ -47,20 +47,20 @@ namespace BlogWebApp.Tests.ControllerTests
         }
 
         [Test]
-        public async Task CreateGenrePost_ShouldThrowDuplicateException_WhenGenreAlreadyExist()
+        public async Task CreateGenrePost_ShouldReturnFalse_WhenGenreAlreadyExist()
         {
             var genreViewModel = new GenreViewModel
             {
                 GenreName = "testgenre"
             };
-            _genreServiceMock.Setup(s => s.CreateGenreAsync(genreViewModel.GenreName)).ThrowsAsync(new Exception("Duplicate genre"));
+            _genreServiceMock.Setup(s => s.CreateGenreAsync(genreViewModel.GenreName)).ReturnsAsync(false);
 
             var result = await _genreController.Create(genreViewModel);
 
             var viewResult = result as ViewResult;
             Assert.That(viewResult, Is.Not.Null);
             Assert.That(viewResult!.Model, Is.EqualTo(genreViewModel));
-            Assert.That(_genreController.ModelState.ContainsKey(nameof(genreViewModel.GenreName)), Is.True);
+            Assert.That(_genreController.ModelState[nameof(genreViewModel.GenreName)]!.Errors.Count,Is.GreaterThan(0));
         }
 
         [TearDown]

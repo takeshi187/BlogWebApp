@@ -10,6 +10,26 @@
     <button class="btn btn-primary" type="submit">Поиск</button>
 </form>
 
+@if (ViewBag.Genres != null)
+{
+    <div class="mb-4">
+        <h4>Фильтр по жанрам:</h4>
+        <div class="btn-group">
+            <a class="btn btn-outline-secondary @(ViewBag.SelectedGenreId == null ? "active" : "")"
+               asp-action="Index">Все</a>
+            @foreach (var genre in ViewBag.Genres)
+            {
+                <a class="btn btn-outline-secondary @(ViewBag.SelectedGenreId == genre.GenreId ? "active" : "")"
+                       asp-action="Index"
+                       asp-route-genreId="@genre.GenreId"
+                       asp-route-query="@ViewBag.Query">
+                    @genre.GenreName
+                </a>
+            }
+        </div>
+    </div>
+}
+
 <section class="blog-header">
     <h1>
         @if (!string.IsNullOrWhiteSpace(ViewBag.Query))

@@ -19,11 +19,6 @@ namespace BlogWebApp.Services.GenreServices
             await _db.SaveChangesAsync();
         }
 
-        public async Task<Genre?> GetByIdAsync(Guid genreId)
-        {
-            return await _db.Genres.FirstOrDefaultAsync(g => g.GenreId == genreId);
-        }
-
         public async Task<Genre?> GetByNameAsync(string genreName)
         {
             return await _db.Genres.FirstOrDefaultAsync(g => g.GenreName == genreName);

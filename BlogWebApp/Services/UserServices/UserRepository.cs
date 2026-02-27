@@ -1,15 +1,19 @@
-﻿using BlogWebApp.Models;
+﻿using BlogWebApp.Db;
+using BlogWebApp.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlogWebApp.Services.UserServices
 {
     public class UserRepository : IUserRepository
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly BlogWebAppDbContext _db;
 
-        public UserRepository(UserManager<ApplicationUser> userManager)
+        public UserRepository(UserManager<ApplicationUser> userManager, BlogWebAppDbContext db)
         {
             _userManager = userManager;
+            _db = db;
         }
 
         public async Task<IdentityResult> AddAsync(ApplicationUser user, string password)
@@ -30,6 +34,11 @@ namespace BlogWebApp.Services.UserServices
         public async Task<IdentityResult> DeleteAsync(ApplicationUser user)
         {
             return await _userManager.DeleteAsync(user);
+        }
+
+        public async Task<IReadOnlyList<ApplicationUser>> GetAllAsync()
+        {
+            return await _db.Users.ToListAsync();
         }
     }
 }

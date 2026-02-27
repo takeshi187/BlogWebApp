@@ -9,5 +9,6 @@ namespace BlogWebApp.Services.CommentServices
         Task<IReadOnlyList<Comment>> GetByArticleIdAsync(Guid articleId);
         Task<IReadOnlyList<Comment>> GetByUserIdAsync(string userId);
         Task DeleteRangeAsync(IReadOnlyCollection<Comment> comments);
+        Task DeleteAsync(Comment comment);
     }
 }

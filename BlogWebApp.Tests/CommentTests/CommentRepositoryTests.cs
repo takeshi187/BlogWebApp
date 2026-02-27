@@ -104,6 +104,19 @@ namespace BlogWebApp.Tests.CommentTests
             Assert.That(result.Count, Is.EqualTo(0));
         }
 
+        [Test]
+        public async Task DeleteCommentAsync_ShouldDeleteComment_WhenExist()
+        {
+            var comment = new Comment("content1", "user1", Guid.NewGuid());
+
+            await _db.Comments.AddAsync(comment);
+
+            await _commentRepository.DeleteAsync(comment);
+            var result = await _commentRepository.GetByUserIdAsync(comment.UserId);
+
+            Assert.That(result.Count, Is.EqualTo(0));
+        }
+
         [TearDown]
         public void TearDown()
         {

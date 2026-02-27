@@ -8,6 +8,7 @@ using BlogWebApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace BlogWebApp.Controllers
 {
@@ -49,21 +50,13 @@ namespace BlogWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                try
-                {
-                    articleViewModel.Image = await _imageStorageService.SaveArticleImageAsync(articleViewModel.ImageFile);
-                    await _articleService.CreateArticleAsync(articleViewModel.Title,
-                        articleViewModel.Image,
-                        articleViewModel.Content,
-                        articleViewModel.GenreId);
-                    return RedirectToAction("Index", "Blog");
-                }
-                catch
-                {
-                    ModelState.AddModelError("", "Не удалось создать пост.");
-                    await LoadGenres(articleViewModel);
-                    return View(articleViewModel);
-                }
+
+                articleViewModel.Image = await _imageStorageService.SaveArticleImageAsync(articleViewModel.ImageFile);
+                await _articleService.CreateArticleAsync(articleViewModel.Title,
+                    articleViewModel.Image,
+                    articleViewModel.Content,
+                    articleViewModel.GenreId);
+                return RedirectToAction("Index", "Blog");
             }
 
             await LoadGenres(articleViewModel);
@@ -101,25 +94,21 @@ namespace BlogWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var article = await _articleService.GetArticleByIdAsync(articleViewModel.ArticleViewModelId);
-                if (article == null)
-                {
-                    ModelState.AddModelError("", "Статья не найдена.");
-                    await LoadGenres(articleViewModel);
-                    return View(articleViewModel);
-                }
-
-                string? imagePath = article.Image;
+                string? imagePath = articleViewModel.Image;
                 if (articleViewModel.ImageFile != null && articleViewModel.ImageFile.Length > 0)
                     imagePath = await _imageStorageService.SaveArticleImageAsync(articleViewModel.ImageFile);
 
-                await _articleService.UpdateArticleAsync(
-                    article.ArticleId,
+                var result = await _articleService.UpdateArticleAsync(
+                    articleViewModel.ArticleViewModelId,
                     articleViewModel.Title,
                     imagePath,
                     articleViewModel.Content,
                     articleViewModel.GenreId
                 );
+
+                if (!result)
+                    return NotFound();
+
                 return RedirectToAction("Index", "Blog");
             }
 
@@ -131,13 +120,14 @@ namespace BlogWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var article = await _articleService.GetArticleByIdAsync(id);
-            if (article == null)
+            var result = await _articleService.DeleteArticleAsync(id);
+
+            if (!result)
                 return NotFound();
 
             await _commentService.DeleteCommentsByArticleIdAsync(id);
             await _likeService.DeleteLikesByArticleIdAsync(id);
-            await _articleService.DeleteArticleAsync(id);
+
             return RedirectToAction("Index", "Blog");
         }
 

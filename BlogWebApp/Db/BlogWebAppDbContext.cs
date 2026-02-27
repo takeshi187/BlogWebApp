@@ -17,29 +17,17 @@ namespace BlogWebApp.Db
         {
             base.OnModelCreating(builder);
 
-            // =========================
-            // ARTICLE
-            // =========================
-
             builder.Entity<Article>()
                 .HasIndex(a => a.GenreId);
 
             builder.Entity<Article>()
                 .HasIndex(a => a.CreatedAt);
 
-            // =========================
-            // COMMENT
-            // =========================
-
             builder.Entity<Comment>()
                 .HasIndex(c => c.ArticleId);
 
             builder.Entity<Comment>()
                 .HasIndex(c => c.UserId);
-
-            // =========================
-            // LIKE
-            // =========================
 
             builder.Entity<Like>()
                 .HasIndex(l => new { l.UserId, l.ArticleId })
@@ -51,17 +39,9 @@ namespace BlogWebApp.Db
             builder.Entity<Like>()
                 .HasIndex(l => l.UserId);
 
-            // =========================
-            // GENRE
-            // =========================
-
             builder.Entity<Genre>()
                 .HasIndex(g => g.GenreName)
                 .IsUnique();
-
-            // =========================
-            // USERS
-            // =========================
 
             builder.Entity<ApplicationUser>()
                 .HasIndex(u => u.NormalizedEmail)

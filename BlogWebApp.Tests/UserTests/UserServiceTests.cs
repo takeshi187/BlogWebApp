@@ -127,52 +127,6 @@ namespace BlogWebApp.Tests.UserTests
         }
 
         [Test]
-        public async Task GetUserByEmailAsync_ShouldReturnUser_WhenUserExist()
-        {
-            var user = new ApplicationUser { Email = "test@example.com" };
-            _userRepositoryMock.Setup(r => r.GetByEmailAsync(user.Email)).ReturnsAsync(user);
-
-            var result = await _userService.GetUserByEmailAsync(user.Email);
-
-            Assert.That(result, Is.Not.Null);
-            _userRepositoryMock.Verify(r => r.GetByEmailAsync(user.Email), Times.Once);
-        }
-
-        [Test]
-        public async Task GetUserByEmailAsync_ShouldThrowInvalidOperationException_WhenUserNotFound()
-        {
-            _userRepositoryMock.Setup(r => r.GetByEmailAsync("test@example.com"))
-                .ReturnsAsync((ApplicationUser?)null);
-
-            Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await _userService.GetUserByEmailAsync("test@example.com"));
-            _userRepositoryMock.Verify(r => r.GetByEmailAsync("test@example.com"), Times.Once);
-        }
-
-        [Test]
-        public async Task GetUserByUserIdAsync_ShouldReturnUser_WhenUserExist()
-        {
-            var user = new ApplicationUser { Id = "1" };
-            _userRepositoryMock.Setup(r => r.GetByIdAsync(user.Id)).ReturnsAsync(user);
-
-            var result = await _userService.GetUserByIdAsync(user.Id);
-
-            Assert.That(result, Is.Not.Null);
-            _userRepositoryMock.Verify(r => r.GetByIdAsync(user.Id), Times.Once);
-        }
-
-        [Test]
-        public async Task GetUserByUserIdAsync_ShouldThrowInvalidOperationException_WhenUserNotFound()
-        {
-            _userRepositoryMock.Setup(r => r.GetByIdAsync("1"))
-                .ReturnsAsync((ApplicationUser?)null);
-
-            Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await _userService.GetUserByIdAsync("1"));
-            _userRepositoryMock.Verify(r => r.GetByIdAsync("1"), Times.Once);
-        }
-
-        [Test]
         public async Task DeleteUserAsync_ShouldDeleteUser_WhenUserExist()
         {
             var user = new ApplicationUser { Id = "1" };
@@ -185,7 +139,7 @@ namespace BlogWebApp.Tests.UserTests
 
             var result = await _userService.DeleteUserAsync("1");
 
-            Assert.That(result.Succeeded, Is.True);
+            Assert.That(result, Is.True);
             _userRepositoryMock.Verify(r => r.DeleteAsync(user), Times.Once);
         }
 
@@ -197,8 +151,7 @@ namespace BlogWebApp.Tests.UserTests
 
             var result = await _userService.DeleteUserAsync("1");
 
-            Assert.That(result.Succeeded, Is.False);
-            Assert.That(result.Errors, Has.One.Matches<IdentityError>(e => e.Description.Contains("User not found")));
+            Assert.That(result, Is.False);
             _userRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<ApplicationUser>()), Times.Never);
         }
 
@@ -209,6 +162,18 @@ namespace BlogWebApp.Tests.UserTests
                 await _userService.DeleteUserAsync(""));
             _userRepositoryMock.Verify(r => r.DeleteAsync(It.IsAny<ApplicationUser>()), Times.Never);
         }
+
+        [Test]
+        public async Task GetAllUsersAsync_ShouldReturnUsers_WhenUsersExist()
+        {
+            var users = new List<ApplicationUser> { new ApplicationUser { Id = "1" }, new ApplicationUser { Id = "2" } };
+            _userRepositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(users);
+
+            var result = await _userService.GetAllUsersAsync();
+
+            Assert.That(result.Count, Is.EqualTo(2));
+            _userRepositoryMock.Verify(r => r.GetAllAsync(), Times.Once);
+        }  
 
         [Test]
         public async Task LogOutAsync_ShouldSignOut_WhenValid()

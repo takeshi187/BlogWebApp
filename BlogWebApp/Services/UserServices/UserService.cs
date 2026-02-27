@@ -51,44 +51,33 @@ namespace BlogWebApp.Services.UserServices
             return result.Succeeded;
         }
 
-        public async Task<ApplicationUser?> GetUserByEmailAsync(string email)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-                throw new ArgumentException("Email cannot be empty.", nameof(email));
-
-            var user = await _userRepository.GetByEmailAsync(email);
-            if (user == null)
-                throw new InvalidOperationException($"User with email '{email}' not found.");
-
-            return user;
-        }
-
-        public async Task<ApplicationUser?> GetUserByIdAsync(string userId)
+        public async Task<bool> DeleteUserAsync(string userId)
         {
             if (string.IsNullOrWhiteSpace(userId))
                 throw new ArgumentException("UserId cannot be empty.", nameof(userId));
 
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
-                throw new InvalidOperationException($"User with id '{userId}' not found.");
-
-            return user;
-        }
-
-        public async Task<IdentityResult> DeleteUserAsync(string userId)
-        {
-            if (string.IsNullOrWhiteSpace(userId))
-                throw new ArgumentException("UserId cannot be empty.", nameof(userId));
-
-            var user = await _userRepository.GetByIdAsync(userId);
-            if (user == null)
-                return IdentityResult.Failed(new IdentityError { Description = "User not found" });
+                return false;
 
             var result = await _userRepository.DeleteAsync(user);
             if (!result.Succeeded)
                 _logger.LogWarning($"Failed to delete user: {userId}. Errors{string.Join(", ", result.Errors.Select(e => e.Description))}");
 
-            return result;
+            return true;
+        }
+
+        public async Task<IReadOnlyList<ApplicationUser>> GetAllUsersAsync()
+        {
+            try
+            {
+                return await _userRepository.GetAllAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error while searching users.");
+                throw;
+            }
         }
 
         public async Task LogoutAsync()

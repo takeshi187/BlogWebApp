@@ -24,21 +24,16 @@ namespace BlogWebApp.Services.ArticleServices
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, $"Database error while adding article with title: {title}");
-                throw new InvalidOperationException("Failed to add article to database.", ex);
+                throw;
             }
         }
 
         public async Task<Article?> GetArticleByIdAsync(Guid articleId)
         {
-
             if (articleId == Guid.Empty)
                 throw new ArgumentException("ArticleId cannot be empty.", nameof(articleId));
 
-            var article = await _articleRepository.GetByIdAsync(articleId);
-            if (article == null)
-                throw new InvalidOperationException($"Article with id: {articleId} not found.");
-
-            return article;
+            return await _articleRepository.GetByIdAsync(articleId);
         }
 
         public async Task<IReadOnlyList<Article>> GetAllArticlesAsync()
@@ -54,25 +49,29 @@ namespace BlogWebApp.Services.ArticleServices
             }
         }
 
-        public async Task UpdateArticleAsync(Guid articleId, string title, string? image, string content, Guid genreId)
+        public async Task<bool> UpdateArticleAsync(Guid articleId, string title, string? image, string content, Guid genreId)
         {
             try
             {
+                if (articleId == Guid.Empty)
+                    throw new ArgumentException("ArticleId cannot be empty.", nameof(articleId));
+
                 var existingArticle = await _articleRepository.GetByIdAsync(articleId);
                 if (existingArticle == null)
-                    throw new InvalidOperationException($"Article with id: {articleId} not found.");
+                    return false;
 
                 existingArticle.Update(title, image, content, genreId);
                 await _articleRepository.UpdateAsync(existingArticle);
+                return true;
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, $"Database error while updating article: {articleId}");
-                throw new InvalidOperationException("Failed to update article.", ex);
+                throw;
             }
         }
 
-        public async Task DeleteArticleAsync(Guid articleId)
+        public async Task<bool> DeleteArticleAsync(Guid articleId)
         {
             try
             {
@@ -80,16 +79,16 @@ namespace BlogWebApp.Services.ArticleServices
                     throw new ArgumentException("ArticleId cannot be empty.", nameof(articleId));
 
                 var article = await _articleRepository.GetByIdAsync(articleId);
-
                 if (article == null)
-                    throw new InvalidOperationException($"Article with id: {articleId} not found.");
+                    return false;
 
                 await _articleRepository.DeleteAsync(article);
+                return true;
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, $"Database error while deleting article: {articleId}");
-                throw new InvalidOperationException("Failed to delete article.", ex);
+                throw;
             }
         }
     }

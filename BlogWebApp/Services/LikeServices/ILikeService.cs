@@ -6,7 +6,7 @@ namespace BlogWebApp.Services.LikeServices
     {
         Task ToggleLikeAsync(Guid articleId, string userId);
         Task<Like?> GetLikeByIdAsync(Guid likeId);
-        Task DeleteLikesByArticleIdAsync(Guid articleId);
-        Task DeleteLikesByUserIdAsync(string userId);
+        Task<bool> DeleteLikesByArticleIdAsync(Guid articleId);
+        Task<bool> DeleteLikesByUserIdAsync(string userId);
     }
 }

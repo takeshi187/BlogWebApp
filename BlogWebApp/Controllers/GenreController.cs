@@ -2,6 +2,7 @@
 using BlogWebApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace BlogWebApp.Controllers
 {
@@ -23,16 +24,20 @@ namespace BlogWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(GenreViewModel genreViewModel)
         {
-            try
+            if(ModelState.IsValid)
             {
-                await _genreService.CreateGenreAsync(genreViewModel.GenreName);
+                var created = await _genreService.CreateGenreAsync(genreViewModel.GenreName);
+
+                if (!created)
+                {
+                    ModelState.AddModelError(nameof(genreViewModel.GenreName), "Жанр с таким именем уже существует.");
+                    return View(genreViewModel);
+                }
+
                 return RedirectToAction("Create", "Article");
             }
-            catch
-            {
-                ModelState.AddModelError(nameof(genreViewModel.GenreName), "Жанр с таким именем уже существует.");
-                return View(genreViewModel);
-            }
+
+            return View(genreViewModel);
         }
     }
 }

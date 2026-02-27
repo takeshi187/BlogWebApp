@@ -81,25 +81,31 @@ namespace BlogWebApp.Tests.ControllerTests
         }
 
         [Test]
-        public async Task AddCommentPost_ShouldRedirectWithError_WhenExceptionOccurs()
+        public async Task AddCommentPost_ShouldRedirectWithError_WhenDbException()
         {
             var articleId = Guid.NewGuid();
-            var commentContent = "This is a valid comment";
-
+            var commentContent = "This is a invalid comment";
             _commentServiceMock.Setup(s => s.CreateCommentAsync(articleId, UserId, commentContent))
                 .ThrowsAsync(new Exception("Database error"));
 
-            var result = await _commentController.AddComment(articleId, commentContent);
+            Assert.ThrowsAsync<Exception>(() => _commentController.AddComment(articleId, commentContent));
+        }
 
-            _commentServiceMock.Verify(s => s.CreateCommentAsync(articleId, UserId, commentContent), Times.Once);
+        [Test]
+        public async Task DeleteCommentPost_ShouldDeleteCommentAndRedirectToDetails_WhenValid()
+        {
+            var commentId = Guid.NewGuid();
+            var articleId = Guid.NewGuid();
+            _commentServiceMock.Setup(s => s.DeleteCommentByIdAsync(commentId)).ReturnsAsync(true);
 
-            var redirect = result as RedirectToActionResult;
-            Assert.That(redirect, Is.Not.Null);
-            Assert.That(redirect.ActionName, Is.EqualTo("Details"));
-            Assert.That(redirect.ControllerName, Is.EqualTo("Article"));
-            Assert.That(redirect.RouteValues["id"], Is.EqualTo(articleId));
+            var result = await _commentController.Delete(commentId, articleId);
+            var redirectResult = result as RedirectToActionResult;
 
-            Assert.That(_commentController.TempData["CommentError"], Is.EqualTo("Не удалось добавить комментарий."));
+            Assert.That(redirectResult, Is.Not.Null);
+            Assert.That(redirectResult.ActionName, Is.EqualTo("Details"));
+            Assert.That(redirectResult.ControllerName, Is.EqualTo("Article"));
+            Assert.That(redirectResult.RouteValues["id"], Is.EqualTo(articleId));
+            _commentServiceMock.Verify(s => s.DeleteCommentByIdAsync(commentId), Times.Once);
         }
 
         [TearDown]

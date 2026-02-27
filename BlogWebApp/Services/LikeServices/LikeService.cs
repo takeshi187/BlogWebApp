@@ -42,8 +42,8 @@ namespace BlogWebApp.Services.LikeServices
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, $"Unexpected datatbase error while toggle like. ArticleId={articleId}, UserId={userId}");
-                return;
+                _logger.LogError(ex, $"Unexpected database error while toggle like. ArticleId={articleId}, UserId={userId}");
+                throw;
             }
         }
 
@@ -52,14 +52,10 @@ namespace BlogWebApp.Services.LikeServices
             if (likeId == Guid.Empty)
                 throw new ArgumentException("LikeId cannot be empty.", nameof(likeId));
 
-            var like = await _likeRepository.GetByIdAsync(likeId);
-            if (like == null)
-                throw new InvalidOperationException($"Like with id: {likeId} not found.");
-
-            return like;
+            return await _likeRepository.GetByIdAsync(likeId);
         }
 
-        public async Task DeleteLikesByArticleIdAsync(Guid articleId)
+        public async Task<bool> DeleteLikesByArticleIdAsync(Guid articleId)
         {
             try
             {
@@ -67,16 +63,20 @@ namespace BlogWebApp.Services.LikeServices
                     throw new ArgumentException($"ArticleId cannot be empty", nameof(articleId));
 
                 var likes = await _likeRepository.GetByArticleIdAsync(articleId);
+                if (likes == null || !likes.Any())
+                    return false;
+
                 await _likeRepository.DeleteRangeAsync(likes);
+                return true;
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, $"Database error while deleting likes for article: {articleId}");
-                throw new InvalidOperationException("Failed to delete likes.", ex);
+                throw;
             }
         }
 
-        public async Task DeleteLikesByUserIdAsync(string userId)
+        public async Task<bool> DeleteLikesByUserIdAsync(string userId)
         {
             try
             {
@@ -84,12 +84,16 @@ namespace BlogWebApp.Services.LikeServices
                     throw new ArgumentException($"UserId cannot be empty", nameof(userId));
 
                 var likes = await _likeRepository.GetByUserIdAsync(userId);
+                if (likes == null || !likes.Any())
+                    return false;
+
                 await _likeRepository.DeleteRangeAsync(likes);
+                return true;
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, $"Database error while deleting likes for user: {userId}");
-                throw new InvalidOperationException("Failed to delete likes.", ex);
+                throw;
             }
         }
     }

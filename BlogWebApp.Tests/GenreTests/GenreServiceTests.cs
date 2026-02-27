@@ -38,45 +38,27 @@ namespace BlogWebApp.Tests.GenreTests
         }
 
         [Test]
-        public async Task CreateGenreAsync_ShouldThrowInvalidOperationException_WhenGenreIsAlreadyExist()
+        public async Task CreateGenreAsync_ShouldThrowDbUpdateException_WhenGenreIsAlreadyExist()
         {
             _genreRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Genre>()))
                 .ThrowsAsync(new DbUpdateException());
 
-            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            Assert.ThrowsAsync<DbUpdateException>(async () =>
                 await _genreService.CreateGenreAsync("testname"));
             _genreRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Genre>()), Times.Once);
         }
 
         [Test]
-        public async Task GetGenreById_ShouldReturnGenre_WhenGenreExist()
+        public async Task CreateGenreAsync_ShouldReturnFalse_WhenGenreAlreadyExists()
         {
-            var genre = new Genre("testname");
-            _genreRepositoryMock.Setup(r => r.GetByIdAsync(genre.GenreId)).ReturnsAsync(genre);
+            var name = "Rock";
+            _genreRepositoryMock.Setup(r => r.GetByNameAsync(name)).ReturnsAsync(new Genre(name));
 
-            var result = await _genreService.GetGenreByIdAsync(genre.GenreId);
+            var result = await _genreService.CreateGenreAsync(name);
 
-            Assert.That(result, Is.EqualTo(genre));
-            _genreRepositoryMock.Verify(r => r.GetByIdAsync(genre.GenreId), Times.Once);
-        }
-
-        [Test]
-        public async Task GetGenreById_ShouldThrowInvalidOperationException_WhenGenreNotFound()
-        {
-            _genreRepositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>()))
-                .ReturnsAsync((Genre?)null);
-
-            Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await _genreService.GetGenreByIdAsync(Guid.NewGuid()));
-            _genreRepositoryMock.Verify(r => r.GetByIdAsync(It.IsAny<Guid>()), Times.Once);
-        }
-
-        [Test]
-        public async Task GetGenreById_ShouldThrowArgumentException_WhenGenreEmpty()
-        {
-            Assert.ThrowsAsync<ArgumentException>(async () =>
-                await _genreService.GetGenreByIdAsync(Guid.Empty));
-            _genreRepositoryMock.Verify(r => r.GetByIdAsync(Guid.Empty), Times.Never);
+            Assert.That(result, Is.False);
+            _genreRepositoryMock.Verify(r => r.GetByNameAsync(name), Times.Once);
+            _genreRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Genre>()), Times.Never);
         }
 
         [Test]
@@ -90,6 +72,16 @@ namespace BlogWebApp.Tests.GenreTests
             var result = await _genreService.GetAllGenresAsync();
 
             Assert.That(genres, Is.EqualTo(result));
+            _genreRepositoryMock.Verify(r => r.GetAllAsync(), Times.Once);
+        }
+
+        [Test]
+        public void GetAllGenresAsync_ShouldThrowException_WhenInvalid()
+        {
+            _genreRepositoryMock.Setup(r => r.GetAllAsync()).ThrowsAsync(new Exception("DB failure"));
+
+            Assert.ThrowsAsync<Exception>(async () =>
+                await _genreService.GetAllGenresAsync());
             _genreRepositoryMock.Verify(r => r.GetAllAsync(), Times.Once);
         }
     }

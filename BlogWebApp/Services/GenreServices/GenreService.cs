@@ -14,39 +14,39 @@ namespace BlogWebApp.Services.GenreServices
             _logger = logger;
         }
 
-        public async Task CreateGenreAsync(string genreName)
+        public async Task<bool> CreateGenreAsync(string genreName)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(genreName))
                     throw new ArgumentException("Genre name cannot be empty.", nameof(genreName));
 
+                var existing = await _genreRepository.GetByNameAsync(genreName);
+                if (existing != null)
+                    return false;
+
                 var genre = new Genre(genreName);
                 await _genreRepository.AddAsync(genre);
+                return true;
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogWarning(ex, $"Genre '{genreName}' already exists (race condition).");
-                throw new InvalidOperationException($"Genre '{genreName}' already exists.", ex);
+                throw;
             }
-        }
-
-        public async Task<Genre?> GetGenreByIdAsync(Guid genreId)
-        {
-
-            if (genreId == Guid.Empty)
-                throw new ArgumentException("genreId cannot be empty.", nameof(genreId));
-
-            var genre = await _genreRepository.GetByIdAsync(genreId);
-            if (genre == null)
-                throw new InvalidOperationException($"Genre with id: {genreId} not found.");
-
-            return genre;
         }
 
         public async Task<IReadOnlyList<Genre>> GetAllGenresAsync()
         {
-            return await _genreRepository.GetAllAsync();
+            try
+            {
+                return await _genreRepository.GetAllAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error while searching genres.");
+                throw;
+            }
         }
     }
 }

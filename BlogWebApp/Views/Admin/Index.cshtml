@@ -1,0 +1,46 @@
+﻿@using BlogWebApp.ViewModels
+@model IEnumerable<UserViewModel>
+
+<h2>Админ панель</h2>
+
+<div class="mb-4">
+    <a asp-controller="Article" asp-action="Create" class="btn btn-primary me-2">
+        Создать пост
+    </a>
+
+    <a asp-controller="Genre" asp-action="Create" class="btn btn-secondary">
+        Создать жанр
+    </a>
+</div>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>UserName</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.Email</td>
+                <td>@user.UserName</td>
+                <td>
+                    <form asp-action="DeleteUser"
+                          method="post"
+                          onsubmit="return confirm('Удалить пользователя и все его данные?');">
+
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="userId" value="@user.Id" />
+
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            Удалить
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

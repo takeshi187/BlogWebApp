@@ -24,7 +24,7 @@ namespace BlogWebApp.Services.CommentServices
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, $"Database error while adding comment. ArticleId={articleId}, UserId={userId}");
-                throw new InvalidOperationException("Failed to add comment to database.", ex);
+                throw;
             }
         }
 
@@ -33,14 +33,10 @@ namespace BlogWebApp.Services.CommentServices
             if (commentId == Guid.Empty)
                 throw new ArgumentException("CommentId cannot be empty.", nameof(commentId));
 
-            var comment = await _commentRepository.GetByIdAsync(commentId);
-            if (comment == null)
-                throw new InvalidOperationException($"Comment with id: {commentId} not found.");
-
-            return comment;
+            return await _commentRepository.GetByIdAsync(commentId);
         }
 
-        public async Task DeleteCommentsByArticleIdAsync(Guid articleId)
+        public async Task<bool> DeleteCommentsByArticleIdAsync(Guid articleId)
         {
             try
             {
@@ -50,18 +46,19 @@ namespace BlogWebApp.Services.CommentServices
                 var comments = await _commentRepository.GetByArticleIdAsync(articleId);
 
                 if (comments == null || !comments.Any())
-                    return;
+                    return false;
 
                 await _commentRepository.DeleteRangeAsync(comments);
+                return true;
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, $"Database error while deleting comments for article: {articleId}");
-                throw new InvalidOperationException("Failed to delete comments.", ex);
+                throw;
             }
         }
 
-        public async Task DeleteCommentsByUserIdAsync(string userId)
+        public async Task<bool> DeleteCommentsByUserIdAsync(string userId)
         {
             try
             {
@@ -71,14 +68,37 @@ namespace BlogWebApp.Services.CommentServices
                 var comments = await _commentRepository.GetByUserIdAsync(userId);
 
                 if (comments == null || !comments.Any())
-                    return;
+                    return false;
 
                 await _commentRepository.DeleteRangeAsync(comments);
+                return true;
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, $"Database error while deleting comments for user: {userId}");
-                throw new InvalidOperationException("Failed to delete comments.", ex);
+                throw;
+            }
+        }
+
+        public async Task<bool> DeleteCommentByIdAsync(Guid commentId)
+        {
+            try
+            {
+                if (commentId == Guid.Empty)
+                    throw new ArgumentException($"CommentId cannot be empty", nameof(commentId));
+
+                var comment = await _commentRepository.GetByIdAsync(commentId);
+
+                if (comment == null)
+                    return false;
+
+                await _commentRepository.DeleteAsync(comment);
+                return true;
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, $"Database error while deleting comment: {commentId}");
+                throw;
             }
         }
     }

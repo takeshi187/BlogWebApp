@@ -114,7 +114,26 @@ else
                     <strong>@comment.UserName</strong>
                     <span class="text-muted">(@comment.CreatedAt.ToShortDateString())</span>
                 </p>
-                <p class="mb-0">@comment.Content</p>
+
+                <p class="mb-2">@comment.Content</p>
+
+                @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                {
+                    <form asp-controller="Comment"
+                          asp-action="Delete"
+                          method="post"
+                          class="d-inline"
+                          onsubmit="return confirm('Удалить комментарий?');">
+
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="commentId" value="@comment.CommentId" />
+                        <input type="hidden" name="articleId" value="@Model.ArticleViewModelId" />
+
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            Удалить
+                        </button>
+                    </form>
+                }
             </div>
         </div>
     }

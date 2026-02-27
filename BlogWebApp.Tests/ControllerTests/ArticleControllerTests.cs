@@ -103,14 +103,10 @@ namespace BlogWebApp.Tests.ControllerTests
                 Content = "testcontent",
                 GenreId = Guid.NewGuid()
             };
+
             _imageStorageMock.Setup(s => s.SaveArticleImageAsync(It.IsAny<IFormFile>())).ThrowsAsync(new Exception());
-            _genreServiceMock.Setup(s => s.GetAllGenresAsync()).ReturnsAsync(new List<Genre>());
 
-            var result = await _articleController.Create(articleViewModel);
-
-            var view = result as ViewResult;
-            Assert.That(view, Is.Not.Null);
-            Assert.That(_articleController.ModelState.IsValid, Is.False);
+            Assert.ThrowsAsync<Exception>(async () => await _articleController.Create(articleViewModel));
         }
 
         [Test]
@@ -215,6 +211,18 @@ namespace BlogWebApp.Tests.ControllerTests
         }
 
         [Test]
+        public async Task ArticleEditGet_ShouldReturnNotFound_WhenArticleDoesNotExist()
+        {
+            var articleId = Guid.NewGuid();
+            _articleServiceMock.Setup(s => s.GetArticleByIdAsync(articleId)).ReturnsAsync((Article)null);
+
+            var result = await _articleController.Edit(articleId);
+
+            Assert.That(result, Is.TypeOf<NotFoundResult>());
+            _articleServiceMock.Verify(s => s.GetArticleByIdAsync(articleId), Times.Once);
+        }
+
+        [Test]
         public async Task ArticleEditPost_ShouldUpdateArticle_WithoutNewImage()
         {
             var article = new Article("oldtitle", "/img/old.png", "oldcontent", Guid.NewGuid());
@@ -226,18 +234,28 @@ namespace BlogWebApp.Tests.ControllerTests
                 GenreId = article.GenreId,
                 ImageFile = null
             };
-            _articleServiceMock.Setup(s => s.GetArticleByIdAsync(article.ArticleId)).ReturnsAsync(article);
+
+            _articleServiceMock
+                .Setup(s => s.UpdateArticleAsync(
+                    articleViewModel.ArticleViewModelId,
+                    articleViewModel.Title,
+                    null,
+                    articleViewModel.Content,
+                    articleViewModel.GenreId))
+                .ReturnsAsync(true);
+
 
             var result = await _articleController.Edit(articleViewModel);
 
             _articleServiceMock.Verify(s =>
                 s.UpdateArticleAsync(
-                    article.ArticleId,
+                    articleViewModel.ArticleViewModelId,
                     articleViewModel.Title,
-                    article.Image,
+                    null,
                     articleViewModel.Content,
                     articleViewModel.GenreId),
                 Times.Once);
+
             var redirect = result as RedirectToActionResult;
             Assert.That(redirect, Is.Not.Null);
             Assert.That(redirect.ActionName, Is.EqualTo("Index"));
@@ -258,20 +276,21 @@ namespace BlogWebApp.Tests.ControllerTests
                 GenreId = article.GenreId,
                 ImageFile = fileMock.Object
             };
-            _articleServiceMock.Setup(s => s.GetArticleByIdAsync(article.ArticleId)).ReturnsAsync(article);
+
             _imageStorageMock.Setup(s => s.SaveArticleImageAsync(fileMock.Object)).ReturnsAsync("/img/new.png");
+            _articleServiceMock
+                .Setup(s => s.UpdateArticleAsync(
+                    articleViewModel.ArticleViewModelId,
+                    articleViewModel.Title,
+                    "/img/new.png",
+                    articleViewModel.Content,
+                    articleViewModel.GenreId))
+                .ReturnsAsync(true);
 
             var result = await _articleController.Edit(articleViewModel);
 
             _imageStorageMock.Verify(s => s.SaveArticleImageAsync(fileMock.Object), Times.Once);
-            _articleServiceMock.Verify(s =>
-                s.UpdateArticleAsync(
-                    article.ArticleId,
-                    articleViewModel.Title,
-                    "/img/new.png",
-                    articleViewModel.Content,
-                    articleViewModel.GenreId),
-                Times.Once);
+
             var redirect = result as RedirectToActionResult;
             Assert.That(redirect, Is.Not.Null);
             Assert.That(redirect.ActionName, Is.EqualTo("Index"));
@@ -288,14 +307,18 @@ namespace BlogWebApp.Tests.ControllerTests
                 Content = "testcontent",
                 GenreId = Guid.NewGuid()
             };
-            _articleServiceMock.Setup(s => s.GetArticleByIdAsync(articleViewModel.ArticleViewModelId)).ReturnsAsync((Article)null);
-            _genreServiceMock.Setup(s => s.GetAllGenresAsync()).ReturnsAsync(new List<Genre>());
+
+            _articleServiceMock
+                .Setup(s => s.UpdateArticleAsync(
+                    articleViewModel.ArticleViewModelId,
+                    articleViewModel.Title,
+                    It.IsAny<string>(),
+                    articleViewModel.Content,
+                    articleViewModel.GenreId))
+                .ReturnsAsync(false);
 
             var result = await _articleController.Edit(articleViewModel);
-
-            var view = result as ViewResult;
-            Assert.That(view, Is.Not.Null);
-            Assert.That(_articleController.ModelState.IsValid, Is.False);
+            Assert.That(result, Is.InstanceOf<NotFoundResult>());
         }
 
         [Test]
@@ -323,7 +346,7 @@ namespace BlogWebApp.Tests.ControllerTests
         public async Task ArticleDeletePost_ShouldDeleteArticle_WithCommentsAndLikes()
         {
             var article = new Article("testtitle", "testimage", "testcontent", Guid.NewGuid());
-            _articleServiceMock.Setup(s => s.GetArticleByIdAsync(article.ArticleId)).ReturnsAsync(article);
+            _articleServiceMock.Setup(s => s.DeleteArticleAsync(article.ArticleId)).ReturnsAsync(true);
 
             var result = await _articleController.Delete(article.ArticleId);
 
@@ -331,6 +354,20 @@ namespace BlogWebApp.Tests.ControllerTests
             _likeServiceMock.Verify(s => s.DeleteLikesByArticleIdAsync(article.ArticleId), Times.Once);
             _articleServiceMock.Verify(s => s.DeleteArticleAsync(article.ArticleId), Times.Once);
             Assert.That(result, Is.InstanceOf<RedirectToActionResult>());
+        }
+
+        [Test]
+        public async Task ArticleDeletePost_ShouldReturnNotFound_WhenInvalid()
+        {
+            var articleId = Guid.NewGuid();
+            _articleServiceMock.Setup(s => s.DeleteArticleAsync(articleId)).ReturnsAsync(false);
+
+            var result = await _articleController.Delete(articleId);
+
+            Assert.That(result, Is.TypeOf<NotFoundResult>());
+            _articleServiceMock.Verify(s => s.DeleteArticleAsync(articleId), Times.Once);
+            _commentServiceMock.Verify(s => s.DeleteCommentsByArticleIdAsync(It.IsAny<Guid>()),Times.Never);
+            _likeServiceMock.Verify(s => s.DeleteLikesByArticleIdAsync(It.IsAny<Guid>()),Times.Never);
         }
 
         [TearDown]

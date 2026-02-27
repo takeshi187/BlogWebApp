@@ -28,16 +28,18 @@ namespace BlogWebApp.Controllers
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            try
-            {
-                await _commentService.CreateCommentAsync(ArticleId, userId, Content);
-            }
-            catch
-            {
-                TempData["CommentError"] = "Не удалось добавить комментарий.";
-            }
+            await _commentService.CreateCommentAsync(ArticleId, userId, Content);
 
             return RedirectToAction("Details", "Article", new { id = ArticleId });
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(Guid commentId, Guid articleId)
+        {
+            await _commentService.DeleteCommentByIdAsync(commentId);
+            return RedirectToAction("Details", "Article", new { id = articleId });
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using BlogWebApp.Controllers;
 using BlogWebApp.Models;
 using BlogWebApp.Services.ArticleServices;
+using BlogWebApp.Services.GenreServices;
 using BlogWebApp.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,13 +14,15 @@ namespace BlogWebApp.Tests.ControllerTests
     public class BlogControllerTests
     {
         private Mock<IArticleService> _articleServiceMock;
+        private Mock<IGenreService> _genreServiceMock;
         private BlogController _blogController;
 
         [SetUp]
         public void SetUp()
         {
             _articleServiceMock = new Mock<IArticleService>();
-            _blogController = new BlogController(_articleServiceMock.Object);
+            _genreServiceMock = new Mock<IGenreService>();
+            _blogController = new BlogController(_articleServiceMock.Object, _genreServiceMock.Object);
 
             _blogController.ControllerContext = new ControllerContext
             {
@@ -35,7 +38,7 @@ namespace BlogWebApp.Tests.ControllerTests
         {
             _articleServiceMock.Setup(s => s.GetAllArticlesAsync()).ReturnsAsync(new List<Article>());
 
-            var result = await _blogController.Index(null);
+            var result = await _blogController.Index(null, null);
             var viewResult = result as ViewResult;
             var articleViewModel = viewResult.Model as List<ArticleViewModel>;
 
@@ -53,7 +56,7 @@ namespace BlogWebApp.Tests.ControllerTests
             var articles = new List<Article> { article1, article2, article3 };
             _articleServiceMock.Setup(s => s.GetAllArticlesAsync()).ReturnsAsync(articles);
 
-            var result = await _blogController.Index(null);
+            var result = await _blogController.Index(null, null);
 
             var viewResult = result as ViewResult;
             var model = viewResult.Model as List<ArticleViewModel>;
@@ -70,13 +73,48 @@ namespace BlogWebApp.Tests.ControllerTests
             var articles = new List<Article> { article1, article2, article3 };
             _articleServiceMock.Setup(s => s.GetAllArticlesAsync()).ReturnsAsync(articles);
 
-            var result = await _blogController.Index("asp");
+            var result = await _blogController.Index("asp", null);
 
             var viewResult = result as ViewResult;
             var model = viewResult.Model as List<ArticleViewModel>;
-
             Assert.That(model.Count, Is.EqualTo(1));
             Assert.That(model[0].Title, Is.EqualTo("ASP.NET Core"));
+        }
+
+        [Test]
+        public async Task BlogIndexGet_ShouldReturnFilteredArticles_WhenGenreFilter()
+        {
+            var article1 = new Article("ASP.NET Core", "testimage", "testcontent", Guid.NewGuid());
+            var article2 = new Article("testtitle", "testimage", "testcontent", article1.GenreId);
+            var article3 = new Article("testtitle", "testimage", "testcontent", Guid.NewGuid());
+            var articles = new List<Article> { article1, article2, article3 };
+            _articleServiceMock.Setup(s => s.GetAllArticlesAsync()).ReturnsAsync(articles);
+
+            var result = await _blogController.Index(null, article1.GenreId);
+
+            var viewResult = result as ViewResult;
+            var model = viewResult.Model as List<ArticleViewModel>;
+            Assert.That(viewResult, Is.Not.Null);
+            Assert.That(model.Count, Is.EqualTo(2));
+            _articleServiceMock.Verify(s => s.GetAllArticlesAsync(), Times.Once);
+        }
+
+        [Test]
+        public async Task BlogIndexGet_ShouldReturnFilteredArticles_WhenGenreFilterAndQuery()
+        {
+            var article1 = new Article("ASP.NET Core", "testimage", "testcontent", Guid.NewGuid());
+            var article2 = new Article("testtitle", "testimage", "testcontent", article1.GenreId);
+            var article3 = new Article("testtitle", "testimage", "testcontent", Guid.NewGuid());
+            var articles = new List<Article> { article1, article2, article3 };
+            _articleServiceMock.Setup(s => s.GetAllArticlesAsync()).ReturnsAsync(articles);
+
+            var result = await _blogController.Index("asp", article1.GenreId);
+
+            var viewResult = result as ViewResult;
+            var model = viewResult.Model as List<ArticleViewModel>;
+            Assert.That(viewResult, Is.Not.Null);
+            Assert.That(model.Count, Is.EqualTo(1));
+            _articleServiceMock.Verify(s => s.GetAllArticlesAsync(), Times.Once);
         }
 
         [Test]
@@ -88,7 +126,7 @@ namespace BlogWebApp.Tests.ControllerTests
             var articles = new List<Article> { article1, article2, article3 };
             _articleServiceMock.Setup(s => s.GetAllArticlesAsync()).ReturnsAsync(articles);
 
-            var result = await _blogController.Index("  c#  ");
+            var result = await _blogController.Index("  c#  ", null);
             var viewResult = result as ViewResult;
             var model = viewResult.Model as List<ArticleViewModel>;
             Assert.That(model.Count, Is.EqualTo(1));
@@ -114,7 +152,7 @@ namespace BlogWebApp.Tests.ControllerTests
                 HttpContext = new DefaultHttpContext { User = user }
             };
 
-            var result = await _blogController.Index(null);
+            var result = await _blogController.Index(null, null);
             var viewResult = result as ViewResult;
             var model = viewResult.Model as List<ArticleViewModel>;
             Assert.That(model, Is.Not.Null);

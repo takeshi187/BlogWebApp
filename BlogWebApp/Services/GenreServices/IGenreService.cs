@@ -4,8 +4,7 @@ namespace BlogWebApp.Services.GenreServices
 {
     public interface IGenreService
     {
-        Task CreateGenreAsync(string genreName);
-        Task<Genre?> GetGenreByIdAsync(Guid genreId);
+        Task<bool> CreateGenreAsync(string genreName);
         Task<IReadOnlyList<Genre>> GetAllGenresAsync();
     }
 }

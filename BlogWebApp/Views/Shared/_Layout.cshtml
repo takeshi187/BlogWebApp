@@ -10,51 +10,77 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BlogWebApp</a>
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container" style="max-width: 1100px; padding: 0 15px;">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="collapse navbar-collapse">
+                    <ul class="navbar-nav me-auto mb-2 mb-sm-0">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Обо мне</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Обо мне</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Blog" asp-action="Index">Блог</a>
+                            <a class="nav-link" asp-controller="Blog" asp-action="Index">Блог</a>
                         </li>
-                        <li class="nav-item">
-                            @if(User.Identity.IsAuthenticated)
-                            {
-                                <form asp-controller="Account" asp-action="Logout" method="post">
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-danger fw-bold" asp-controller="Admin" asp-action="Index">
+                                    Админ панель
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link text-muted">
+                                    @User.Identity.Name
+                                </span>
+                            </li>
+
+                            <li class="nav-item">
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit">Выйти (@User.Identity.Name)</button>
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm ms-2">
+                                        Выйти
+                                    </button>
                                 </form>
-                            }
-                            else
-                            {
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Вход</a>
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Регистрация</a>
-                            }
-                        </li>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">
+                                    Вход
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="btn btn-primary btn-sm ms-2" asp-controller="Account" asp-action="Register">
+                                    Регистрация
+                                </a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div class="container" style="max-width: 1100px; padding: 0 15px;">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
-
     <footer class="border-top footer text-muted">
-        <div class="container">
+        <div class="container" style="max-width: 1100px; padding: 0 15px;">
             &copy; 2025 - BlogWebApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

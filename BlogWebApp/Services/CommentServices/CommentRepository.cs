@@ -39,5 +39,11 @@ namespace BlogWebApp.Services.CommentServices
             _db.Comments.RemoveRange(comments);
             await _db.SaveChangesAsync();
         }
+
+        public async Task DeleteAsync(Comment comment)
+        {
+            _db.Comments.Remove(comment);
+            await _db.SaveChangesAsync();
+        }
     }
 }

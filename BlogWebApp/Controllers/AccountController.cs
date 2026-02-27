@@ -20,8 +20,7 @@ namespace BlogWebApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(
-            RegisterViewModel registerViewModel)
+        public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
         {
             if (ModelState.IsValid)
             {
@@ -55,6 +54,7 @@ namespace BlogWebApp.Controllers
                             "Пароль должен содержать хотя бы одну цифру (0–9).",
                         _ => error.Description
                     };
+
                     ModelState.AddModelError(string.Empty, errorMessage);
                 }
             }
@@ -94,9 +94,6 @@ namespace BlogWebApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult AccessDenied()
-        {
-            return View();
-        }
+        public IActionResult AccessDenied() => View();      
     }
 }
